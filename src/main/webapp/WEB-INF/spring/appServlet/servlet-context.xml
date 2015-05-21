@@ -45,6 +45,8 @@
 		<beans:property name="prefix" value="/WEB-INF/views/" />
 		<beans:property name="suffix" value=".jsp" />
 	</beans:bean>
+	
+	<beans:bean id="rand" class="java.util.Random" />
 
 	<context:component-scan base-package="com.dak.duty" />
 

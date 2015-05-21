@@ -15,6 +15,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -31,6 +32,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Getter
 @Setter
+@EqualsAndHashCode
 public class Person  implements Serializable {
    private static final long serialVersionUID = 1L;
 
@@ -67,6 +69,14 @@ public class Person  implements Serializable {
       
       pd.setPerson(this);
       duties.add(pd);
+   }
+   
+   @Transient
+   public void addDutyAndPreference(final Duty d, final Integer preference){
+      PersonDuty pd = new PersonDuty();
+      pd.setDuty(d);
+      pd.setPreference(preference);
+      this.addPersonDuty(pd);
    }
    
 }

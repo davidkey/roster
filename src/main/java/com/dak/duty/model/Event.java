@@ -8,6 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -35,6 +37,10 @@ public class Event implements Serializable {
    
    @Temporal(TemporalType.DATE)
    private Date dateEvent;
+   
+   @ManyToOne
+   @JoinColumn(name="event_type_id", nullable=false)
+   private EventType eventType;
    
    private String name;
 
