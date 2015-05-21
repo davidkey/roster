@@ -22,6 +22,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import org.hibernate.validator.constraints.Email;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -45,7 +46,8 @@ public class Person  implements Serializable {
    @Column(nullable = false)
    private String nameLast;
    
-   @Column(nullable = false)
+   @Column(nullable = true) // can either be null OR a valid email address
+   @Email
    private String emailAddress;
    
    @Column(nullable = false)

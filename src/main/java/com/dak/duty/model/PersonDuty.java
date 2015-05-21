@@ -32,8 +32,8 @@ public class PersonDuty implements Serializable {
    private static final long serialVersionUID = 1L;
    
    @Id
-   @SequenceGenerator(name = "duty_id_seq", sequenceName = "duty_id_seq")
-   @GeneratedValue(strategy = GenerationType.AUTO, generator = "duty_id_seq")
+   @SequenceGenerator(name = "person_duty_id_seq", sequenceName = "person_duty_id_seq")
+   @GeneratedValue(strategy = GenerationType.AUTO, generator = "person_duty_id_seq")
    @Column(nullable = false)
    private long id;
    
