@@ -35,4 +35,5 @@ public class Duty implements Serializable {
    
    @Column(nullable = true)
    private String description;
+
 }

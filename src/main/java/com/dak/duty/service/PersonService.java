@@ -10,6 +10,7 @@ import java.util.Set;
 
 import lombok.NonNull;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,11 +46,11 @@ public class PersonService {
 
       final Map<Person, Integer> personPreferenceRanking = new HashMap<Person, Integer>();
       for(Person person : people){
-         if(peopleAlreadyServing != null && peopleAlreadyServing.size() > 0 && peopleAlreadyServing.contains(person)){
+         if(!CollectionUtils.isEmpty(peopleAlreadyServing) && peopleAlreadyServing.contains(person)){
             // if this person is already doing something today, make it as unlikely as possible to do something else
             personPreferenceRanking.put(person, 0);
          }
-         else if(peopleWhoServedInLastEvent != null && peopleWhoServedInLastEvent.size() > 0 && peopleWhoServedInLastEvent.contains(person)){
+         else if(!CollectionUtils.isEmpty(peopleWhoServedInLastEvent) && peopleWhoServedInLastEvent.contains(person)){
             final Person whoDidThisDutyLastTime = priorEventRoster.getDutiesAndPeople().get(duty);
             if(whoDidThisDutyLastTime != null && whoDidThisDutyLastTime.getId() == person.getId()){
                // if this person did this same thing last time, make it as unlikely as possible to do it again
@@ -86,7 +87,7 @@ public class PersonService {
          }
       }
 
-      return listOfPeopleTimesPreferenceRanking.size() > 0 ? listOfPeopleTimesPreferenceRanking.get(rand.nextInt(listOfPeopleTimesPreferenceRanking.size())) : null;
+      return CollectionUtils.isEmpty(listOfPeopleTimesPreferenceRanking) ? null : listOfPeopleTimesPreferenceRanking.get(rand.nextInt(listOfPeopleTimesPreferenceRanking.size()));
    }
 
    private Set<Person> getPeopleWhoServed(final EventRoster er){
@@ -94,9 +95,7 @@ public class PersonService {
 
       if(er != null){
          for(Person p : er.getDutiesAndPeople().values()){
-            if(p != null){
-               people.add(p);
-            }
+            CollectionUtils.addIgnoreNull(people, p);
          }
       }
 

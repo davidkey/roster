@@ -24,4 +24,5 @@ public class EventRoster {
          dutiesAndPeople.put(d, null);
       }
    }
+   
 }
