@@ -44,6 +44,12 @@ public class TestController {
 
    @Autowired
    EventService eventService;
+   
+   @RequestMapping("/eventRepository/{eventTypeId}")
+   final @ResponseBody List<Event> tryEventRepos(@PathVariable Long eventTypeId){
+      final EventType et = eventTypeRepos.findOne(eventTypeId);
+      return eventRepos.findMostRecentEventsByEventType(et);
+   }
 
    @RequestMapping("/eventService")
    final @ResponseBody EventNode eventService(){
