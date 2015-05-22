@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
@@ -43,11 +44,34 @@ public class PersonDuty implements Serializable {
    private Person person;
    
    @Column(nullable = false)
-   @Min(0)
+   @Min(-1)
    @Max(10)
-   private Integer preference = 0;
+   private Integer preference = -1; // -1 means NEVER pick me ... EVER!
+   
+   @Column(nullable = false)
+   @Min(-1)
+   @Max(10)
+   private Integer adjustedPreference = null;
 
    @ManyToOne
    @JoinColumn(name="duty_id", nullable=false)
    private Duty duty;
+   
+   
+   @Transient
+   public int getWeightedPreference(){
+      return adjustedPreference == null ? preference : adjustedPreference;
+   }
+   
+   @Transient
+   public void incrementWeightedPreferenceIfNeeded(){
+      if(adjustedPreference < preference){
+         adjustedPreference++;
+      }
+   }
+   
+   public void setPreference(final Integer preference){
+      this.preference = preference;
+      setAdjustedPreference(preference);
+   }
 }

@@ -31,17 +31,12 @@ public class PersonService {
    Random rand;
 
    public Person getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster){
-      return getPersonForDuty(duty, currentEventRoster, null);
-   }
-
-   public Person getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster, final EventRoster priorEventRoster){
       final List<Person> people = personRepos.findByDuties_Duty(duty);//personRepos.findAll();
 
       if(people == null || people.size() == 0){
          return null;
       }
 
-      final Set<Person> peopleWhoServedInLastEvent = getPeopleWhoServed(priorEventRoster);
       final Set<Person> peopleAlreadyServing = getPeopleWhoServed(currentEventRoster);
 
       final Map<Person, Integer> personPreferenceRanking = new HashMap<Person, Integer>();
@@ -49,16 +44,6 @@ public class PersonService {
          if(!CollectionUtils.isEmpty(peopleAlreadyServing) && peopleAlreadyServing.contains(person)){
             // if this person is already doing something today, make it as unlikely as possible to do something else
             personPreferenceRanking.put(person, 0);
-         }
-         else if(!CollectionUtils.isEmpty(peopleWhoServedInLastEvent) && peopleWhoServedInLastEvent.contains(person)){
-            final Person whoDidThisDutyLastTime = priorEventRoster.getDutiesAndPeople().get(duty);
-            if(whoDidThisDutyLastTime != null && whoDidThisDutyLastTime.getId() == person.getId()){
-               // if this person did this same thing last time, make it as unlikely as possible to do it again
-               personPreferenceRanking.put(person, 0);
-            } else {
-               // if this person did *something* last time (not this exact duty), make them half as likely to have to do *anythin)g* this time
-               personPreferenceRanking.put(person, (int)Math.ceil(getDutyPreference(person, duty) / 2));
-            }
          } else {
             personPreferenceRanking.put(person, getDutyPreference(person, duty));
          }
@@ -106,7 +91,7 @@ public class PersonService {
       final Set<PersonDuty> personDuties = p.getDuties();
       for(PersonDuty pd : personDuties){
          if(pd.getDuty().getId() == d.getId()){
-            return pd.getPreference();
+            return pd.getWeightedPreference();
 
          }
       }
