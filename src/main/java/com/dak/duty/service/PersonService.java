@@ -79,11 +79,11 @@ public class PersonService {
       Set<Person> people = new HashSet<Person>();
 
       if(er != null){
-         for(Person p : er.getDutiesAndPeople().values()){
-            CollectionUtils.addIgnoreNull(people, p);
+         for(int i = 0; i < er.getDutiesAndPeople().size(); i++){
+            CollectionUtils.addIgnoreNull(people, er.getDutiesAndPeople().get(i).getValue());
          }
       }
-
+      
       return people;
    }
 

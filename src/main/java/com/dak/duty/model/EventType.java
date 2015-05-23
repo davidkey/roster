@@ -1,11 +1,12 @@
 package com.dak.duty.model;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -20,6 +21,8 @@ import lombok.Setter;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import com.dak.duty.model.enums.EventTypeInterval;
 
 @Entity
 @Table(name = "event_type")
@@ -42,12 +45,16 @@ public class EventType implements Serializable {
    private String description;
    
    @ManyToMany(fetch=FetchType.EAGER)
-   private Set<Duty> duties;
+   private List<Duty> duties;
+   
+   @Enumerated(EnumType.STRING)
+   @Column(nullable = false)
+   private EventTypeInterval interval;
    
    @Transient
    public void addDuty(final Duty d){
       if(duties == null){
-         duties = new HashSet<Duty>();
+         duties = new ArrayList<Duty>();
       }
       
       duties.add(d);

@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -54,11 +55,11 @@ public class TestController {
    @RequestMapping("/eventService")
    final @ResponseBody EventNode eventService(){
       Event event = eventRepos.findOne(1L);
-      Map<Duty, Person> dutiesAndPeople = eventService.getRosterForEvent(event).getDutiesAndPeople();
+      List<Entry<Duty, Person>> dutiesAndPeople = eventService.getRosterForEvent(event).getDutiesAndPeople();
 
       List<DutyPersonNode> nodes = new ArrayList<DutyPersonNode>(dutiesAndPeople.size());
 
-      for (Map.Entry<Duty, Person> entry : dutiesAndPeople.entrySet()) {
+      for (Map.Entry<Duty, Person> entry : dutiesAndPeople) {
          Duty key = entry.getKey();
          Person value = entry.getValue();
          nodes.add(new DutyPersonNode(key, value));

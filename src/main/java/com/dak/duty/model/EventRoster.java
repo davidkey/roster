@@ -1,8 +1,7 @@
 package com.dak.duty.model;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import lombok.Getter;
 
@@ -12,17 +11,20 @@ public class EventRoster {
    final private Event event;
    
    @Getter
-   private Map<Duty, Person> dutiesAndPeople;
+   private List<Map.Entry<Duty, Person>> dutiesAndPeople;
    
    public EventRoster(final Event event){
       this.event = event; 
       
-      final Set<Duty> dutiesForEvent = event.getEventType().getDuties();   
-      dutiesAndPeople = new HashMap<Duty, Person>();
+      final List<Duty> dutiesForEvent = event.getEventType().getDuties();   
+      dutiesAndPeople = new java.util.ArrayList<>();
    
       for(Duty d : dutiesForEvent){
-         dutiesAndPeople.put(d, null);
+         java.util.Map.Entry<Duty, Person> pair1 = new java.util.AbstractMap.SimpleEntry<>(d, null);
+         dutiesAndPeople.add(pair1);
       }
    }
+   
+   
    
 }

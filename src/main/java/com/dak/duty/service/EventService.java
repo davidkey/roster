@@ -25,28 +25,21 @@ public class EventService {
 
    @Autowired
    PersonRepository personRepos;
-   
+
    @Autowired 
    PersonService personService;
-   
-   public EventRoster getRosterForEvent(final Event event){
-      
-      // populate event roster
-      final EventRoster eventRoster = new EventRoster(event);
-      for(Duty d : event.getEventType().getDuties()){
-         Person personForDuty = personService.getPersonForDuty(d, eventRoster);
-         eventRoster.getDutiesAndPeople().put(d, personForDuty);
-      }
-      
-      // create list of people with duties today
+
+   public void updatePreferenceRankingsBasedOnRoster(final EventRoster eventRoster){
+      // create set of people with duties today
       final Set<Person> peopleWithDuties = new HashSet<Person>();
-      for(Person p : eventRoster.getDutiesAndPeople().values()){
-         CollectionUtils.addIgnoreNull(peopleWithDuties, p);
+      for(int i = 0; i < eventRoster.getDutiesAndPeople().size(); i++){
+         CollectionUtils.addIgnoreNull(peopleWithDuties, eventRoster.getDutiesAndPeople().get(i).getValue());
       }
       
+
       // make them less likely to have to do anything next time (reduce their ranking) -- //TODO: adjust reduction amount? maybe /2 ?
       for(Person p : peopleWithDuties){
-         
+
          Set<PersonDuty> personDuties = p.getDuties();
          for(PersonDuty pd : personDuties){
             // did this person do this duty today?
@@ -59,9 +52,9 @@ public class EventService {
             }
          }
       }
-      
+
       personRepos.save(peopleWithDuties);
-      
+
       // increment everyone else's adjusted preference by 1 
       List<Person> peopleNotServing = null;
       if(CollectionUtils.isEmpty(peopleWithDuties)){
@@ -69,7 +62,7 @@ public class EventService {
       } else {
          peopleNotServing = personRepos.findByIdNotIn(getIds(peopleWithDuties));
       }
-      
+
       if(!CollectionUtils.isEmpty(peopleNotServing)){
          for(Person p : peopleNotServing){
             Set<PersonDuty> personDuties = p.getDuties();
@@ -78,32 +71,46 @@ public class EventService {
             }
          }
       }
-      
+
       personRepos.save(peopleNotServing);
-      
+   }
+
+   public EventRoster getRosterForEvent(final Event event){
+
+      // populate event roster
+      final EventRoster eventRoster = new EventRoster(event);
+      for(int i = 0; i < eventRoster.getDutiesAndPeople().size(); i++){
+         Person personForDuty = personService.getPersonForDuty(eventRoster.getDutiesAndPeople().get(i).getKey(), eventRoster);
+         eventRoster.getDutiesAndPeople().get(i).setValue(personForDuty);
+      }
+
+      //updatePreferenceRankingsBasedOnRoster(eventRoster); // <- don't forget to call this from controller once user has "approved" event roster
+
       return eventRoster;
    }
-   
+
    //FIXME: kludge until I can figure out how I borked equals / hashcode -- should be able to [a.equals(b)] but have to use [a.getId() == b.getId()]
    private static boolean personDidThisDuty(final Person person, final Duty duty, final EventRoster eventRoster){
-      for(Duty d : eventRoster.getDutiesAndPeople().keySet()){
+
+      for(int i = 0; i < eventRoster.getDutiesAndPeople().size(); i++){
+         final Duty d = eventRoster.getDutiesAndPeople().get(i).getKey();
          if(d != null && d.getId() == duty.getId()){
-            Person dutyDoer = eventRoster.getDutiesAndPeople().get(d);
+            final Person dutyDoer = eventRoster.getDutiesAndPeople().get(i).getValue();
             return dutyDoer != null && dutyDoer.getId() == person.getId();
          }
       }
-         
+
       return false;
    }
-   
+
    private static Set<Long> getIds(@NonNull Set<Person> people){
       Set<Long> ids = new HashSet<Long>(people.size());
-      
+
       for(Person p : people){
          ids.add(p.getId());
       }
-      
+
       return ids;
-      
+
    }
 }
