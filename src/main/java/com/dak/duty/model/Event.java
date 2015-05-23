@@ -21,6 +21,8 @@ import lombok.Setter;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Entity
 @Table(name = "event")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -36,6 +38,8 @@ public class Event implements Serializable {
    private long id;
    
    @Temporal(TemporalType.DATE)
+   @Column(nullable = false)
+   @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
    private Date dateEvent;
    
    @ManyToOne

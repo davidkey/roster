@@ -1,7 +1,12 @@
 package com.dak.duty.service;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.text.SimpleDateFormat;
 
 import javax.transaction.Transactional;
 
@@ -13,29 +18,100 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dak.duty.model.Duty;
+import com.dak.duty.model.Event;
 import com.dak.duty.model.EventType;
+import com.dak.duty.model.Person;
 import com.dak.duty.model.enums.EventTypeInterval;
+import com.dak.duty.repository.DutyRepository;
+import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.EventTypeRepository;
+import com.dak.duty.repository.PersonRepository;
+
+import org.apache.commons.math3.random.RandomDataGenerator;
+import org.fluttercode.datafactory.impl.DataFactory;
 
 @Service
 @Transactional
 public class InitialisationService {
 
    private static final Logger logger = LoggerFactory.getLogger(InitialisationService.class);
+   private static final DateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
    
    @Autowired
    EventTypeRepository eventTypeRepos;
    
+   @Autowired
+   DutyRepository dutyRepos;
+   
+   @Autowired
+   PersonRepository personRepos;
+   
+   @Autowired
+   EventRepository eventRepos;
    
    public void populateDefaultData(){
       final List<Duty> defaultDuties = getDefaultDuties();
+      dutyRepos.save(defaultDuties);
+      
       final List<EventType> defaultEventTypes = getDefaultEventTypes(defaultDuties);
+      eventTypeRepos.save(defaultEventTypes);
       
+      final List<Person> defaultPeople = getDefaultPeople(defaultDuties); 
+      personRepos.save(defaultPeople);
       
-      //TODO: persist defaults
+      final List<Event> defaultEvents = getDefaultEvents(defaultEventTypes);
+      eventRepos.save(defaultEvents);
+      
    }
    
-   public List<Duty> getDefaultDuties(){
+   protected List<Event> getDefaultEvents(final List<EventType> eventTypes){
+      final List<Event> events = new ArrayList<Event>(eventTypes.size());
+      
+      for(EventType et : eventTypes){
+         final Event e = new Event();
+        
+         e.setName(et.getName());
+         try{
+            if(e.getName().contains("Sunday")){
+               e.setDateEvent(format.parse("05/24/2015")); // sunday
+            } else {
+               e.setDateEvent(format.parse("05/27/2015")); // wednesday
+            }
+         } catch (ParseException pe){ }
+         e.setEventType(et);
+        
+         events.add(e);
+      }
+      
+      return events;
+   }
+   
+   protected List<Person> getDefaultPeople(final List<Duty> duties){
+      final List<Person> people = new ArrayList<Person>();
+      DataFactory df = new DataFactory();
+      RandomDataGenerator randomData = new RandomDataGenerator();
+      
+      final List<Duty> scrambledDuties = new ArrayList<Duty>(duties);
+      for(int i = 0; i < 100; i++){
+         Person p = new Person();
+         p.setActive(true);
+         p.setEmailAddress(df.getEmailAddress());
+         p.setNameFirst(df.getFirstName());
+         p.setNameLast(df.getLastName());
+         
+         Collections.shuffle(scrambledDuties);
+         final int numDuties = randomData.nextInt(2, scrambledDuties.size()-1);
+         for(int x = 0; x < numDuties; x++){
+            p.addDutyAndPreference(duties.get(x), randomData.nextInt(1, 9));
+         }
+         
+         people.add(p);
+      }
+      
+      return people;
+   }
+   
+   protected List<Duty> getDefaultDuties(){
       final List<Duty> duties = new ArrayList<Duty>();
       
       Duty duty = null;
@@ -83,7 +159,7 @@ public class InitialisationService {
       return duties;
    }
    
-   public List<EventType> getDefaultEventTypes(@NonNull final List<Duty> duties){
+   protected List<EventType> getDefaultEventTypes(@NonNull final List<Duty> duties){
       final List<Duty> sundayAmDuties = new ArrayList<Duty>();
       final List<Duty> sundayPmDuties  = new ArrayList<Duty>();
       final List<Duty> wednesdayDuties = new ArrayList<Duty>();
