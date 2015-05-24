@@ -44,7 +44,7 @@ public class AdminController {
       logger.debug("getAdminHome()");
       
       final Page<Event> events = eventRepos.findAllByOrderByDateEventDescIdDesc(new PageRequest(0, 20));
-      logger.info("events found: {}", events.getContent().size());
+      logger.debug("events found: {}", events.getContent().size());
       
       model.addAttribute("events", events.getContent());
       return "admin/admin";
@@ -66,7 +66,7 @@ public class AdminController {
       logger.debug("getRostersAndEvents()");
       
       final List<Event> events = eventRepos.findAll();
-      logger.info("events found: {}", events.size());
+      logger.debug("events found: {}", events.size());
       
       model.addAttribute("events", events);
       return "admin/rosters";
@@ -77,7 +77,7 @@ public class AdminController {
       logger.debug("getEventTypes()");
       
       final List<EventType> eventTypes = eventTypeRepos.findAll();
-      logger.info("event types found: {}", eventTypes.size());
+      logger.debug("event types found: {}", eventTypes.size());
       
       model.addAttribute("eventTypes", eventTypes);
       return "admin/eventScheduling";
@@ -88,7 +88,7 @@ public class AdminController {
       logger.debug("getDuties()");
       
       final List<Duty> duties = dutyRepos.findAll();
-      logger.info("duties found: {}", duties.size());
+      logger.debug("duties found: {}", duties.size());
       
       model.addAttribute("duties", duties);
       return "admin/dutyManagement";
