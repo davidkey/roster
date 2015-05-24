@@ -1,4 +1,6 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -102,32 +104,22 @@
                   <th>#</th>
                   <th>Date</th>
                   <th>Name</th>
+                  <th>Generated?</th>
                   <th>Complete?</th>
                   <th>Approved?</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>3</td>
-                  <td>05/27/2015</td>
-                  <td>Wednesday</td>
-                  <td>Y</td>
-                  <td>N</td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>05/24/2015</td>
-                  <td>Sunday PM</td>
-                  <td>Y</td>
-                  <td>Y</td>
-                </tr>
-                <tr>
-                  <td>1</td>
-                  <td>05/24/2015</td>
-                  <td>Sunday AM</td>
-                  <td>Y</td>
-                  <td>Y</td>
-                </tr>
+              	<c:forEach var="event" items="${events}">
+					<tr>
+						<td>${event.id}</td>
+						<td>${event.dateEvent}</td>
+						<td>${event.name}</td>
+						<td>${event.rosterGenerated}</td>
+						<td>${event.rosterFullyPopulated}</td>
+						<td>${event.approved}</td>
+					</tr>
+				</c:forEach>
               </tbody>
             </table>
           </div>

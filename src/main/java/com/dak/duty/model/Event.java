@@ -71,6 +71,11 @@ public class Event implements Serializable {
    }
    
    @Transient
+   public boolean isRosterGenerated(){
+      return roster != null && roster.size() > 0;
+   }
+   
+   @Transient
    public void addEventRosterItem(final EventRosterItem eri){
       if(eri == null){
          return;
