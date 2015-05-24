@@ -5,33 +5,31 @@
 <html lang="en">
 <head>
 <jsp:include page="../shared/header.jsp" />
-<title>People</title>
+<title>Event Scheduling</title>
 </head>
 
 <body>
 	<jsp:include page="../shared/nav.jsp" />
 
 	<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-		<h1 class="page-header">People</h1>
+		<h1 class="page-header">Event Scheduling</h1>
 		<div class="table-responsive">
-			<table class="table table-striped" id="personTable">
+			<table class="table table-striped" id="eventTypeTable">
 				<thead>
 					<tr>
 						<th>#</th>
-						<th>Last Name</th>
-						<th>First Name</th>
-						<th>Email</th>
-						<th>Active?</th>
+						<th>Name</th>
+						<th>Description</th>
+						<th>Interval</th>
 					</tr>
 				</thead>
 				<tbody>
-					<c:forEach var="person" items="${people}">
+					<c:forEach var="eventType" items="${eventTypes}">
 						<tr>
-							<td>${person.id}</td>
-							<td><c:out value="${person.nameLast}"/></td>
-							<td><c:out value="${person.nameFirst}"/></td>
-							<td><c:out value="${person.emailAddress}"/></td>
-							<td>${person.active}</td>
+							<td>${eventType.id}</td>
+							<td><c:out value="${eventType.name}"/></td>
+							<td><c:out value="${eventType.description}"/></td>
+							<td>${eventType.interval}</td>
 						</tr>
 					</c:forEach>
 				</tbody>
@@ -42,7 +40,7 @@
 	<jsp:include page="../shared/footer.jsp" />
 	<script>
 		$(document).ready(function() {
-		    $('#personTable').DataTable();
+		    $('#eventTypeTable').DataTable();
 		} );
 	</script>
 </body>

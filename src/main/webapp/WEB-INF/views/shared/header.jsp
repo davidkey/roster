@@ -6,6 +6,7 @@
     <!-- Bootstrap -->
     <link href="<c:url value="/resources/bootstrap/css/bootstrap.min.css"/>" rel="stylesheet">
     <link href="<c:url value="/resources/css/dashboard.css"/>" rel="stylesheet">
+    
     <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.css">
   
 

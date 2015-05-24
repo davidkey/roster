@@ -31,7 +31,7 @@ public class PersonService {
    Random rand;
 
    public Person getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster){
-      final List<Person> people = personRepos.findByDuties_Duty(duty);//personRepos.findAll();
+      final List<Person> people = personRepos.findByActiveTrueAndDuties_Duty(duty);//personRepos.findAll();
 
       if(people == null || people.size() == 0){
          return null;

@@ -60,7 +60,7 @@ public class EventService {
       if(CollectionUtils.isEmpty(peopleWithDuties)){
          peopleNotServing = personRepos.findAll();
       } else {
-         peopleNotServing = personRepos.findByIdNotIn(getIds(peopleWithDuties));
+         peopleNotServing = personRepos.findByActiveTrueAndIdNotIn(getIds(peopleWithDuties));
       }
 
       if(!CollectionUtils.isEmpty(peopleNotServing)){
