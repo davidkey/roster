@@ -4,16 +4,16 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <jsp:include page="shared/header.jsp" />
+    <jsp:include page="../shared/header.jsp" />
     <title>REPLACE_ME</title>
   </head>
   
   <body>
-    <jsp:include page="shared/nav.jsp" />
+    <jsp:include page="../shared/nav.jsp" />
         
     <!-- content -->
         
-     <jsp:include page="shared/footer.jsp" />
+     <jsp:include page="../shared/footer.jsp" />
   </body>
   
 </html>
