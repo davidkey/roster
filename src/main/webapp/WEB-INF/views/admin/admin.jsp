@@ -103,6 +103,7 @@
                   <th>Date</th>
                   <th>Name</th>
                   <th>Complete?</th>
+                  <th>Approved?</th>
                 </tr>
               </thead>
               <tbody>
@@ -111,17 +112,20 @@
                   <td>05/27/2015</td>
                   <td>Wednesday</td>
                   <td>Y</td>
+                  <td>N</td>
                 </tr>
                 <tr>
                   <td>2</td>
                   <td>05/24/2015</td>
                   <td>Sunday PM</td>
                   <td>Y</td>
+                  <td>Y</td>
                 </tr>
                 <tr>
                   <td>1</td>
                   <td>05/24/2015</td>
                   <td>Sunday AM</td>
+                  <td>Y</td>
                   <td>Y</td>
                 </tr>
               </tbody>

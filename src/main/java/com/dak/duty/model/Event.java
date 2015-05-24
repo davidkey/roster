@@ -58,6 +58,8 @@ public class Event implements Serializable {
    
    private String name;
    
+   private boolean approved = false;
+   
    @OneToMany(mappedBy="event", orphanRemoval=true, fetch=FetchType.EAGER)
    @JsonManagedReference
    @Cascade({CascadeType.ALL})
