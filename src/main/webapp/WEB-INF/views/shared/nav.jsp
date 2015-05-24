@@ -21,15 +21,16 @@
 
     <div class="container-fluid">
       <div class="row">
-        <div class="col-sm-3 col-md-2 sidebar">
+        <div id="navsidebar" class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
-            <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
-            <li><a href="#">Rosters</a></li>
-            <li><a href="#">People</a></li>
-            <li><a href="#">Event Scheduling</a></li>
-            <li><a href="#">Duty Management</a></li>
+            <li class="active" id="navAdmin"><a href="<c:url value="/admin/"/>">Overview <span class="sr-only">(current)</span></a></li>
+            <li id="navRoster"><a href="#">Rosters</a></li>
+            <li id="navPeople"><a href="<c:url value="/admin/people/"/>">People</a></li>
+            <li id="navEventScheduling"><a href="#">Event Scheduling</a></li>
+            <li id="navDutyManagement"><a href="#">Duty Management</a></li>
           </ul>
           <ul class="nav nav-sidebar">
-            <li><a href="">Settings</a></li>
+            <li id="navSettings"><a href="">Settings</a></li>
+            <li id="navAbout"><a href="">About</a></li>
           </ul>
         </div>

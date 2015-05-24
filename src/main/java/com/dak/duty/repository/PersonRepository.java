@@ -13,4 +13,5 @@ import com.dak.duty.model.Person;
 public interface PersonRepository extends JpaRepository<Person, Long>{
    public List<Person> findByDuties_Duty(Duty duty);
    public List<Person> findByIdNotIn(Collection<Long> personIds);
+   public List<Person> findAllByOrderByNameLastAscNameFirstAsc();
 }

@@ -1,5 +1,7 @@
 package com.dak.duty.controller;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.dak.duty.model.Event;
+import com.dak.duty.model.Person;
 import com.dak.duty.repository.EventRepository;
+import com.dak.duty.repository.PersonRepository;
 
 @Controller
 @RequestMapping("/admin")
@@ -22,6 +26,9 @@ public class AdminController {
    @Autowired
    EventRepository eventRepos;
    
+   @Autowired
+   PersonRepository personRepos;
+   
    @RequestMapping(value = "/", method = RequestMethod.GET)
    public String getAdminHome(Model model){
       logger.debug("getAdminHome()");
@@ -31,5 +38,16 @@ public class AdminController {
       
       model.addAttribute("events", events.getContent());
       return "admin/admin";
+   }
+   
+   @RequestMapping(value = "/people", method = RequestMethod.GET)
+   public String getPeople(Model model){
+      logger.debug("getPeople()");
+      
+      final List<Person> people = personRepos.findAllByOrderByNameLastAscNameFirstAsc();
+      logger.debug("people found: {}", people.size());
+      
+      model.addAttribute("people", people);
+      return "admin/people";
    }
 }
