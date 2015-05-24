@@ -12,7 +12,8 @@
 		<org.springframework-version>4.1.4.RELEASE</org.springframework-version>
 		<org.aspectj-version>1.6.10</org.aspectj-version>
 		<org.slf4j-version>1.6.6</org.slf4j-version>
-		<hibernate.version>4.3.5.Final</hibernate.version>
+		<hibernate.version>4.3.10.Final</hibernate.version>
+		<!-- <hibernate.version>4.3.5.Final</hibernate.version>-->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<display_version>v${project.version} - build ${BUILD_NUMBER} - git ${GIT_COMMIT}</display_version>
 	</properties>

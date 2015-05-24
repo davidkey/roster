@@ -37,7 +37,7 @@ public class EventService {
       }
       
 
-      // make them less likely to have to do anything next time (reduce their ranking) -- //TODO: adjust reduction amount? maybe /2 ?
+      // make them less likely to have to do anything next time (reduce their ranking)
       for(Person p : peopleWithDuties){
 
          Set<PersonDuty> personDuties = p.getDuties();

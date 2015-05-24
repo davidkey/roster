@@ -1,9 +1,6 @@
 package com.dak.duty.controller;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.Event;
+import com.dak.duty.model.EventRoster;
 import com.dak.duty.model.EventType;
 import com.dak.duty.model.Person;
 import com.dak.duty.repository.DutyRepository;
@@ -51,19 +49,14 @@ public class TestController {
    }
 
    @RequestMapping("/eventService")
-   final @ResponseBody EventNode eventService(){
+   final @ResponseBody Event eventService(){
       Event event = eventRepos.findOne(1L);
-      List<Entry<Duty, Person>> dutiesAndPeople = eventService.getRosterForEvent(event).getDutiesAndPeople();
+      EventRoster er = eventService.getRosterForEvent(event);
 
-      List<DutyPersonNode> nodes = new ArrayList<DutyPersonNode>(dutiesAndPeople.size());
+      event.setEventRoster(er);
+      eventRepos.saveAndFlush(event); // have to flush after clearing event roster items (setEventRoster())
 
-      for (Map.Entry<Duty, Person> entry : dutiesAndPeople) {
-         Duty key = entry.getKey();
-         Person value = entry.getValue();
-         nodes.add(new DutyPersonNode(key, value));
-      }
-
-      return new EventNode(event, nodes.toArray());
+      return event;
    }
 
    @RequestMapping("/personService/{dutyId}")

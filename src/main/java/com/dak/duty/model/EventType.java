@@ -3,6 +3,7 @@ package com.dak.duty.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -21,6 +22,8 @@ import lombok.Setter;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import com.dak.duty.model.enums.EventTypeInterval;
 
@@ -45,11 +48,20 @@ public class EventType implements Serializable {
    private String description;
    
    @ManyToMany(fetch=FetchType.EAGER)
+   @Fetch(FetchMode.SELECT) // to prevent dupes... super annoying dupes - see https://stackoverflow.com/questions/17566304/multiple-fetches-with-eager-type-in-hibernate-with-jpa
    private List<Duty> duties;
    
    @Enumerated(EnumType.STRING)
    @Column(nullable = false)
    private EventTypeInterval interval;
+   
+   public void setDuties(List<Duty> duties){
+      this.duties = duties;
+   }
+   
+   public List<Duty> getDuties(){
+      return duties;
+   }
    
    @Transient
    public void addDuty(final Duty d){
