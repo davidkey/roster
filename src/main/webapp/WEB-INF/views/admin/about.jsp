@@ -19,7 +19,7 @@
 		<p>
 			<small>${display_version}</small>
 		</p>
-		
+
 	</div>
 
 	<jsp:include page="../shared/footer.jsp" />
