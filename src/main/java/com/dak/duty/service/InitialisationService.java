@@ -189,7 +189,6 @@ public class InitialisationService {
                wednesdayDuties.add(d);
                break;               
             default:
-               // possible problem - we've got a default duty without an event
                logger.warn("possible problem - we've got a default duty ({}) without an associated event.", d);
                break;
          }
