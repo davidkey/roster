@@ -184,6 +184,7 @@ public class InitialisationService {
                sundayAmDuties.add(d);
                sundayAmDuties.add(d);
                sundayAmDuties.add(d);
+               sundayPmDuties.add(d);
                break;
             case "Invitation":
                wednesdayDuties.add(d);

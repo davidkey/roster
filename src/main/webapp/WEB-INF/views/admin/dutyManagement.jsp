@@ -38,7 +38,9 @@
 	<jsp:include page="../shared/footer.jsp" />
 	<script>
 		$(document).ready(function() {
-		    $('#dutyTable').DataTable();
+		    $('#dutyTable').DataTable({
+		    	"order": [[0, "desc"]]
+		    });
 		} );
 	</script>
 </body>

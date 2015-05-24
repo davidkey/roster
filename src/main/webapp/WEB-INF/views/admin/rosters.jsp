@@ -44,7 +44,9 @@
 	<jsp:include page="../shared/footer.jsp" />
 	<script>
 		$(document).ready(function() {
-		    $('#eventTable').DataTable();
+		    $('#eventTable').DataTable({
+		    	"order": [[1, "desc"]]
+		    });
 		} );
 	</script>
 </body>

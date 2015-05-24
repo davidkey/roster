@@ -16,7 +16,7 @@
     		var pathname = window.location.pathname; 
     		var pieces = pathname.split('/');
     		var section = pieces[2];
-    		if(section === 'admin'){
+    		if(section === 'admin' && pieces[3]){
     			section  = pieces[3];
     		}
     		var activePage = 'navAdmin';

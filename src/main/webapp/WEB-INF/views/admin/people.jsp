@@ -42,7 +42,9 @@
 	<jsp:include page="../shared/footer.jsp" />
 	<script>
 		$(document).ready(function() {
-		    $('#personTable').DataTable();
+		    $('#personTable').DataTable({
+		    	"order": [[1, "asc"]]
+		    });
 		} );
 	</script>
 </body>
