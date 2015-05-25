@@ -38,9 +38,9 @@
 							<td>${event.id}</td>
 							<td>${event.dateEvent}</td>
 							<td><c:out value="${event.name}" /></td>
-							<td>${event.rosterGenerated}</td>
-							<td>${event.rosterFullyPopulated}</td>
-							<td>${event.approved}</td>
+							<td>${event.rosterGenerated ? 'Yes' : 'No'}</td>
+							<td>${event.rosterFullyPopulated ? 'Yes' : 'No'}</td>
+							<td>${event.approved ? 'Yes' : 'No'}</td>
 						</tr>
 					</c:forEach>
 				</tbody>
@@ -52,7 +52,8 @@
 	<script>
 		$(document).ready(function() {
 		    $('#eventTable').DataTable({
-		    	"order": [[1, "desc"]]
+		    	"order": [[1, "desc"]],
+		    	stateSave: true
 		    });
 		} );
 	</script>

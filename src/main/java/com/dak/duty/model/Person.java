@@ -1,6 +1,7 @@
 package com.dak.duty.model;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,8 +12,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.PreUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import lombok.EqualsAndHashCode;
@@ -26,6 +30,7 @@ import org.hibernate.annotations.CascadeType;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
@@ -57,12 +62,22 @@ public class Person  implements Serializable {
 
    @Column(nullable = false)
    private Boolean active = true;
+   
+   @Column(nullable = false)
+   @Temporal(TemporalType.TIMESTAMP)
+   @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd hh:mm aaa")
+   private Date lastUpdated = new Date();
 
    @OneToMany(mappedBy="person", fetch=FetchType.EAGER)
    @JsonManagedReference
    @Cascade({CascadeType.ALL})
    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
    private Set<PersonDuty> duties;
+   
+   @PreUpdate
+   protected void onUpdate() {
+      lastUpdated = new Date();
+   }
    
    @Transient
    public int getPreferenceForDuty(Duty d){
@@ -95,6 +110,7 @@ public class Person  implements Serializable {
       PersonDuty pd = new PersonDuty();
       pd.setDuty(duty);
       pd.setPreference(preference);
+      setLastUpdated(new Date());
       this.addPersonDuty(pd);
    }
 
@@ -114,6 +130,7 @@ public class Person  implements Serializable {
             if(pd.getDuty() != null && pd.getDuty().getId() == duty.getId()){
                found = true;
                pd.setPreference(preference);
+               setLastUpdated(new Date());
                break;
             }
          }

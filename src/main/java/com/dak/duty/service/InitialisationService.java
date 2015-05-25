@@ -50,7 +50,23 @@ public class InitialisationService {
    @Autowired
    EventRepository eventRepos;
    
+   protected void clearAllData(){
+      eventRepos.deleteAll();
+      eventRepos.flush();
+      
+      personRepos.deleteAll();
+      personRepos.flush();
+      
+      eventTypeRepos.deleteAll();
+      eventTypeRepos.flush();
+      
+      dutyRepos.deleteAll();
+      dutyRepos.flush();
+   }
+   
    public void populateDefaultData(){
+      clearAllData();
+      
       final List<Duty> defaultDuties = getDefaultDuties();
       dutyRepos.save(defaultDuties);
       

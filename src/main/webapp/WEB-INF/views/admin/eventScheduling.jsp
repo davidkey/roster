@@ -1,6 +1,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,6 +22,7 @@
 						<th>Name</th>
 						<th>Description</th>
 						<th>Interval</th>
+						<th># Duties</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -30,6 +32,7 @@
 							<td><c:out value="${eventType.name}"/></td>
 							<td><c:out value="${eventType.description}"/></td>
 							<td>${eventType.interval} - ${eventType.intervalDetail}</td>
+							<td>${fn:length(eventType.duties)}</td> <%--  does this work if duties is empty / null? --%>
 						</tr>
 					</c:forEach>
 				</tbody>
@@ -40,7 +43,9 @@
 	<jsp:include page="../shared/footer.jsp" />
 	<script>
 		$(document).ready(function() {
-		    $('#eventTypeTable').DataTable();
+		    $('#eventTypeTable').DataTable({
+		    	stateSave: true
+		    });
 		} );
 	</script>
 </body>

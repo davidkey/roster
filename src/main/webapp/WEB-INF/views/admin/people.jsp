@@ -28,6 +28,7 @@
 						<th>First Name</th>
 						<th>Email</th>
 						<th>Active?</th>
+						<th>Updated</th>
 						<th>Edit</th>
 						<th>Manage Duties</th>
 					</tr>
@@ -39,7 +40,8 @@
 							<td><c:out value="${person.nameLast}"/></td>
 							<td><c:out value="${person.nameFirst}"/></td>
 							<td><c:out value="${person.emailAddress}"/></td>
-							<td>${person.active}</td>
+							<td>${person.active ? 'Yes' : 'No'}</td>
+							<td><fmt:formatDate value="${person.lastUpdated}" pattern="yyyy-MM-dd hh:mm aaa" /></td>
 							<td><a href="${pageContext.request.contextPath}/admin/people/${person.id}"><button type="button" class="btn btn-xs btn-primary">Edit</button></a></td>
 							<td><a href="${pageContext.request.contextPath}/admin/people/${person.id}/duties"><button type="button" class="btn btn-xs btn-info">Manage Duties</button></a></td>
 						</tr>
@@ -53,7 +55,8 @@
 	<script>
 		$(document).ready(function() {
 		    $('#personTable').DataTable({
-		    	"order": [[1, "asc"]]
+		    	"order": [[1, "asc"]],
+		    	stateSave: true
 		    });
 		} );
 	</script>
