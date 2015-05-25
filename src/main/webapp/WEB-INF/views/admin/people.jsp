@@ -12,8 +12,14 @@
 	<jsp:include page="../shared/nav.jsp" />
 
 	<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+		<jsp:include page="../shared/flashMessages.jsp" />
 		<h1 class="page-header">People</h1>
 		<div class="table-responsive">
+			<p>
+				<a href="${pageContext.request.contextPath}/admin/people/new">
+					<button type="button" class="btn btn-lg btn-success">Add New Person</button>
+				</a>
+			</p>
 			<table class="table table-striped" id="personTable">
 				<thead>
 					<tr>
@@ -22,6 +28,8 @@
 						<th>First Name</th>
 						<th>Email</th>
 						<th>Active?</th>
+						<th>Edit</th>
+						<th>Manage Duties</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -32,6 +40,8 @@
 							<td><c:out value="${person.nameFirst}"/></td>
 							<td><c:out value="${person.emailAddress}"/></td>
 							<td>${person.active}</td>
+							<td><a href="${pageContext.request.contextPath}/admin/people/${person.id}"><button type="button" class="btn btn-xs btn-primary">Edit</button></a></td>
+							<td><a href="${pageContext.request.contextPath}/admin/people/${person.id}/duties"><button type="button" class="btn btn-xs btn-info">Manage Duties</button></a></td>
 						</tr>
 					</c:forEach>
 				</tbody>

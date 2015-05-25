@@ -24,6 +24,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -41,20 +42,22 @@ public class Person  implements Serializable {
    @GeneratedValue(strategy = GenerationType.AUTO, generator = "person_id_seq")
    @Column(nullable = false)
    private long id;
-   
+
    @Column(nullable = false)
+   @NotEmpty
    private String nameFirst;
-   
+
    @Column(nullable = false)
+   @NotEmpty
    private String nameLast;
-   
+
    @Column(nullable = true) // can either be null OR a valid email address
    @Email
    private String emailAddress;
-   
+
    @Column(nullable = false)
    private Boolean active = true;
-   
+
    @OneToMany(mappedBy="person", fetch=FetchType.EAGER)
    @JsonManagedReference
    @Cascade({CascadeType.ALL})
@@ -62,21 +65,56 @@ public class Person  implements Serializable {
    private Set<PersonDuty> duties;
    
    @Transient
+   public int getPreferenceForDuty(Duty d){
+      for(PersonDuty pd : duties){
+         if(pd.getDuty() != null && pd.getDuty().getId() == d.getId()){
+            return pd.getPreference();
+         }
+      }
+      return -1;
+   }
+
+   @Transient
    public void addPersonDuty(final PersonDuty pd){
       if(duties == null){
          duties = new HashSet<PersonDuty>();
       }
-      
+
       pd.setPerson(this);
       duties.add(pd);
    }
-   
+
    @Transient
+   @Deprecated // use addOrUpdateDutyAndPreference instead
    public void addDutyAndPreference(final Duty d, final Integer preference){
       PersonDuty pd = new PersonDuty();
       pd.setDuty(d);
       pd.setPreference(preference);
       this.addPersonDuty(pd);
    }
-   
+
+   @Transient
+   public void addOrUpdateDutyAndPreference(final Duty d, final Integer preference){
+      boolean found = false;
+      
+      if(duties != null){
+         for(PersonDuty pd : duties){
+            if(pd.getDuty() != null && pd.getDuty().getId() == d.getId()){
+               found = true;
+               pd.setPreference(preference);
+               break;
+            }
+         }
+      }
+         
+      if(!found){
+         if(preference > -1){ // don't bother saving 'never pick me' preference
+            PersonDuty pd = new PersonDuty();
+            pd.setDuty(d);
+            pd.setPreference(preference);
+            this.addPersonDuty(pd);
+         }
+      }
+   }
+
 }
