@@ -22,6 +22,7 @@ import com.dak.duty.model.Event;
 import com.dak.duty.model.EventType;
 import com.dak.duty.model.Person;
 import com.dak.duty.model.enums.EventTypeInterval;
+import com.dak.duty.model.enums.IntervalWeekly;
 import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.EventTypeRepository;
@@ -200,18 +201,21 @@ public class InitialisationService {
       sundayAm.setDescription(sundayAm.getName());
       sundayAm.setDuties(sundayAmDuties);
       sundayAm.setInterval(EventTypeInterval.WEEKLY);
+      sundayAm.setIntervalDetail(IntervalWeekly.SUNDAY.toString());
       
       final EventType sundayPm = new EventType();
       sundayPm.setName("Sunday PM");
       sundayPm.setDescription(sundayPm.getName());
       sundayPm.setDuties(sundayPmDuties);
       sundayPm.setInterval(EventTypeInterval.WEEKLY);
+      sundayPm.setIntervalDetail(IntervalWeekly.SUNDAY.toString());
       
       final EventType wednesday = new EventType();
       wednesday.setName("Wednesday PM");
       wednesday.setDescription(wednesday.getName());
       wednesday.setDuties(wednesdayDuties);
       wednesday.setInterval(EventTypeInterval.WEEKLY);
+      wednesday.setIntervalDetail(IntervalWeekly.WEDNESDAY.toString());
       
       final List<EventType> eventTypes = new ArrayList<EventType>();
       eventTypes.add(sundayAm);

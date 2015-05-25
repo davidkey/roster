@@ -29,7 +29,7 @@
 							<td>${eventType.id}</td>
 							<td><c:out value="${eventType.name}"/></td>
 							<td><c:out value="${eventType.description}"/></td>
-							<td>${eventType.interval}</td>
+							<td>${eventType.interval} - ${eventType.intervalDetail}</td>
 						</tr>
 					</c:forEach>
 				</tbody>

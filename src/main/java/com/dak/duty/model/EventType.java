@@ -26,6 +26,8 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import com.dak.duty.model.enums.EventTypeInterval;
+import com.dak.duty.model.exception.IntervalValidationException;
+import com.dak.duty.model.validation.EventTypeIntervalValidation;
 
 @Entity
 @Table(name = "event_type")
@@ -55,12 +57,23 @@ public class EventType implements Serializable {
    @Column(nullable = false)
    private EventTypeInterval interval;
    
-   public void setDuties(List<Duty> duties){
-      this.duties = duties;
+   @Column(nullable = false)
+   private String intervalDetail;
+   
+   public void setInterval(final EventTypeInterval interval){
+      if(intervalDetail != null && !EventTypeIntervalValidation.validate(interval, intervalDetail)){
+         throw new IntervalValidationException("IntervalDetail '" + intervalDetail + "' invalid for type " + interval.toString());
+      }
+      
+      this.interval = interval;
    }
    
-   public List<Duty> getDuties(){
-      return duties;
+   public void setIntervalDetail(final String intervalDetail){
+      if(interval != null && !EventTypeIntervalValidation.validate(interval, intervalDetail)){
+         throw new IntervalValidationException("IntervalDetail '" + intervalDetail + "' invalid for type " + interval.toString());
+      }
+      
+      this.intervalDetail = intervalDetail;
    }
    
    @Transient

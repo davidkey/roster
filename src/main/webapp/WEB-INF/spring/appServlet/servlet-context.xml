@@ -87,7 +87,7 @@
 		<beans:property name="jpaProperties">
 			<beans:props>
 				<beans:prop key="hibernate.use_sql_comments">false</beans:prop>
-				<beans:prop key="hibernate.hbm2ddl.auto">update</beans:prop>
+				<beans:prop key="hibernate.hbm2ddl.auto">create</beans:prop>
 				<beans:prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</beans:prop>
 				<beans:prop key="hibernate.show_sql">true</beans:prop>
 				<beans:prop key="hibernate.format_sql">true</beans:prop>
