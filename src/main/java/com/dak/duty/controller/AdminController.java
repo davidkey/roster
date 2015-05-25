@@ -28,6 +28,7 @@ import com.dak.duty.model.Duty;
 import com.dak.duty.model.Event;
 import com.dak.duty.model.EventType;
 import com.dak.duty.model.Person;
+import com.dak.duty.model.enums.EventTypeInterval;
 import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.EventTypeRepository;
@@ -108,6 +109,32 @@ public class AdminController {
       model.addAttribute("eventTypes", eventTypes);
       return "admin/eventScheduling";
    }
+   
+   @RequestMapping(value = "eventScheduling", method = RequestMethod.POST)
+   public String saveEventType(@ModelAttribute @Valid EventType eventType, BindingResult result, final RedirectAttributes redirectAttributes){
+      logger.debug("saveEventType()");
+      final boolean alreadyExisted = eventType.getId() > 0;
+
+      if(result.hasErrors()){
+         //TODO: read and implement(?): https://stackoverflow.com/questions/2543797/spring-redirect-after-post-even-with-validation-errors
+         return "admin/eventType"; // is this right? url changes after post... how to fix? TODO: FIXME
+      }
+
+      eventTypeRepos.save(eventType);
+      redirectAttributes.addFlashAttribute("msg_success", alreadyExisted ? "Event Type updated!" : "Event Type added!");
+      return "redirect:/admin/eventScheduling";
+   }
+
+   
+   @RequestMapping(value = "/eventScheduling/new", method = RequestMethod.GET)
+   public String getAddEventType(Model model){
+      logger.debug("getAddEventType()");
+
+
+      model.addAttribute("eventType", new EventType());
+      model.addAttribute("eventTypeIntervals", EventTypeInterval.values());
+      return "admin/eventType";
+   }
 
    @RequestMapping(value = "/dutyManagement", method = RequestMethod.GET)
    public String getDuties(Model model){
@@ -153,7 +180,7 @@ public class AdminController {
       final boolean personAlreadyExisted = person.getId() > 0;
 
       if(result.hasErrors()){
-         return "admin/person";
+         return "admin/person"; // is this right? url changes after post... how to fix? TODO: FIXME
       }
 
       personRepos.save(person);

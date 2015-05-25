@@ -16,6 +16,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +25,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import com.dak.duty.model.enums.EventTypeInterval;
 import com.dak.duty.model.exception.IntervalValidationException;
@@ -44,6 +46,7 @@ public class EventType implements Serializable {
    private long id;
    
    @Column(nullable = false, unique = true)
+   @NotEmpty
    private String name;
    
    @Column(nullable = true)
@@ -55,6 +58,7 @@ public class EventType implements Serializable {
    
    @Enumerated(EnumType.STRING)
    @Column(nullable = false)
+   @NotNull // see https://stackoverflow.com/questions/5982741/error-no-validator-could-be-found-for-type-java-lang-integer
    private EventTypeInterval interval;
    
    @Column(nullable = true)

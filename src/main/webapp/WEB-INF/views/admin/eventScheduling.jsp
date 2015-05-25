@@ -13,8 +13,14 @@
 	<jsp:include page="../shared/nav.jsp" />
 
 	<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+		<jsp:include page="../shared/flashMessages.jsp" />
 		<h1 class="page-header">Event Scheduling</h1>
 		<div class="table-responsive">
+			<p>
+				<a href="${pageContext.request.contextPath}/admin/eventScheduling/new">
+					<button type="button" class="btn btn-lg btn-success">Add Event</button>
+				</a>
+			</p>
 			<table class="table table-striped" id="eventTypeTable">
 				<thead>
 					<tr>
@@ -23,6 +29,7 @@
 						<th>Description</th>
 						<th>Interval</th>
 						<th># Duties</th>
+						<th>Edit</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -33,6 +40,7 @@
 							<td><c:out value="${eventType.description}"/></td>
 							<td>${eventType.interval} - ${eventType.intervalDetail}</td>
 							<td>${fn:length(eventType.duties)}</td> <%--  does this work if duties is empty / null? --%>
+							<td><a href="#"><button type="button" class="btn btn-xs btn-primary">Edit</button></a></td>
 						</tr>
 					</c:forEach>
 				</tbody>
