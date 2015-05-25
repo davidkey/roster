@@ -99,7 +99,7 @@ public class AdminController {
       return "redirect:/admin/rosters";
    }
 
-   @RequestMapping(value = "/eventScheduling", method = RequestMethod.GET)
+   @RequestMapping(value = "/eventTypes", method = RequestMethod.GET)
    public String getEventTypes(Model model){
       logger.debug("getEventTypes()");
 
@@ -107,7 +107,7 @@ public class AdminController {
       logger.debug("event types found: {}", eventTypes.size());
 
       model.addAttribute("eventTypes", eventTypes);
-      return "admin/eventScheduling";
+      return "admin/eventTypes";
    }
    
    @RequestMapping(value = "eventScheduling", method = RequestMethod.POST)
@@ -122,11 +122,11 @@ public class AdminController {
 
       eventTypeRepos.save(eventType);
       redirectAttributes.addFlashAttribute("msg_success", alreadyExisted ? "Event Type updated!" : "Event Type added!");
-      return "redirect:/admin/eventScheduling";
+      return "redirect:/admin/eventTypes";
    }
 
    
-   @RequestMapping(value = "/eventScheduling/new", method = RequestMethod.GET)
+   @RequestMapping(value = "/eventTypes/new", method = RequestMethod.GET)
    public String getAddEventType(Model model){
       logger.debug("getAddEventType()");
 

@@ -6,7 +6,7 @@
 <html lang="en">
 <head>
 <jsp:include page="../shared/header.jsp" />
-<title>Event Scheduling</title>
+<title>Event Types</title>
 </head>
 
 <body>
@@ -14,10 +14,10 @@
 
 	<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 		<jsp:include page="../shared/flashMessages.jsp" />
-		<h1 class="page-header">Event Scheduling</h1>
+		<h1 class="page-header">Event Types</h1>
 		<div class="table-responsive">
 			<p>
-				<a href="${pageContext.request.contextPath}/admin/eventScheduling/new">
+				<a href="${pageContext.request.contextPath}/admin/eventTypes/new">
 					<button type="button" class="btn btn-lg btn-success">Add Event</button>
 				</a>
 			</p>

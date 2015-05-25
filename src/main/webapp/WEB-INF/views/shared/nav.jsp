@@ -26,7 +26,7 @@
             <li id="navAdmin"><a href="<c:url value="/admin/"/>">Overview <span class="sr-only">(current)</span></a></li>
             <li id="navRosters"><a href="<c:url value="/admin/rosters/"/>">Rosters</a></li>
             <li id="navPeople"><a href="<c:url value="/admin/people/"/>">People</a></li>
-            <li id="navEventScheduling"><a href="<c:url value="/admin/eventScheduling/"/>">Event Scheduling</a></li>
+            <li id="navEventTypes"><a href="<c:url value="/admin/eventTypes/"/>">Event Scheduling</a></li>
             <li id="navDutyManagement"><a href="<c:url value="/admin/dutyManagement/"/>">Duty Management</a></li>
           </ul>
           <ul class="nav nav-sidebar">
