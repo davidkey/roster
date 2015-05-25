@@ -425,6 +425,22 @@
 					<showDeprecation>true</showDeprecation>
 				</configuration>
 			</plugin>
+			
+			<!--<plugin>  see https://stackoverflow.com/questions/283489/is-there-a-way-to-hide-maven-2-target-folder-in-eclipse-3 
+			    <artifactId>maven-clean-plugin</artifactId>
+			    <configuration>
+			        <excludeDefaultDirectories>true</excludeDefaultDirectories>
+			        <filesets>
+			            <fileset>
+			                <directory>target</directory>
+			                <includes>
+			                    <include>**/*</include>
+			                </includes>
+			            </fileset>
+			        </filesets>
+			    </configuration>
+			</plugin>
+			-->
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
