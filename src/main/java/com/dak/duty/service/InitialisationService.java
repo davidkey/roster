@@ -87,6 +87,7 @@ public class InitialisationService {
       return events;
    }
    
+   @SuppressWarnings("deprecation")
    protected List<Person> getDefaultPeople(final List<Duty> duties){
       final List<Person> people = new ArrayList<Person>();
       DataFactory df = new DataFactory();
@@ -103,7 +104,7 @@ public class InitialisationService {
          Collections.shuffle(scrambledDuties);
          final int numDuties = randomData.nextInt(2, scrambledDuties.size()-1);
          for(int x = 0; x < numDuties; x++){
-            p.addDutyAndPreference(duties.get(x), randomData.nextInt(1, 9));
+            p.addDutyAndPreference(scrambledDuties.get(x), randomData.nextInt(1, 9));
          }
          
          people.add(p);

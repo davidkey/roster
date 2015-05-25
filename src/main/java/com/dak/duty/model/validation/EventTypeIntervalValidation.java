@@ -3,6 +3,7 @@ package com.dak.duty.model.validation;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import com.dak.duty.model.enums.EventTypeInterval;
 import com.dak.duty.model.enums.IntervalWeekly;
@@ -53,6 +54,16 @@ public class EventTypeIntervalValidation {
       }
       
       return false;
+   }
+   
+   public static Date strToDate(final String str){
+         try {
+            return df.parse(str);
+         } catch (ParseException e) {
+            
+         }
+
+      return null;
    }
    
 }

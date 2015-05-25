@@ -1,5 +1,6 @@
 package com.dak.duty.repository;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -22,6 +23,9 @@ public interface EventRepository extends JpaRepository<Event, Long>{
    // example: we're creating roster for Sunday AM - we want to pull last Sunday PM and last Sunday AM
    @Query("select e from Event e where e.eventType = ?1 and e.dateEvent = (select max(e.dateEvent) from Event e where e.eventType = ?1)")
    public List<Event> findMostRecentEventsByEventType(final EventType et);
+   
+   @Query("select max(e.dateEvent) from Event e")
+   public Date findMaxEventDate();
    
    public List<Event> findAllByOrderByDateEventDesc();
    public Page<Event> findAllByOrderByDateEventDescIdDesc(Pageable pageable);

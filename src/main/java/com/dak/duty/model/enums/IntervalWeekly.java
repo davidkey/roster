@@ -2,7 +2,7 @@ package com.dak.duty.model.enums;
 
 public enum IntervalWeekly {
    
-   SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY;
+   MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY;
    
    public static boolean isEnumValue(final String input){
       

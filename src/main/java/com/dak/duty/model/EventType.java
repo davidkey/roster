@@ -57,7 +57,7 @@ public class EventType implements Serializable {
    @Column(nullable = false)
    private EventTypeInterval interval;
    
-   @Column(nullable = false)
+   @Column(nullable = true)
    private String intervalDetail;
    
    public void setInterval(final EventTypeInterval interval){

@@ -1,7 +1,11 @@
 package com.dak.duty.service;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.transaction.Transactional;
@@ -9,15 +13,21 @@ import javax.transaction.Transactional;
 import lombok.NonNull;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.Event;
 import com.dak.duty.model.EventRoster;
+import com.dak.duty.model.EventType;
 import com.dak.duty.model.Person;
 import com.dak.duty.model.PersonDuty;
+import com.dak.duty.model.enums.EventTypeInterval;
+import com.dak.duty.repository.EventRepository;
+import com.dak.duty.repository.EventTypeRepository;
 import com.dak.duty.repository.PersonRepository;
+import com.dak.duty.service.IntervalService.EventTypeDetailNode;
 
 @Service
 @Transactional
@@ -28,7 +38,81 @@ public class EventService {
 
    @Autowired 
    PersonService personService;
+   
+   @Autowired
+   EventRepository eventRepos;
+   
+   @Autowired
+   EventTypeRepository eventTypeRepos;
+   
+   @Autowired
+   IntervalService intervalService;
+   
+   public void createMissingEventsForCurrentMonth(){
+      /**
+       * should be easy enough to implement. 
+       * 
+       * just look for any events and their associated dates (by interval, detail)
+       * that don't have an Event record in db.
+       */
+      throw new NotImplementedException("need to add this method");
+   }
 
+   public void createAndSaveEventsForNextMonth(){
+      final Date mostRecentGenerationDate = eventRepos.findMaxEventDate();
+      Date startDate = null;
+      if(mostRecentGenerationDate == null){
+         startDate = intervalService.getFirstDayOfMonth(new Date());
+      } else {
+         startDate = intervalService.getFirstDayOfNextMonth(mostRecentGenerationDate);
+      }
+      
+      createAndSaveEventsForMonth(startDate);
+   }
+   
+   public void createAndSaveEventsForMonth(final Date startDate){
+
+      final Map<EventTypeDetailNode, List<Date>> eventTypeDays = new HashMap<EventTypeDetailNode, List<Date>>();
+
+      for(EventTypeInterval eti : EventTypeInterval.values()){
+         List<EventType> eventTypes = eventTypeRepos.findByInterval(eti);
+         for(EventType et : eventTypes){
+
+            final EventTypeDetailNode etdn = intervalService.createEventTypeDetailNode(eti, et.getIntervalDetail());
+            if(!eventTypeDays.containsKey(etdn)){
+               List<Date> results = intervalService.getDaysOfMonthForInterval(startDate, eti, et.getIntervalDetail());
+               eventTypeDays.put(etdn, results);
+            }
+         }
+      }
+      
+      final List<EventType> allEventTypes = eventTypeRepos.findAll();
+      final List<Event> eventsToAdd = new ArrayList<Event>();
+      
+      for(EventType et : allEventTypes){
+         final EventTypeDetailNode etdn = intervalService.createEventTypeDetailNode(et.getInterval(), et.getIntervalDetail());
+         if(eventTypeDays.containsKey(etdn)){
+            List<Date> daysToProcessForEvent = eventTypeDays.get(etdn);
+            for(Date d : daysToProcessForEvent){
+               Event e = new Event();
+               e.setDateEvent(d);
+               e.setEventType(et);
+               e.setName(et.getName());
+               e.setApproved(false);
+               eventsToAdd.add(e);
+            }
+         }
+      }
+      
+      for(Event e : eventsToAdd){
+         EventRoster er = getRosterForEvent(e);
+         e.setEventRoster(er);
+         updatePreferenceRankingsBasedOnRoster(er);
+      }
+      
+      eventRepos.save(eventsToAdd);
+   }
+   
    public void updatePreferenceRankingsBasedOnRoster(final EventRoster eventRoster){
       // create set of people with duties today
       final Set<Person> peopleWithDuties = new HashSet<Person>();

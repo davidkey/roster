@@ -12,8 +12,15 @@
 	<jsp:include page="../shared/nav.jsp" />
 
 	<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+		<jsp:include page="../shared/flashMessages.jsp" />
 		<h1 class="page-header">Rosters &amp; Events</h1>
 		<div class="table-responsive">
+			<p>
+				<a href="${pageContext.request.contextPath}/admin/rosters/generate">
+					<button type="button" class="btn btn-lg btn-success">Generate Next Set</button>
+				</a>
+			</p>
+			<br/>
 			<table class="table table-striped" id="eventTable">
 				<thead>
 					<tr>
