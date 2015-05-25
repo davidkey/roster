@@ -110,7 +110,7 @@ public class AdminController {
       return "admin/eventTypes";
    }
    
-   @RequestMapping(value = "eventScheduling", method = RequestMethod.POST)
+   @RequestMapping(value = "/eventTypes", method = RequestMethod.POST)
    public String saveEventType(@ModelAttribute @Valid EventType eventType, BindingResult result, final RedirectAttributes redirectAttributes){
       logger.debug("saveEventType()");
       final boolean alreadyExisted = eventType.getId() > 0;
