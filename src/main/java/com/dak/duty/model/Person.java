@@ -84,22 +84,34 @@ public class Person  implements Serializable {
       duties.add(pd);
    }
 
+   /**
+    * This method will become private - use {@link #addOrUpdateDutyAndPreference(Duty, Integer) addOrUpdateDutyAndPreference} instead.
+    * @param duty
+    * @param preference
+    */
    @Transient
-   @Deprecated // use addOrUpdateDutyAndPreference instead
-   public void addDutyAndPreference(final Duty d, final Integer preference){
+   @Deprecated
+   public void addDutyAndPreference(final Duty duty, final Integer preference){
       PersonDuty pd = new PersonDuty();
-      pd.setDuty(d);
+      pd.setDuty(duty);
       pd.setPreference(preference);
       this.addPersonDuty(pd);
    }
 
+   /**
+    * Adds (or updates) duty and preference pair for this {@link #Person Person}.
+    * Note that if preference is -1, it will not be added, only updated if the duty
+    * already exists.
+    * @param duty
+    * @param preference
+    */
    @Transient
-   public void addOrUpdateDutyAndPreference(final Duty d, final Integer preference){
+   public void addOrUpdateDutyAndPreference(final Duty duty, final Integer preference){
       boolean found = false;
       
       if(duties != null){
          for(PersonDuty pd : duties){
-            if(pd.getDuty() != null && pd.getDuty().getId() == d.getId()){
+            if(pd.getDuty() != null && pd.getDuty().getId() == duty.getId()){
                found = true;
                pd.setPreference(preference);
                break;
@@ -110,7 +122,7 @@ public class Person  implements Serializable {
       if(!found){
          if(preference > -1){ // don't bother saving 'never pick me' preference
             PersonDuty pd = new PersonDuty();
-            pd.setDuty(d);
+            pd.setDuty(duty);
             pd.setPreference(preference);
             this.addPersonDuty(pd);
          }
