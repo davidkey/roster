@@ -39,7 +39,7 @@
 							<td><c:out value="${eventType.name}"/></td>
 							<td><c:out value="${eventType.description}"/></td>
 							<td>${eventType.interval} - ${eventType.intervalDetail}</td>
-							<td>${fn:length(eventType.duties)}</td> <%--  does this work if duties is empty / null? --%>
+							<td>${fn:length(eventType.duties)}</td>
 							<td><a href="#"><button type="button" class="btn btn-xs btn-primary">Edit</button></a></td>
 						</tr>
 					</c:forEach>
