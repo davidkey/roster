@@ -170,7 +170,7 @@ public class AdminController {
       return "admin/eventType";
    }
 
-   @RequestMapping(value = "/dutyManagement", method = RequestMethod.GET)
+   @RequestMapping(value = "/duties", method = RequestMethod.GET)
    public String getDuties(Model model){
       logger.debug("getDuties()");
 
@@ -178,7 +178,7 @@ public class AdminController {
       logger.debug("duties found: {}", duties.size());
 
       model.addAttribute("duties", duties);
-      return "admin/dutyManagement";
+      return "admin/duties";
    }
 
    @RequestMapping(value = "/settings", method = RequestMethod.GET)
