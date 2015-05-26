@@ -63,7 +63,7 @@
 								<c:set var="count" value="${count + 1}" scope="page"/>
 								<div class="checkbox">
 									<label>
-							    		<input class="dutyCheckbox" type="checkbox" name="duties[${count}].id" value="${duty.id}" checked="checked" /> ${duty.name}
+							    		<input class="dutyCheckbox" type="checkbox" name="duties[${count}].id" value="${duty.id}" checked="checked" /> <c:out value="${duty.name}" />
 									</label>
 									<c:if test="${val eq 1}">
 										&nbsp;
@@ -76,7 +76,7 @@
 							<c:set var="count" value="${count + 1}" scope="page"/>
 							<div class="checkbox">
 								<label>
-									<input class="dutyCheckbox" type="checkbox" name="duties[${count}].id" value="${duty.id}" /> ${duty.name}
+									<input class="dutyCheckbox" type="checkbox" name="duties[${count}].id" value="${duty.id}" /> <c:out value="${duty.name}" />
 								</label> 
 								&nbsp;
 								<button type="button" class="btn btn-default btn-xs add-another">Duplicate Me</button>
