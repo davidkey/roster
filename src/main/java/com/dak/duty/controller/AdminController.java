@@ -1,5 +1,6 @@
 package com.dak.duty.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -52,7 +53,7 @@ public class AdminController {
 
    @Autowired
    DutyRepository dutyRepos;
-   
+
    @Autowired
    EventService eventService;
 
@@ -109,7 +110,7 @@ public class AdminController {
       model.addAttribute("eventTypes", eventTypes);
       return "admin/eventTypes";
    }
-   
+
    @RequestMapping(value = "/eventTypes", method = RequestMethod.POST)
    public String saveEventType(@ModelAttribute @Valid EventType eventType, BindingResult result, final RedirectAttributes redirectAttributes){
       logger.debug("saveEventType()");
@@ -120,12 +121,44 @@ public class AdminController {
          return "admin/eventType"; // is this right? url changes after post... how to fix? TODO: FIXME
       }
 
+      /**
+       * couldn't figure out how to cleanly handle checkboxes for duties, so manually marshalling Duty objects
+       */
+      final List<Duty> duties = eventType.getDuties();
+      final List<Duty> fixedDuties = new ArrayList<Duty>();
+      if(duties != null){
+         for(int i = 0, len = duties.size(); i < len; i++){
+            final long dutyId = duties.get(i).getId();
+            if(dutyId > 0){
+               Duty duty = dutyRepos.findOne(dutyId);
+               
+               if(duty == null){
+                  throw new RuntimeException("Invalid duty id " + dutyId); //FIXME: vague exception type
+               }
+               
+               fixedDuties.add(duty);
+            }
+         }
+         
+         eventType.getDuties().clear();
+         eventType.setDuties(fixedDuties);
+      }
+
       eventTypeRepos.save(eventType);
       redirectAttributes.addFlashAttribute("msg_success", alreadyExisted ? "Event Type updated!" : "Event Type added!");
       return "redirect:/admin/eventTypes";
    }
 
-   
+   @RequestMapping(value = "/eventTypes/{eventTypeId}", method = RequestMethod.GET)
+   public String getEventTypeById(@PathVariable long eventTypeId, Model model){
+      logger.debug("getEventTypeById({})", eventTypeId);
+
+      model.addAttribute("eventType", eventTypeRepos.findOne(eventTypeId));
+      model.addAttribute("eventTypeIntervals", EventTypeInterval.values());
+      model.addAttribute("allPossibleDuties", dutyRepos.findAll());
+      return "admin/eventType";
+   }
+
    @RequestMapping(value = "/eventTypes/new", method = RequestMethod.GET)
    public String getAddEventType(Model model){
       logger.debug("getAddEventType()");
@@ -133,6 +166,7 @@ public class AdminController {
 
       model.addAttribute("eventType", new EventType());
       model.addAttribute("eventTypeIntervals", EventTypeInterval.values());
+      model.addAttribute("allPossibleDuties", dutyRepos.findAll());
       return "admin/eventType";
    }
 

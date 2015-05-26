@@ -40,7 +40,7 @@
 							<td><c:out value="${eventType.description}"/></td>
 							<td>${eventType.interval} - ${eventType.intervalDetail}</td>
 							<td>${fn:length(eventType.duties)}</td>
-							<td><a href="#"><button type="button" class="btn btn-xs btn-primary">Edit</button></a></td>
+							<td><a href="${pageContext.request.contextPath}/admin/eventTypes/${eventType.id}"><button type="button" class="btn btn-xs btn-primary">Edit</button></a></td>
 						</tr>
 					</c:forEach>
 				</tbody>
