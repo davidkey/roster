@@ -180,6 +180,35 @@ public class AdminController {
       model.addAttribute("duties", duties);
       return "admin/duties";
    }
+   
+   @RequestMapping(value = "/duties", method = RequestMethod.POST)
+   public String saveDuty(@ModelAttribute @Valid Duty duty, BindingResult result, final RedirectAttributes redirectAttributes){
+      logger.debug("saveDuty()");
+      final boolean alreadyExisted = duty.getId() > 0;
+
+      if(result.hasErrors()){
+         return "admin/duty"; // is this right? url changes after post... how to fix? TODO: FIXME
+      }
+
+      dutyRepos.save(duty);
+      redirectAttributes.addFlashAttribute("msg_success", alreadyExisted ? "Duty updated!" : "Duty added!");
+      return "redirect:/admin/duties";
+   }
+   
+   @RequestMapping(value = "/duties/new", method = RequestMethod.GET)
+   public String getNewDuty(Model model){
+      logger.debug("getNewDuty()");
+
+      model.addAttribute("duty", new Duty());
+      return "admin/duty";
+   }
+   
+   @RequestMapping(value = "/duties/{dutyId}", method = RequestMethod.GET)
+   public String getEditDuty(@PathVariable Long dutyId, Model model){
+      logger.debug("getEditDuty()");
+      model.addAttribute("duty", dutyRepos.findOne(dutyId));
+      return "admin/duty";
+   }
 
    @RequestMapping(value = "/settings", method = RequestMethod.GET)
    public String getSettings(Model model){

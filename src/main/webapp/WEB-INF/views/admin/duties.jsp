@@ -12,14 +12,21 @@
 	<jsp:include page="../shared/nav.jsp" />
 
 	<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+		<jsp:include page="../shared/flashMessages.jsp" />
 		<h1 class="page-header">Duty Management</h1>
 		<div class="table-responsive">
+			<p>
+				<a href="${pageContext.request.contextPath}/admin/duties/new">
+					<button type="button" class="btn btn-lg btn-success">Add Duty</button>
+				</a>
+			</p>
 			<table class="table table-striped" id="dutyTable">
 				<thead>
 					<tr>
 						<th>#</th>
 						<th>Name</th>
 						<th>Description</th>
+						<th>Edit</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -28,6 +35,7 @@
 							<td>${duty.id}</td>
 							<td><c:out value="${duty.name}"/></td>
 							<td><c:out value="${duty.description}"/></td>
+							<td><a href="${pageContext.request.contextPath}/admin/duties/${duty.id}"><button type="button" class="btn btn-xs btn-primary">Edit</button></a></td>
 						</tr>
 					</c:forEach>
 				</tbody>
