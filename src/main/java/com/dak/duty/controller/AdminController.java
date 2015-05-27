@@ -89,6 +89,14 @@ public class AdminController {
       model.addAttribute("events", events);
       return "admin/rosters";
    }
+   
+   @RequestMapping(value = "/rosters/{eventId}", method = RequestMethod.GET)
+   public String getEventAndRoster(@PathVariable Long eventId, Model model){
+      logger.debug("getEventAndRoster({})", eventId);
+
+      model.addAttribute("event", eventRepos.findOne(eventId));
+      return "admin/roster";
+   }
 
    @RequestMapping(value = "/rosters/generate", method = RequestMethod.GET)
    public String generateRosters(Model model, final RedirectAttributes redirectAttributes){

@@ -30,6 +30,7 @@
 						<th>Generated?</th>
 						<th>Complete?</th>
 						<th>Approved?</th>
+						<th>View</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -41,6 +42,7 @@
 							<td>${event.rosterGenerated ? 'Yes' : 'No'}</td>
 							<td>${event.rosterFullyPopulated ? 'Yes' : 'No'}</td>
 							<td>${event.approved ? 'Yes' : 'No'}</td>
+							<td><a href="${pageContext.request.contextPath}/admin/rosters/${event.id}"><button type="button" class="btn btn-xs btn-primary">View</button></a></td>
 						</tr>
 					</c:forEach>
 				</tbody>
