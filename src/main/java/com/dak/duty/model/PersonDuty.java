@@ -66,7 +66,14 @@ public class PersonDuty implements Serializable {
    @Transient
    public void incrementWeightedPreferenceIfNeeded(){
       if(adjustedPreference < preference){
-         adjustedPreference++;
+         final int diff = preference - adjustedPreference;
+         if(diff >= 7){
+            adjustedPreference += 3;
+         } else if(diff >= 4){
+            adjustedPreference += 2;
+         } else {
+            adjustedPreference++;
+         }
       }
    }
    
