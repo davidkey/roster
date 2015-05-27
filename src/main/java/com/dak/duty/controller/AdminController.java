@@ -34,6 +34,7 @@ import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.EventTypeRepository;
 import com.dak.duty.repository.PersonRepository;
+import com.dak.duty.service.DutyService;
 import com.dak.duty.service.EventService;
 
 @Controller
@@ -56,6 +57,9 @@ public class AdminController {
 
    @Autowired
    EventService eventService;
+   
+   @Autowired
+   DutyService dutyService;
 
    @RequestMapping(value = "/", method = RequestMethod.GET)
    public String getAdminHome(Model model){
@@ -197,8 +201,8 @@ public class AdminController {
       if(result.hasErrors()){
          return "admin/duty"; // is this right? url changes after post... how to fix? TODO: FIXME
       }
-
-      dutyRepos.save(duty);
+      
+      dutyService.saveOrUpdateDuty(duty);
       redirectAttributes.addFlashAttribute("msg_success", alreadyExisted ? "Duty updated!" : "Duty added!");
       return "redirect:/admin/duties";
    }
@@ -208,13 +212,16 @@ public class AdminController {
       logger.debug("getNewDuty()");
 
       model.addAttribute("duty", new Duty());
+      model.addAttribute("maxSortOrder", dutyRepos.findMaxSortOrder());
       return "admin/duty";
    }
    
    @RequestMapping(value = "/duties/{dutyId}", method = RequestMethod.GET)
    public String getEditDuty(@PathVariable Long dutyId, Model model){
       logger.debug("getEditDuty()");
+      
       model.addAttribute("duty", dutyRepos.findOne(dutyId));
+      model.addAttribute("maxSortOrder", dutyRepos.findMaxSortOrder());
       return "admin/duty";
    }
 

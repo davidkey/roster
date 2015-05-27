@@ -25,6 +25,17 @@
 				<form:input path="description" class="form-control" placeholder="Reads section of scripture to congregation"/>
 				<form:errors path="description" class="alert-danger" />
 			</div>
+			
+			<div class="form-group">
+				<label for="sortOrder">Sort Order</label>
+				<form:select path="sortOrder" class="form-control">
+					<c:forEach begin="1" end="${maxSortOrder}" var="val">
+						<form:option value="${val}">${val}</form:option>
+					</c:forEach>
+
+				</form:select>
+				<form:errors path="sortOrder" class="alert-danger" />
+			</div>
 
 			<button type="submit" class="btn btn-default">Save</button>
 		</form:form>

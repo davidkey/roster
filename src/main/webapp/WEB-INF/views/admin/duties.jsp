@@ -26,6 +26,7 @@
 						<th>#</th>
 						<th>Name</th>
 						<th>Description</th>
+						<th>Sort Order</th>
 						<th>Edit</th>
 					</tr>
 				</thead>
@@ -35,6 +36,7 @@
 							<td>${duty.id}</td>
 							<td><c:out value="${duty.name}"/></td>
 							<td><c:out value="${duty.description}"/></td>
+							<td>${duty.sortOrder}</td>
 							<td><a href="${pageContext.request.contextPath}/admin/duties/${duty.id}"><button type="button" class="btn btn-xs btn-primary">Edit</button></a></td>
 						</tr>
 					</c:forEach>
@@ -47,7 +49,7 @@
 	<script>
 		$(document).ready(function() {
 		    $('#dutyTable').DataTable({
-		    	"order": [[0, "desc"]],
+		    	"order": [[3, "asc"]],
 		    	stateSave: true
 		    });
 		} );

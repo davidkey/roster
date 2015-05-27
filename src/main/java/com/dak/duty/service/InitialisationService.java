@@ -133,45 +133,54 @@ public class InitialisationService {
       final List<Duty> duties = new ArrayList<Duty>();
       
       Duty duty = null;
+      int count = 1;
       
       duty = new Duty();
       duty.setName("Song Leading");
       duty.setDescription(duty.getName());
+      duty.setSortOrder(count++);
       duties.add(duty);
 
       duty = new Duty();
       duty.setName("Opening Prayer");
       duty.setDescription(duty.getName());
+      duty.setSortOrder(count++);
       duties.add(duty);
 
       duty = new Duty();
       duty.setName("Closing Prayer");
       duty.setDescription(duty.getName());
+      duty.setSortOrder(count++);
       duties.add(duty);
 
       duty = new Duty();
       duty.setName("Annoucements");
       duty.setDescription(duty.getName());
+      duty.setSortOrder(count++);
       duties.add(duty);
 
       duty = new Duty();
       duty.setName("Scripture Reading");
       duty.setDescription(duty.getName());
+      duty.setSortOrder(count++);
       duties.add(duty);
 
       duty = new Duty();
       duty.setName("Preaching");
       duty.setDescription(duty.getName());
+      duty.setSortOrder(count++);
       duties.add(duty);
 
       duty = new Duty();
       duty.setName("Table");
       duty.setDescription(duty.getName());
+      duty.setSortOrder(count++);
       duties.add(duty);
 
       duty = new Duty();
       duty.setName("Invitation");
       duty.setDescription(duty.getName());
+      duty.setSortOrder(count++);
       duties.add(duty);
       
       return duties;

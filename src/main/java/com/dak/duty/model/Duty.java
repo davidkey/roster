@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.validation.constraints.Min;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -37,5 +38,9 @@ public class Duty implements Serializable {
    
    @Column(nullable = true)
    private String description;
+   
+   @Min(1)
+   @Column(nullable = false)
+   private Integer sortOrder = 1;
 
 }
