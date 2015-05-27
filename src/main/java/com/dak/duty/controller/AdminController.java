@@ -1,6 +1,7 @@
 package com.dak.duty.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -27,8 +28,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.Event;
+import com.dak.duty.model.EventRosterItem;
 import com.dak.duty.model.EventType;
 import com.dak.duty.model.Person;
+import com.dak.duty.model.comparable.EventRosterItemSortByDutyOrder;
 import com.dak.duty.model.enums.EventTypeInterval;
 import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.EventRepository;
@@ -98,7 +101,13 @@ public class AdminController {
    public String getEventAndRoster(@PathVariable Long eventId, Model model){
       logger.debug("getEventAndRoster({})", eventId);
 
-      model.addAttribute("event", eventRepos.findOne(eventId));
+      final Event event = eventRepos.findOne(eventId);
+      
+      List<EventRosterItem> sortedRoster = new ArrayList<EventRosterItem>(event.getRoster());
+      Collections.sort(sortedRoster, new EventRosterItemSortByDutyOrder());
+      
+      model.addAttribute("event", event);
+      model.addAttribute("roster", sortedRoster);
       return "admin/roster";
    }
 

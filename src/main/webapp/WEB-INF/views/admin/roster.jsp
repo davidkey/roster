@@ -21,7 +21,7 @@
 				<small><fmt:formatDate pattern="EEEE" value="${event.dateEvent}" /></small>
 			</h3>
 	
-			<c:forEach var="rosterItem" items="${event.roster}">
+			<c:forEach var="rosterItem" items="${roster}">
 				<div class="row">
 					<div class="col-md-4">${rosterItem.duty.name}</div>
 					<div class="col-md-4">${rosterItem.person.nameFirst} ${rosterItem.person.nameLast}</div>
