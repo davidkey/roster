@@ -20,13 +20,24 @@
 				<fmt:formatDate pattern="MM/dd/yyyy" value="${event.dateEvent}" /> 
 				<small><fmt:formatDate pattern="EEEE" value="${event.dateEvent}" /></small>
 			</h3>
-	
-			<c:forEach var="rosterItem" items="${roster}">
-				<div class="row">
-					<div class="col-md-4">${rosterItem.duty.name}</div>
-					<div class="col-md-4">${rosterItem.person.nameFirst} ${rosterItem.person.nameLast}</div>
-				</div>
-			</c:forEach>
+			
+			<table class="table table-striped" id="rosterTable">
+				<thead>
+					<tr>
+						<th>Duty</th>
+						<th>Person</th>
+					</tr>
+				</thead>
+				<tbody>
+				<c:forEach var="rosterItem" items="${roster}">
+					<tr>
+						<td>${rosterItem.duty.name}</td>
+						<td>${rosterItem.person.nameFirst} ${rosterItem.person.nameLast}</td>
+					</tr>
+				</c:forEach>
+				</tbody>
+			</table>
+
 		</div>
 		
 		
