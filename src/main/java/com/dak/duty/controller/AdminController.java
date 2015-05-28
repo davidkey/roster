@@ -60,7 +60,7 @@ public class AdminController {
 
    @Autowired
    EventService eventService;
-   
+
    @Autowired
    DutyService dutyService;
 
@@ -96,16 +96,16 @@ public class AdminController {
       model.addAttribute("events", events);
       return "admin/rosters";
    }
-   
+
+
+
    @RequestMapping(value = "/rosters/{eventId}", method = RequestMethod.GET)
    public String getEventAndRoster(@PathVariable Long eventId, Model model){
       logger.debug("getEventAndRoster({})", eventId);
 
       final Event event = eventRepos.findOne(eventId);
-      
-      List<EventRosterItem> sortedRoster = new ArrayList<EventRosterItem>(event.getRoster());
-      Collections.sort(sortedRoster, new EventRosterItemSortByDutyOrder());
-      
+      final List<EventRosterItem> sortedRoster = eventService.getSortedRosterIncludingEmptySlots(event);
+
       model.addAttribute("event", event);
       model.addAttribute("roster", sortedRoster);
       return "admin/roster";
@@ -120,7 +120,7 @@ public class AdminController {
       redirectAttributes.addFlashAttribute("msg_success", numGenerated + " rosters generated!");
       return "redirect:/admin/rosters";
    }
-   
+
    @RequestMapping(value = "/rosters/generateMissing", method = RequestMethod.GET)
    public String generateMissingRosters(Model model, final RedirectAttributes redirectAttributes){
       logger.debug("generateMissingRosters()");
@@ -130,27 +130,27 @@ public class AdminController {
       redirectAttributes.addFlashAttribute("msg_success", numGenerated + " missing rosters generated!");
       return "redirect:/admin/rosters";
    }
-   
+
    @RequestMapping(value = "/rosters/approveAllFullyPopulated", method = RequestMethod.GET)
    public String approveAllFullyPopulated(Model model, final RedirectAttributes redirectAttributes){
       logger.debug("approveAllFullyPopulated()");
 
       final List<Event> events = eventRepos.findByApproved(false);
       final List<Event> eventsToApprove = new ArrayList<Event>();
-      
+
       for(Event e : events){
          if(e.isRosterFullyPopulated()){
             e.setApproved(true);
             eventsToApprove.add(e);
          }
       }
-      
+
       eventRepos.save(eventsToApprove);
 
       redirectAttributes.addFlashAttribute("msg_success", eventsToApprove.size() + " rosters approved!");
       return "redirect:/admin/rosters";
    }
-   
+
    @RequestMapping(value = "/rosters/approveAll", method = RequestMethod.GET)
    public String approveAll(Model model, final RedirectAttributes redirectAttributes){
       logger.debug("approveAll()");
@@ -160,7 +160,7 @@ public class AdminController {
       redirectAttributes.addFlashAttribute("msg_success", numAffected + " rosters approved!");
       return "redirect:/admin/rosters";
    }
-   
+
    @RequestMapping(value = "/rosters/unapproveAll", method = RequestMethod.GET)
    public String unapproveAll(Model model, final RedirectAttributes redirectAttributes){
       logger.debug("unapproveAll()");
@@ -202,15 +202,15 @@ public class AdminController {
             final long dutyId = duties.get(i).getId();
             if(dutyId > 0){
                Duty duty = dutyRepos.findOne(dutyId);
-               
+
                if(duty == null){
                   throw new RuntimeException("Invalid duty id " + dutyId); //FIXME: vague exception type
                }
-               
+
                fixedDuties.add(duty);
             }
          }
-         
+
          eventType.getDuties().clear();
          eventType.setDuties(fixedDuties);
       }
@@ -251,7 +251,7 @@ public class AdminController {
       model.addAttribute("duties", duties);
       return "admin/duties";
    }
-   
+
    @RequestMapping(value = "/duties", method = RequestMethod.POST)
    public String saveDuty(@ModelAttribute @Valid Duty duty, BindingResult result, final RedirectAttributes redirectAttributes){
       logger.debug("saveDuty()");
@@ -260,12 +260,12 @@ public class AdminController {
       if(result.hasErrors()){
          return "admin/duty"; // is this right? url changes after post... how to fix? TODO: FIXME
       }
-      
+
       dutyService.saveOrUpdateDuty(duty);
       redirectAttributes.addFlashAttribute("msg_success", alreadyExisted ? "Duty updated!" : "Duty added!");
       return "redirect:/admin/duties";
    }
-   
+
    @RequestMapping(value = "/duties/new", method = RequestMethod.GET)
    public String getNewDuty(Model model){
       logger.debug("getNewDuty()");
@@ -274,11 +274,11 @@ public class AdminController {
       model.addAttribute("maxSortOrder", dutyRepos.findMaxSortOrder());
       return "admin/duty";
    }
-   
+
    @RequestMapping(value = "/duties/{dutyId}", method = RequestMethod.GET)
    public String getEditDuty(@PathVariable Long dutyId, Model model){
       logger.debug("getEditDuty()");
-      
+
       model.addAttribute("duty", dutyRepos.findOne(dutyId));
       model.addAttribute("maxSortOrder", dutyRepos.findMaxSortOrder());
       return "admin/duty";

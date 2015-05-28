@@ -1,6 +1,7 @@
 package com.dak.duty.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,9 +20,11 @@ import org.springframework.stereotype.Service;
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.Event;
 import com.dak.duty.model.EventRoster;
+import com.dak.duty.model.EventRosterItem;
 import com.dak.duty.model.EventType;
 import com.dak.duty.model.Person;
 import com.dak.duty.model.PersonDuty;
+import com.dak.duty.model.comparable.EventRosterItemSortByDutyOrder;
 import com.dak.duty.model.enums.EventTypeInterval;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.EventTypeRepository;
@@ -224,6 +227,65 @@ public class EventService {
       //updatePreferenceRankingsBasedOnRoster(eventRoster); // <- don't forget to call this from controller once user has "approved" event roster
 
       return eventRoster;
+   }
+   
+   public List<EventRosterItem> getSortedRosterIncludingEmptySlots(@NonNull final Long eventId){
+      return getSortedRosterIncludingEmptySlots(eventRepos.findOne(eventId));
+   }
+   
+   public List<EventRosterItem> getSortedRosterIncludingEmptySlots(@NonNull final Event event){
+      final List<Duty> allDutiesForEventType = event.getEventType().getDuties();
+      List<EventRosterItem> sortedRoster = new ArrayList<EventRosterItem>(event.getRoster());
+
+      /**
+       * If we just sorted our List<EventRosterItem> and returned it, we would not be
+       * including unassigned slots. The following adds "empty" records as needed to
+       * ensure blank slots are displayed in application where needed.
+       */
+      if(sortedRoster.size() < allDutiesForEventType.size()){
+         for(Duty d : allDutiesForEventType){
+            int expectedDutyCount = getNumberOccurencesDuty(allDutiesForEventType, d);
+            int actualDutyCount = getNumberOccurencesDutyForEventRosterItem(sortedRoster, d);
+
+            if(expectedDutyCount != actualDutyCount){
+               for(int i = actualDutyCount; i < expectedDutyCount; i++){
+                  EventRosterItem eri = new EventRosterItem();
+                  eri.setDuty(d);
+                  eri.setEvent(event);
+                  eri.setPerson(null);
+                  sortedRoster.add(eri);
+               }
+            }
+         }
+      }
+
+      Collections.sort(sortedRoster, new EventRosterItemSortByDutyOrder());
+      
+      return sortedRoster;
+   }
+   
+   private int getNumberOccurencesDuty(List<Duty> duties, Duty duty){
+      int num = 0;
+
+      for(Duty d : duties){
+         if(d.getId() == duty.getId()){
+            num++;
+         }
+      }
+
+      return num;
+   }
+
+   private int getNumberOccurencesDutyForEventRosterItem(List<EventRosterItem> items, Duty duty){
+      int num = 0;
+
+      for(EventRosterItem eri : items){
+         if(eri.getDuty().getId() == duty.getId()){
+            num++;
+         }
+      }
+
+      return num;
    }
 
    //FIXME: kludge until I can figure out how I borked equals / hashcode -- should be able to [a.equals(b)] but have to use [a.getId() == b.getId()]
