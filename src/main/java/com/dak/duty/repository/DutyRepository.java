@@ -15,12 +15,12 @@ public interface DutyRepository extends JpaRepository<Duty, Long>{
    
    @Modifying
    @Query("update Duty d set d.sortOrder = d.sortOrder + 1 where d.sortOrder >= ?1")
-   int incrementSortOrderAboveAndIncluding(Integer sortOrder);
+   public Integer incrementSortOrderAboveAndIncluding(Integer sortOrder);
    
    @Modifying
    @Query("update Duty d set d.sortOrder = d.sortOrder - 1 where d.sortOrder > ?1")
-   int decrementSortOrderAbove(Integer sortOrder);
+   public Integer decrementSortOrderAbove(Integer sortOrder);
    
    @Query("select max(d.sortOrder) from Duty d")
-   int findMaxSortOrder();
+   public Integer findMaxSortOrder();
 }

@@ -30,7 +30,7 @@ public interface EventRepository extends JpaRepository<Event, Long>{
    
    @Modifying
    @Query("update Event e set e.approved = ?1")
-   public int setApprovedStatusOnAllEvents(boolean approved);
+   public Integer setApprovedStatusOnAllEvents(boolean approved);
    
    //public List<Event> findAllByRosterFullyPopulated();
    //public List<Event> findAllByRosterFullyPopulatedAndApprovedIsFalse();

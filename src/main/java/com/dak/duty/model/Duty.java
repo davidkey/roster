@@ -33,7 +33,7 @@ public class Duty implements Serializable {
    @Column(nullable = false)
    private long id;
    
-   @Column(nullable = false)
+   @Column(nullable = false, unique = true)
    private String name;
    
    @Column(nullable = true)
@@ -42,5 +42,13 @@ public class Duty implements Serializable {
    @Min(1)
    @Column(nullable = false)
    private Integer sortOrder = 1;
+   
+   public void setName(String name){
+      if(name != null){
+         name = name.trim();
+      }
+      
+      this.name = name;
+   }
 
 }

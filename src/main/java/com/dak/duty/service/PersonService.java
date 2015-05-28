@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 
@@ -42,8 +43,13 @@ public class PersonService {
       final Map<Person, Integer> personPreferenceRanking = new HashMap<Person, Integer>();
       for(Person person : people){
          if(!CollectionUtils.isEmpty(peopleAlreadyServing) && peopleAlreadyServing.contains(person)){
-            // if this person is already doing something today, make it as unlikely as possible to do something else
-            personPreferenceRanking.put(person, 0);
+            if(getPeopleServingDuty(duty, currentEventRoster).contains(person)){  
+               // if this person is already doing THIS exact duty today, don't let them do it again!
+               personPreferenceRanking.put(person, -1);
+            } else { 
+               // if this person is already doing something today, make it as unlikely as possible to do something else
+               personPreferenceRanking.put(person, 0);
+            }
          } else {
             personPreferenceRanking.put(person, getDutyPreference(person, duty));
          }
@@ -75,6 +81,23 @@ public class PersonService {
       return CollectionUtils.isEmpty(listOfPeopleTimesPreferenceRanking) ? null : listOfPeopleTimesPreferenceRanking.get(rand.nextInt(listOfPeopleTimesPreferenceRanking.size()));
    }
 
+   private Set<Person> getPeopleServingDuty(@NonNull final Duty duty, @NonNull final EventRoster currentEventRoster){
+      Set<Person> peopleServingDuty = new HashSet<Person>();
+
+      for(Entry<Duty, Person> entry : currentEventRoster.getDutiesAndPeople()){
+         if(entry.getKey() == null || entry.getValue() == null){
+            continue;
+         }
+
+         if(entry.getKey().getId() == duty.getId()){
+            peopleServingDuty.add(entry.getValue());
+         }
+      }
+
+      return peopleServingDuty;
+   }
+
+
    private Set<Person> getPeopleWhoServed(final EventRoster er){
       Set<Person> people = new HashSet<Person>();
 
@@ -83,7 +106,7 @@ public class PersonService {
             CollectionUtils.addIgnoreNull(people, er.getDutiesAndPeople().get(i).getValue());
          }
       }
-      
+
       return people;
    }
 

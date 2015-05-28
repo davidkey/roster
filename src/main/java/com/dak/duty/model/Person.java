@@ -18,6 +18,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -34,7 +35,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
-@Table(name = "person")
+@Table(name = "person", uniqueConstraints={@UniqueConstraint(columnNames={"nameFirst", "nameLast"})})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Getter
 @Setter
