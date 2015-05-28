@@ -13,7 +13,6 @@ import javax.transaction.Transactional;
 import lombok.NonNull;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,27 +37,79 @@ public class EventService {
 
    @Autowired 
    PersonService personService;
-   
+
    @Autowired
    EventRepository eventRepos;
-   
+
    @Autowired
    EventTypeRepository eventTypeRepos;
-   
+
    @Autowired
    IntervalService intervalService;
    
-   public void createMissingEventsForCurrentMonth(){
-      /**
-       * should be easy enough to implement. 
-       * 
-       * just look for any events and their associated dates (by interval, detail)
-       * that don't have an Event record in db.
-       */
-      throw new NotImplementedException("need to add this method");
+   public int approveAllRosters(){
+      return eventRepos.setApprovedStatusOnAllEvents(true);
+   }
+   
+   public int unApproveAllRosters(){
+      return eventRepos.setApprovedStatusOnAllEvents(false);
    }
 
-   public void createAndSaveEventsForNextMonth(){
+   public int createAndSaveMissingEvents(){
+      final Date maxEventDate = eventRepos.findMaxEventDate();
+
+      if(maxEventDate == null){
+         return 0; // there's never even been a normal event generation process, so don't bother trying to create missing events
+      }
+
+      final List<Event> missingEvents = getMissingEventsForRange(intervalService.getCurrentSystemDate(), maxEventDate);
+
+      for(Event e : missingEvents){
+         EventRoster er = getRosterForEvent(e);
+         e.setEventRoster(er);
+         updatePreferenceRankingsBasedOnRoster(er);
+      }
+
+      eventRepos.save(missingEvents);
+
+      return missingEvents == null ? 0 : missingEvents.size();
+   }
+
+   /**
+    * Get missing events for date range.
+    * @param startDate (inclusive)
+    * @param endDate (inclusive)
+    * @return
+    */
+   protected List<Event> getMissingEventsForRange(final Date startDate, final Date endDate){
+      final List<Event> missingEvents = new ArrayList<Event>();
+      final List<EventType> eventTypesWithNoEvents = eventTypeRepos.getEventTypesWithNoEvents();
+
+      for(final EventType et : eventTypesWithNoEvents){
+         Date currDate = intervalService.getFirstDayOfMonth(startDate);
+         
+         while(currDate.compareTo(endDate) <= 0){
+            final List<Date> eventDays = intervalService.getDaysOfMonthForEventType(currDate, et);
+            for(Date day : eventDays){
+               if(day.compareTo(startDate) >= 0 /*&& day.compareTo(endDate) <= 0*/){ // commented out because we want to generate possible events through EOM
+                  Event event = new Event();
+                  event.setEventType(et);
+                  event.setDateEvent(day);
+                  event.setApproved(false);
+                  event.setName(et.getName());
+
+                  missingEvents.add(event);
+               }
+            }
+            
+            currDate = intervalService.getFirstDayOfNextMonth(currDate);
+         }
+      }
+
+      return missingEvents;
+   }
+
+   public int createAndSaveEventsForNextMonth(){
       final Date mostRecentGenerationDate = eventRepos.findMaxEventDate();
       Date startDate = null;
       if(mostRecentGenerationDate == null){
@@ -66,11 +117,11 @@ public class EventService {
       } else {
          startDate = intervalService.getFirstDayOfNextMonth(mostRecentGenerationDate);
       }
-      
-      createAndSaveEventsForMonth(startDate);
+
+      return createAndSaveEventsForMonth(startDate);
    }
-   
-   public void createAndSaveEventsForMonth(final Date startDate){
+
+   public int createAndSaveEventsForMonth(final Date startDate){
 
       final Map<EventTypeDetailNode, List<Date>> eventTypeDays = new HashMap<EventTypeDetailNode, List<Date>>();
 
@@ -85,10 +136,10 @@ public class EventService {
             }
          }
       }
-      
+
       final List<EventType> allEventTypes = eventTypeRepos.findAll();
       final List<Event> eventsToAdd = new ArrayList<Event>();
-      
+
       for(EventType et : allEventTypes){
          final EventTypeDetailNode etdn = intervalService.createEventTypeDetailNode(et.getInterval(), et.getIntervalDetail());
          if(eventTypeDays.containsKey(etdn)){
@@ -103,23 +154,25 @@ public class EventService {
             }
          }
       }
-      
+
       for(Event e : eventsToAdd){
          EventRoster er = getRosterForEvent(e);
          e.setEventRoster(er);
          updatePreferenceRankingsBasedOnRoster(er);
       }
-      
+
       eventRepos.save(eventsToAdd);
+
+      return eventsToAdd == null ? 0 : eventsToAdd.size();
    }
-   
+
    public void updatePreferenceRankingsBasedOnRoster(final EventRoster eventRoster){
       // create set of people with duties today
       final Set<Person> peopleWithDuties = new HashSet<Person>();
       for(int i = 0; i < eventRoster.getDutiesAndPeople().size(); i++){
          CollectionUtils.addIgnoreNull(peopleWithDuties, eventRoster.getDutiesAndPeople().get(i).getValue());
       }
-      
+
 
       // make them less likely to have to do anything next time (reduce their ranking)
       for(Person p : peopleWithDuties){

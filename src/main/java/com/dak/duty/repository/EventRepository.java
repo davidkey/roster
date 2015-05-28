@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.RepositoryDefinition;
 import org.springframework.stereotype.Repository;
@@ -27,6 +28,20 @@ public interface EventRepository extends JpaRepository<Event, Long>{
    @Query("select max(e.dateEvent) from Event e")
    public Date findMaxEventDate();
    
+   @Modifying
+   @Query("update Event e set e.approved = ?1")
+   public int setApprovedStatusOnAllEvents(boolean approved);
+   
+   //public List<Event> findAllByRosterFullyPopulated();
+   //public List<Event> findAllByRosterFullyPopulatedAndApprovedIsFalse();
+   
+   //public List<Event> findAllByRosterGenerated();
+   //public List<Event> findAllByRosterGeneratedAndApprovedIsFalse();
+   
+   public List<Event> findByApproved(boolean approved);
+   
    public List<Event> findAllByOrderByDateEventDesc();
    public Page<Event> findAllByOrderByDateEventDescIdDesc(Pageable pageable);
+   
+  
 }

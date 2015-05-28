@@ -115,9 +115,59 @@ public class AdminController {
    public String generateRosters(Model model, final RedirectAttributes redirectAttributes){
       logger.debug("generateRosters()");
 
-      eventService.createAndSaveEventsForNextMonth();
+      final int numGenerated = eventService.createAndSaveEventsForNextMonth();
 
-      redirectAttributes.addFlashAttribute("msg_success", "Rosters generated!");
+      redirectAttributes.addFlashAttribute("msg_success", numGenerated + " rosters generated!");
+      return "redirect:/admin/rosters";
+   }
+   
+   @RequestMapping(value = "/rosters/generateMissing", method = RequestMethod.GET)
+   public String generateMissingRosters(Model model, final RedirectAttributes redirectAttributes){
+      logger.debug("generateMissingRosters()");
+
+      final int numGenerated = eventService.createAndSaveMissingEvents();
+
+      redirectAttributes.addFlashAttribute("msg_success", numGenerated + " missing rosters generated!");
+      return "redirect:/admin/rosters";
+   }
+   
+   @RequestMapping(value = "/rosters/approveAllFullyPopulated", method = RequestMethod.GET)
+   public String approveAllFullyPopulated(Model model, final RedirectAttributes redirectAttributes){
+      logger.debug("approveAllFullyPopulated()");
+
+      final List<Event> events = eventRepos.findByApproved(false);
+      final List<Event> eventsToApprove = new ArrayList<Event>();
+      
+      for(Event e : events){
+         if(e.isRosterFullyPopulated()){
+            e.setApproved(true);
+            eventsToApprove.add(e);
+         }
+      }
+      
+      eventRepos.save(eventsToApprove);
+
+      redirectAttributes.addFlashAttribute("msg_success", eventsToApprove.size() + " rosters approved!");
+      return "redirect:/admin/rosters";
+   }
+   
+   @RequestMapping(value = "/rosters/approveAll", method = RequestMethod.GET)
+   public String approveAll(Model model, final RedirectAttributes redirectAttributes){
+      logger.debug("approveAll()");
+
+      final int numAffected = eventService.approveAllRosters();
+
+      redirectAttributes.addFlashAttribute("msg_success", numAffected + " rosters approved!");
+      return "redirect:/admin/rosters";
+   }
+   
+   @RequestMapping(value = "/rosters/unapproveAll", method = RequestMethod.GET)
+   public String unapproveAll(Model model, final RedirectAttributes redirectAttributes){
+      logger.debug("unapproveAll()");
+
+      final int numAffected = eventService.unApproveAllRosters();
+
+      redirectAttributes.addFlashAttribute("msg_success", numAffected + " rosters unapproved!");
       return "redirect:/admin/rosters";
    }
 

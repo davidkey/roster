@@ -19,6 +19,18 @@
 				<a href="${pageContext.request.contextPath}/admin/rosters/generate">
 					<button type="button" class="btn btn-lg btn-success">Generate Next Set</button>
 				</a>
+				&nbsp;
+				<a href="${pageContext.request.contextPath}/admin/rosters/generateMissing">
+					<button type="button" class="btn btn-lg btn-success">Generate Missing Rosters</button>
+				</a>
+				&nbsp;
+				<a href="${pageContext.request.contextPath}/admin/rosters/approveAllFullyPopulated">
+					<button type="button" class="btn btn-lg btn-success">Approve All Fully Populated Rosters</button>
+				</a>
+				&nbsp;
+				<a href="${pageContext.request.contextPath}/admin/rosters/unapproveAll">
+					<button type="button" class="btn btn-lg btn-success">Unapprove All Rosters</button>
+				</a>
 			</p>
 			<br/>
 			<table class="table table-striped" id="eventTable">

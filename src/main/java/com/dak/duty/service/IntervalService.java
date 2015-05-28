@@ -11,12 +11,17 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
+import com.dak.duty.model.EventType;
 import com.dak.duty.model.enums.EventTypeInterval;
 import com.dak.duty.model.enums.IntervalWeekly;
 import com.dak.duty.model.validation.EventTypeIntervalValidation;
 
 @Service
 public class IntervalService {
+   
+   public List<Date> getDaysOfMonthForEventType(@NonNull final Date monthDate, @NonNull final EventType et){
+      return getDaysOfMonthForInterval(monthDate, et.getInterval(), et.getIntervalDetail());
+   }
    
    public List<Date> getDaysOfMonthForInterval(@NonNull final Date monthDate, @NonNull final EventTypeInterval eti, @NonNull final String intervalDetail){
       final List<Date> dates = new ArrayList<Date>();
@@ -51,6 +56,10 @@ public class IntervalService {
       }
 
       return dates;
+   }
+   
+   public Date getCurrentSystemDate(){
+      return sanitizeDate(new Date());
    }
    
    public List<Date> getDaysOfQuarterForInterval(@NonNull final Date firstMonthOfQuarter, @NonNull final EventTypeInterval eti, @NonNull final String intervalDetail){
