@@ -29,19 +29,10 @@ public interface EventRepository extends JpaRepository<Event, Long>{
    public Date findMaxEventDate();
    
    @Modifying
-   @Query("update Event e set e.approved = ?1")
+   @Query("update Event e set e.approved = ?1 where e.approved != ?1")
    public Integer setApprovedStatusOnAllEvents(boolean approved);
    
-   //public List<Event> findAllByRosterFullyPopulated();
-   //public List<Event> findAllByRosterFullyPopulatedAndApprovedIsFalse();
-   
-   //public List<Event> findAllByRosterGenerated();
-   //public List<Event> findAllByRosterGeneratedAndApprovedIsFalse();
-   
    public List<Event> findByApproved(boolean approved);
-   
    public List<Event> findAllByOrderByDateEventDesc();
    public Page<Event> findAllByOrderByDateEventDescIdDesc(Pageable pageable);
-   
-  
 }
