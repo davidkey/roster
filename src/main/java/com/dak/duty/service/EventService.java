@@ -49,11 +49,11 @@ public class EventService {
 
    @Autowired
    IntervalService intervalService;
-   
+
    public int approveAllRosters(){
       return eventRepos.setApprovedStatusOnAllEvents(true);
    }
-   
+
    public int unApproveAllRosters(){
       return eventRepos.setApprovedStatusOnAllEvents(false);
    }
@@ -90,7 +90,7 @@ public class EventService {
 
       for(final EventType et : eventTypesWithNoEvents){
          Date currDate = intervalService.getFirstDayOfMonth(startDate);
-         
+
          while(currDate.compareTo(endDate) <= 0){
             final List<Date> eventDays = intervalService.getDaysOfMonthForEventType(currDate, et);
             for(Date day : eventDays){
@@ -104,7 +104,7 @@ public class EventService {
                   missingEvents.add(event);
                }
             }
-            
+
             currDate = intervalService.getFirstDayOfNextMonth(currDate);
          }
       }
@@ -228,11 +228,11 @@ public class EventService {
 
       return eventRoster;
    }
-   
+
    public List<EventRosterItem> getSortedRosterIncludingEmptySlots(@NonNull final Long eventId){
       return getSortedRosterIncludingEmptySlots(eventRepos.findOne(eventId));
    }
-   
+
    public List<EventRosterItem> getSortedRosterIncludingEmptySlots(@NonNull final Event event){
       final List<Duty> allDutiesForEventType = event.getEventType().getDuties();
       List<EventRosterItem> sortedRoster = new ArrayList<EventRosterItem>(event.getRoster());
@@ -245,7 +245,7 @@ public class EventService {
       if(sortedRoster.size() < allDutiesForEventType.size()){
          for(Duty d : allDutiesForEventType){
             int expectedDutyCount = getNumberOccurencesDuty(allDutiesForEventType, d);
-            int actualDutyCount = getNumberOccurencesDutyForEventRosterItem(sortedRoster, d);
+            int actualDutyCount = getNumberOccurencesDuty(getDuties(sortedRoster), d);
 
             if(expectedDutyCount != actualDutyCount){
                for(int i = actualDutyCount; i < expectedDutyCount; i++){
@@ -260,28 +260,30 @@ public class EventService {
       }
 
       Collections.sort(sortedRoster, new EventRosterItemSortByDutyOrder());
-      
+
       return sortedRoster;
    }
-   
-   private int getNumberOccurencesDuty(List<Duty> duties, Duty duty){
-      int num = 0;
 
-      for(Duty d : duties){
-         if(d.getId() == duty.getId()){
-            num++;
+   private List<Duty> getDuties(List<EventRosterItem> items){
+      List<Duty> duties = new ArrayList<Duty>();
+
+      if(items != null){
+         for(EventRosterItem eri : items){
+            duties.add(eri.getDuty());
          }
       }
 
-      return num;
+      return duties;
    }
 
-   private int getNumberOccurencesDutyForEventRosterItem(List<EventRosterItem> items, Duty duty){
+   private int getNumberOccurencesDuty(List<Duty> duties, Duty duty){
       int num = 0;
 
-      for(EventRosterItem eri : items){
-         if(eri.getDuty().getId() == duty.getId()){
-            num++;
+      if(duties != null){
+         for(Duty d : duties){
+            if(d.getId() == duty.getId()){
+               num++;
+            }
          }
       }
 

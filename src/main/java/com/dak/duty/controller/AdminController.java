@@ -1,7 +1,6 @@
 package com.dak.duty.controller;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,7 +30,6 @@ import com.dak.duty.model.Event;
 import com.dak.duty.model.EventRosterItem;
 import com.dak.duty.model.EventType;
 import com.dak.duty.model.Person;
-import com.dak.duty.model.comparable.EventRosterItemSortByDutyOrder;
 import com.dak.duty.model.enums.EventTypeInterval;
 import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.EventRepository;
@@ -271,7 +269,7 @@ public class AdminController {
       logger.debug("getNewDuty()");
 
       model.addAttribute("duty", new Duty());
-      model.addAttribute("maxSortOrder", dutyRepos.findMaxSortOrder());
+      model.addAttribute("maxSortOrder", dutyRepos.findMaxSortOrder() + 1);
       return "admin/duty";
    }
 
