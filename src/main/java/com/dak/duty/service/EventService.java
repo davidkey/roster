@@ -116,7 +116,7 @@ public class EventService {
       final Date mostRecentGenerationDate = eventRepos.findMaxEventDate();
       Date startDate = null;
       if(mostRecentGenerationDate == null){
-         startDate = intervalService.getFirstDayOfMonth(new Date());
+         startDate = intervalService.getFirstDayOfMonth(intervalService.getCurrentSystemDate());
       } else {
          startDate = intervalService.getFirstDayOfNextMonth(mostRecentGenerationDate);
       }
