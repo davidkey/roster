@@ -35,4 +35,9 @@ public interface EventRepository extends JpaRepository<Event, Long>{
    public List<Event> findByApproved(boolean approved);
    public List<Event> findAllByOrderByDateEventDesc();
    public Page<Event> findAllByOrderByDateEventDescIdDesc(Pageable pageable);
+   
+   @Query("select e from Event e where e.dateEvent >= ?1 and e.dateEvent <= ?2")
+   public List<Event> findEventsByDateBetween(final Date startDate, final Date endDate);
+   
+   public List<Event> findAllByDateEventGreaterThanEqual(final Date d);
 }

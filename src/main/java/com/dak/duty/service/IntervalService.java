@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import lombok.NonNull;
 
@@ -102,7 +103,7 @@ public class IntervalService {
    }
 
    protected synchronized int getDayOfWeek(final Date d){
-      Calendar cal = Calendar.getInstance();
+      Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
       cal.setTime(d);
 
       return cal.get(Calendar.DAY_OF_WEEK);

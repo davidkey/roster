@@ -1,6 +1,9 @@
 package com.dak.duty.controller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.dak.duty.model.Duty;
@@ -37,6 +41,8 @@ import com.dak.duty.repository.EventTypeRepository;
 import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.service.DutyService;
 import com.dak.duty.service.EventService;
+import com.dak.duty.service.EventService.EventCalendarNode;
+import com.dak.duty.service.IntervalService;
 
 @Controller
 @RequestMapping("/admin")
@@ -62,6 +68,11 @@ public class AdminController {
    @Autowired
    DutyService dutyService;
 
+   @Autowired
+   IntervalService intervalService;
+
+   private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); //FIXME: not thread safe
+
    @RequestMapping(value = "/", method = RequestMethod.GET)
    public String getAdminHome(Model model){
       logger.debug("getAdminHome()");
@@ -71,6 +82,23 @@ public class AdminController {
 
       model.addAttribute("events", events.getContent());
       return "admin/admin";
+   }
+
+   @RequestMapping(value = "/events/{year}/{month}/json", method = RequestMethod.GET)
+   public @ResponseBody List<EventCalendarNode> getEventCalendarItems(@PathVariable("year") final Integer year, @PathVariable("month") final Integer month) throws ParseException{
+      logger.info("getEventCalendarItems({}, {})", year, month);
+      final Date monthDate = sdf.parse(year + "-" + month + "-01");  //FIXME: ugly
+      return eventService.getEventCalendarNodesForMonth(monthDate);
+   }
+   
+   @RequestMapping(value = "/events/all/json", method = RequestMethod.GET)
+   public @ResponseBody List<EventCalendarNode> getFutureEventCalendarItems(){
+      return eventService.getAllFutureEventCalendarNodes(intervalService.getFirstDayOfMonth(intervalService.getCurrentSystemDate()));
+   }
+
+   @RequestMapping(value = "/events/current/json", method = RequestMethod.GET)
+   public @ResponseBody List<EventCalendarNode> getCurrentEventCalendarItems(){
+      return eventService.getEventCalendarNodesForMonth(intervalService.getCurrentSystemDate());
    }
 
    @RequestMapping(value = "/people", method = RequestMethod.GET)

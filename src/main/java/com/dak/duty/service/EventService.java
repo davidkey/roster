@@ -1,5 +1,6 @@
 package com.dak.duty.service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -11,6 +12,7 @@ import java.util.Set;
 
 import javax.transaction.Transactional;
 
+import lombok.Getter;
 import lombok.NonNull;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -49,6 +51,33 @@ public class EventService {
 
    @Autowired
    IntervalService intervalService;
+   
+   public List<EventCalendarNode> getAllFutureEventCalendarNodes(final Date startDate){
+      final List<EventCalendarNode> nodes = new ArrayList<EventCalendarNode>();
+
+      final List<Event> events = eventRepos.findAllByDateEventGreaterThanEqual(startDate);
+      for(Event e : events){
+         nodes.add(new EventCalendarNode(e.getId(), e.getEventType().getName(), e.getDateEvent()));
+      }
+      
+      Collections.sort(nodes);
+      return nodes;
+   }
+   
+   public List<EventCalendarNode> getEventCalendarNodesForMonth(final Date monthDate){
+      final List<EventCalendarNode> nodes = new ArrayList<EventCalendarNode>();
+      
+      final Date startDate = intervalService.getFirstDayOfMonth(monthDate);
+      final Date endDate = intervalService.getLastDayOfMonth(startDate);
+      
+      final List<Event> events = eventRepos.findEventsByDateBetween(startDate, endDate);
+      for(Event e : events){
+         nodes.add(new EventCalendarNode(e.getId(), e.getEventType().getName(), e.getDateEvent()));
+      }
+      
+      Collections.sort(nodes);
+      return nodes;
+   }
 
    public int approveAllRosters(){
       return eventRepos.setApprovedStatusOnAllEvents(true);
@@ -313,5 +342,30 @@ public class EventService {
 
       return ids;
 
+   }
+   
+   public static class EventCalendarNode implements Comparable<EventCalendarNode>{
+      @Getter
+      private final long id;
+      
+      @Getter
+      private final String title;
+      
+      protected final Date start;
+      
+      public String getStart(){
+         return new SimpleDateFormat("yyyy-MM-dd").format(start);
+      }
+     
+      public EventCalendarNode(final long id, final String title, final Date eventDate){
+         this.id = id;
+         this.title = title;
+         this.start = eventDate;
+      }
+
+      @Override
+      public int compareTo(EventCalendarNode o) {
+         return this.start.compareTo(o.start);
+      }
    }
 }
