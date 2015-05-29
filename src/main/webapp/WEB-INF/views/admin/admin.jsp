@@ -27,36 +27,7 @@
           <h1 class="page-header">Dashboard</h1>
          
           <div id='calendar'></div>
-          <%-- 
-		  <h2 class="sub-header">Upcoming / Recently Generated Rosters</h2>
-          <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Date</th>
-                  <th>Name</th>
-                  <th>Generated?</th>
-                  <th>Complete?</th>
-                  <th>Approved?</th>
-                </tr>
-              </thead>
-              <tbody>
-              	<c:forEach var="event" items="${events}">
-					<tr>
-						<td>${event.id}</td>
-						<td>${event.dateEvent}</td>
-						<td>${event.name}</td>
-						<td>${event.rosterGenerated}</td>
-						<td>${event.rosterFullyPopulated}</td>
-						<td>${event.approved}</td>
-					</tr>
-				</c:forEach>
-              </tbody>
-            </table>
-          </div> --%>
         </div>
-        
         
      <jsp:include page="../shared/footer.jsp" />
      <script type='text/javascript' src='//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js'></script>
@@ -98,8 +69,6 @@
 	 			editable: true,
 	 			events: data
 	 		});
-	 		
-	 		$("#calendar").fullCalendar('render');
 		}
  		
  	});
