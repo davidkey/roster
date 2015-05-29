@@ -64,7 +64,7 @@
 	 				center: 'title',
 	 				right: 'month,agendaWeek,agendaDay'
 	 			},
-	 			defaultDate: data && data[0] && data[0]['start'] ? data[0]['start'] : moment().format("YYYY-MM-DD"),
+	 			defaultDate: moment().format("YYYY-MM-DD"),
 	 			defaultView: 'month',
 	 			editable: true,
 	 			events: data
