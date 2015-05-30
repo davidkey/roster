@@ -103,7 +103,6 @@ public class InitialisationService {
       return events;
    }
    
-   @SuppressWarnings("deprecation")
    protected List<Person> getDefaultPeople(final List<Duty> duties){
       final List<Person> people = new ArrayList<Person>();
       DataFactory df = new DataFactory();
