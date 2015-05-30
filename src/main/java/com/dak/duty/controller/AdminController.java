@@ -1,7 +1,6 @@
 package com.dak.duty.controller;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,6 +11,7 @@ import java.util.Map.Entry;
 
 import javax.validation.Valid;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +41,8 @@ import com.dak.duty.repository.EventTypeRepository;
 import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.service.DutyService;
 import com.dak.duty.service.EventService;
-import com.dak.duty.service.container.EventCalendarNode;
 import com.dak.duty.service.IntervalService;
+import com.dak.duty.service.container.EventCalendarNode;
 
 @Controller
 @RequestMapping("/admin")
@@ -71,8 +71,6 @@ public class AdminController {
    @Autowired
    IntervalService intervalService;
 
-   private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); //FIXME: not thread safe
-
    @RequestMapping(value = "/", method = RequestMethod.GET)
    public String getAdminHome(Model model){
       logger.debug("getAdminHome()");
@@ -87,7 +85,7 @@ public class AdminController {
    @RequestMapping(value = "/events/{year}/{month}/json", method = RequestMethod.GET)
    public @ResponseBody List<EventCalendarNode> getEventCalendarItems(@PathVariable("year") final Integer year, @PathVariable("month") final Integer month) throws ParseException{
       logger.info("getEventCalendarItems({}, {})", year, month);
-      final Date monthDate = sdf.parse(year + "-" + month + "-01");  //FIXME: ugly
+      final Date monthDate = new DateTime(year, month, 1, 0, 0 ,0).toDate();
       return eventService.getEventCalendarNodesForMonth(monthDate);
    }
    

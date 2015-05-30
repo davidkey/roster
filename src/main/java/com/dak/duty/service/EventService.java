@@ -319,7 +319,6 @@ public class EventService {
       return num;
    }
 
-   //FIXME: kludge until I can figure out how I borked equals / hashcode -- should be able to [a.equals(b)] but have to use [a.getId() == b.getId()]
    private static boolean personDidThisDuty(final Person person, final Duty duty, final EventRoster eventRoster){
 
       for(int i = 0; i < eventRoster.getDutiesAndPeople().size(); i++){
