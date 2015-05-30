@@ -75,11 +75,6 @@ public class AdminController {
    @RequestMapping(value = "/", method = RequestMethod.GET)
    public String getAdminHome(Model model){
       logger.debug("getAdminHome()");
-
-      final Page<Event> events = eventRepos.findAllByOrderByDateEventDescIdDesc(new PageRequest(0, 20));
-      logger.debug("events found: {}", events.getContent().size());
-
-      model.addAttribute("events", events.getContent());
       return "admin/admin";
    }
 
