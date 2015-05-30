@@ -15,7 +15,7 @@
 		<h1 class="page-header">View Roster</h1>
 
 		<div id="roster">
-			<h2>${event.eventType.name}</h2>
+			<h2><c:out value="${event.eventType.name}"/></h2>
 			<h3>
 				<fmt:formatDate pattern="MM/dd/yyyy" value="${event.dateEvent}" /> 
 				<small><fmt:formatDate pattern="EEEE" value="${event.dateEvent}" /></small>
@@ -31,8 +31,8 @@
 				<tbody>
 				<c:forEach var="rosterItem" items="${roster}">
 					<tr>
-						<td>${rosterItem.duty.name}</td>
-						<td>${rosterItem.person.nameFirst} ${rosterItem.person.nameLast}</td>
+						<td><c:out value="${rosterItem.duty.name}"/></td>
+						<td><c:out value="${rosterItem.person.nameFirst} ${rosterItem.person.nameLast}"/></td>
 					</tr>
 				</c:forEach>
 				</tbody>

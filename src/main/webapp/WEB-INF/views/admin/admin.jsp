@@ -50,7 +50,6 @@
 			        	} catch(err) {
 			        		// some browsers don't support .forEach yet...
 			        	}
-			        	/* TODO: need to escape event names for (against? :)) xss */
 			        	populateCalendar(data);
 			        }
 			    });
