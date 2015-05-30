@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.dak.duty.InvalidIdException;
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.Event;
 import com.dak.duty.model.EventRosterItem;
@@ -212,8 +213,8 @@ public class AdminController {
       final boolean alreadyExisted = eventType.getId() > 0;
 
       if(result.hasErrors()){
-         //TODO: read and implement(?): https://stackoverflow.com/questions/2543797/spring-redirect-after-post-even-with-validation-errors
-         return "admin/eventType"; // is this right? url changes after post... how to fix? TODO: FIXME
+         // read and implement(?): https://stackoverflow.com/questions/2543797/spring-redirect-after-post-even-with-validation-errors
+         return "admin/eventType"; // is this right? url changes after post... how to fix? FIXME
       }
 
       /**
@@ -228,7 +229,7 @@ public class AdminController {
                Duty duty = dutyRepos.findOne(dutyId);
 
                if(duty == null){
-                  throw new RuntimeException("Invalid duty id " + dutyId); //FIXME: vague exception type
+                  throw new InvalidIdException("Invalid duty id " + dutyId);
                }
 
                fixedDuties.add(duty);
@@ -282,7 +283,7 @@ public class AdminController {
       final boolean alreadyExisted = duty.getId() > 0;
 
       if(result.hasErrors()){
-         return "admin/duty"; // is this right? url changes after post... how to fix? TODO: FIXME
+         return "admin/duty"; // is this right? url changes after post... how to fix? FIXME
       }
 
       dutyService.saveOrUpdateDuty(duty);
@@ -341,7 +342,7 @@ public class AdminController {
       final boolean personAlreadyExisted = person.getId() > 0;
 
       if(result.hasErrors()){
-         return "admin/person"; // is this right? url changes after post... how to fix? TODO: FIXME
+         return "admin/person"; // is this right? url changes after post... how to fix FIXME
       }
 
       personRepos.save(person);
