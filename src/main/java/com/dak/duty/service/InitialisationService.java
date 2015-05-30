@@ -154,7 +154,7 @@ public class InitialisationService {
       duties.add(duty);
 
       duty = new Duty();
-      duty.setName("Annoucements");
+      duty.setName("Announcements");
       duty.setDescription(duty.getName());
       duty.setSortOrder(count++);
       duties.add(duty);
