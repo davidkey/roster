@@ -25,6 +25,11 @@
 				class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
 				<beans:property name="prettyPrint" value="true" />
 			</beans:bean>
+			
+			<!-- force utf encoding -->
+			<beans:bean class="org.springframework.http.converter.StringHttpMessageConverter">
+		      <beans:property name="supportedMediaTypes" value = "text/plain;charset=UTF-8" />
+		    </beans:bean>
 		</message-converters>
 	</annotation-driven>
 	
