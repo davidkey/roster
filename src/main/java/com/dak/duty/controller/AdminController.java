@@ -41,7 +41,7 @@ import com.dak.duty.repository.EventTypeRepository;
 import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.service.DutyService;
 import com.dak.duty.service.EventService;
-import com.dak.duty.service.EventService.EventCalendarNode;
+import com.dak.duty.service.container.EventCalendarNode;
 import com.dak.duty.service.IntervalService;
 
 @Controller
@@ -377,8 +377,8 @@ public class AdminController {
          final List<String> vals = entry.getValue();
 
          if(key != null && vals != null && vals.size() > 0 && key.startsWith("duty_")){
-            final long dutyId = Long.valueOf(key.split("_")[1]);
-            final int prefRanking = Integer.valueOf(vals.get(0));
+            final long dutyId = Long.parseLong(key.split("_")[1]);
+            final int prefRanking = Integer.parseInt(vals.get(0));
             dutyPrefs.put(dutyId, prefRanking);
          }
       }

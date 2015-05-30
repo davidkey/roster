@@ -1,6 +1,5 @@
 package com.dak.duty.service;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -12,7 +11,6 @@ import java.util.Set;
 
 import javax.transaction.Transactional;
 
-import lombok.Getter;
 import lombok.NonNull;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -32,6 +30,8 @@ import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.EventTypeRepository;
 import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.service.IntervalService.EventTypeDetailNode;
+import com.dak.duty.service.container.comparable.EventCalendarNodeSortByDate;
+import com.dak.duty.service.container.EventCalendarNode;
 
 @Service
 @Transactional
@@ -60,7 +60,7 @@ public class EventService {
          nodes.add(new EventCalendarNode(e.getId(), e.getEventType().getName(), e.getDateEvent()));
       }
       
-      Collections.sort(nodes);
+      Collections.sort(nodes, new EventCalendarNodeSortByDate());
       return nodes;
    }
    
@@ -75,7 +75,7 @@ public class EventService {
          nodes.add(new EventCalendarNode(e.getId(), e.getEventType().getName(), e.getDateEvent()));
       }
       
-      Collections.sort(nodes);
+      Collections.sort(nodes, new EventCalendarNodeSortByDate());
       return nodes;
    }
 
@@ -104,7 +104,7 @@ public class EventService {
 
       eventRepos.save(missingEvents);
 
-      return missingEvents == null ? 0 : missingEvents.size();
+      return missingEvents.size();
    }
 
    /**
@@ -195,7 +195,7 @@ public class EventService {
 
       eventRepos.save(eventsToAdd);
 
-      return eventsToAdd == null ? 0 : eventsToAdd.size();
+      return eventsToAdd.size();
    }
 
    public void updatePreferenceRankingsBasedOnRoster(final EventRoster eventRoster){
@@ -217,7 +217,7 @@ public class EventService {
                pd.setAdjustedPreference(0); 
             } else {
                // make them roughly half as likely to have to do anything going forward
-               pd.setAdjustedPreference((int)Math.floor(pd.getAdjustedPreference() / 2)); 
+               pd.setAdjustedPreference(pd.getAdjustedPreference() / 2); 
             }
          }
       }
@@ -342,30 +342,5 @@ public class EventService {
 
       return ids;
 
-   }
-   
-   public static class EventCalendarNode implements Comparable<EventCalendarNode>{
-      @Getter
-      private final long id;
-      
-      @Getter
-      private final String title;
-      
-      protected final Date start;
-      
-      public String getStart(){
-         return new SimpleDateFormat("yyyy-MM-dd").format(start);
-      }
-     
-      public EventCalendarNode(final long id, final String title, final Date eventDate){
-         this.id = id;
-         this.title = title;
-         this.start = eventDate;
-      }
-
-      @Override
-      public int compareTo(EventCalendarNode o) {
-         return this.start.compareTo(o.start);
-      }
    }
 }

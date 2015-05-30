@@ -1,10 +1,12 @@
 package com.dak.duty.model.comparable;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import com.dak.duty.model.EventRosterItem;
 
-public class EventRosterItemSortByDutyOrder implements Comparator<EventRosterItem> {
+public class EventRosterItemSortByDutyOrder implements Comparator<EventRosterItem>, Serializable {
+   private static final long serialVersionUID = 1L;
 
    @Override
    public int compare(EventRosterItem o1, EventRosterItem o2) {

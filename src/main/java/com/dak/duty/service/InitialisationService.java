@@ -1,13 +1,8 @@
 package com.dak.duty.service;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.text.SimpleDateFormat;
-
 import javax.transaction.Transactional;
 
 import lombok.NonNull;
@@ -30,13 +25,15 @@ import com.dak.duty.repository.PersonRepository;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.fluttercode.datafactory.impl.DataFactory;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 @Service
 @Transactional
 public class InitialisationService {
 
    private static final Logger logger = LoggerFactory.getLogger(InitialisationService.class);
-   private static final DateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
+   public static final DateTimeFormatter fmt = DateTimeFormat.forPattern("MM/dd/yyyy");
    
    @Autowired
    EventTypeRepository eventTypeRepos;
@@ -90,11 +87,14 @@ public class InitialisationService {
          e.setName(et.getName());
          try{
             if(e.getName().contains("Sunday")){
-               e.setDateEvent(format.parse("05/24/2015")); // sunday
+               e.setDateEvent(fmt.parseDateTime("05/24/2015").toDate()); // sunday
             } else {
-               e.setDateEvent(format.parse("05/27/2015")); // wednesday
+               e.setDateEvent(fmt.parseDateTime("05/27/2015").toDate()); // wednesday
             }
-         } catch (ParseException pe){ }
+         } catch (IllegalArgumentException iae){
+            // do nothing
+         }
+         
          e.setEventType(et);
         
          events.add(e);

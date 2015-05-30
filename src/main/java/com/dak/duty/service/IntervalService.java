@@ -49,7 +49,7 @@ public class IntervalService {
             }
          }
       } else if(EventTypeInterval.MONTHLY.equals(eti)){
-         DateTime dt = som.plusDays(Integer.valueOf(intervalDetail)-1);
+         DateTime dt = som.plusDays(Integer.parseInt(intervalDetail)-1);
          if(dt.compareTo(eom) > 0){ // if MONTHLY interval occurs on 29th, 30th or 31st and this month doesn't have that many days ...
             dt = eom;               // ... just use EOM
          }

@@ -1,15 +1,16 @@
 package com.dak.duty.model.validation;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import com.dak.duty.model.enums.EventTypeInterval;
 import com.dak.duty.model.enums.IntervalWeekly;
 
 public class EventTypeIntervalValidation {
-   public static final DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+   public static final DateTimeFormatter fmt = DateTimeFormat.forPattern("MM/dd/yyyy");
+  
    
    public static boolean validate(final EventTypeInterval eti, final String value){
       if(eti == null || value == null){ // could this cause problems depending on hibernate's create order?
@@ -36,7 +37,7 @@ public class EventTypeIntervalValidation {
       int returnVal = -1;
       
       try{
-         returnVal = Integer.valueOf(input);
+         returnVal = Integer.parseInt(input);
       } catch (NumberFormatException nfe){
          // do nothing
       }
@@ -47,9 +48,9 @@ public class EventTypeIntervalValidation {
    public static boolean isValidDate(final String input){
       
       try{
-        df.parse(input); 
+        fmt.parseDateTime(input);
         return true;
-      } catch (ParseException pe){
+      } catch (IllegalArgumentException iae){
          // do nothing
       }
       
@@ -57,11 +58,11 @@ public class EventTypeIntervalValidation {
    }
    
    public static Date strToDate(final String str){
-         try {
-            return df.parse(str);
-         } catch (ParseException e) {
-            
-         }
+      try{
+         return fmt.parseDateTime(str).toDate();
+       } catch (IllegalArgumentException iae){
+          // do nothing
+       }
 
       return null;
    }

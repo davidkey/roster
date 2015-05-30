@@ -1,11 +1,23 @@
-<?xml version="1.0"?>
-<FindBugsFilter>
+<?xml version="1.0" encoding="UTF-8"?>
+
+<FindBugsFilter xmlns="http://findbugs.sourceforge.net/filter/3.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://findbugs.sourceforge.net/filter/3.0.0 https://findbugs.googlecode.com/git/findbugs/etc/findbugsfilter.xsd">
+    
 	<Match>
 		<Package name="~.*\.model"/>
 		<Bug pattern="EI_EXPOSE_REP"/>
 	</Match>
 	<Match>
 		<Package name="~.*\.model"/>
+		<Bug pattern="EI_EXPOSE_REP2"/>
+	</Match>
+	<Match>
+		<Package name="~.*\.service\.container"/>
+		<Bug pattern="EI_EXPOSE_REP"/>
+	</Match>
+	<Match>
+		<Package name="~.*\.service\.container"/>
 		<Bug pattern="EI_EXPOSE_REP2"/>
 	</Match>
 </FindBugsFilter>
