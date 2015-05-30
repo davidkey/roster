@@ -17,9 +17,7 @@
 		<h1 class="page-header">Event Types</h1>
 		<div class="table-responsive">
 			<p>
-				<a href="${pageContext.request.contextPath}/admin/eventTypes/new">
-					<button type="button" class="btn btn-lg btn-success">Add Event</button>
-				</a>
+				<a href="${pageContext.request.contextPath}/admin/eventTypes/new" class="btn btn-lg btn-success">Add Event</a>
 			</p>
 			<table class="table table-striped" id="eventTypeTable">
 				<thead>
@@ -40,7 +38,7 @@
 							<td><c:out value="${eventType.description}"/></td>
 							<td>${eventType.interval} - ${eventType.intervalDetail}</td>
 							<td>${fn:length(eventType.duties)}</td>
-							<td><a href="${pageContext.request.contextPath}/admin/eventTypes/${eventType.id}"><button type="button" class="btn btn-xs btn-primary">Edit</button></a></td>
+							<td><a href="${pageContext.request.contextPath}/admin/eventTypes/${eventType.id}" class="btn btn-xs btn-primary">Edit</a></td>
 						</tr>
 					</c:forEach>
 				</tbody>

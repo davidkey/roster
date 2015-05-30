@@ -16,9 +16,7 @@
 		<h1 class="page-header">People</h1>
 		<div class="table-responsive">
 			<p>
-				<a href="${pageContext.request.contextPath}/admin/people/new">
-					<button type="button" class="btn btn-lg btn-success">Add New Person</button>
-				</a>
+				<a href="${pageContext.request.contextPath}/admin/people/new" class="btn btn-lg btn-success">Add New Person</a>
 			</p>
 			<table class="table table-striped" id="personTable">
 				<thead>
@@ -42,8 +40,8 @@
 							<td><c:out value="${person.emailAddress}"/></td>
 							<td>${person.active ? 'Yes' : 'No'}</td>
 							<td><fmt:formatDate value="${person.lastUpdated}" pattern="yyyy-MM-dd hh:mm aaa" /></td>
-							<td><a href="${pageContext.request.contextPath}/admin/people/${person.id}"><button type="button" class="btn btn-xs btn-primary">Edit</button></a></td>
-							<td><a href="${pageContext.request.contextPath}/admin/people/${person.id}/duties"><button type="button" class="btn btn-xs btn-info">Manage Duties</button></a></td>
+							<td><a href="${pageContext.request.contextPath}/admin/people/${person.id}" class="btn btn-xs btn-primary">Edit</a></td>
+							<td><a href="${pageContext.request.contextPath}/admin/people/${person.id}/duties" class="btn btn-xs btn-info">Manage Duties</a></td>
 						</tr>
 					</c:forEach>
 				</tbody>

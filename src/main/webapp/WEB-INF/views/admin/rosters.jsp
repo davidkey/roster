@@ -16,21 +16,13 @@
 		<h1 class="page-header">Rosters &amp; Events</h1>
 		<div class="table-responsive">
 			<p>
-				<a href="${pageContext.request.contextPath}/admin/rosters/generate">
-					<button type="button" class="btn btn-lg btn-success">Generate Next Set</button>
-				</a>
+				<a href="${pageContext.request.contextPath}/admin/rosters/generate" class="btn btn-lg btn-success">Generate Next Set</a>
 				&nbsp;
-				<a href="${pageContext.request.contextPath}/admin/rosters/generateMissing">
-					<button type="button" class="btn btn-lg btn-success">Generate Missing Rosters</button>
-				</a>
+				<a href="${pageContext.request.contextPath}/admin/rosters/generateMissing" class="btn btn-lg btn-success">Generate Missing Rosters</a>
 				&nbsp;
-				<a href="${pageContext.request.contextPath}/admin/rosters/approveAllFullyPopulated">
-					<button type="button" class="btn btn-lg btn-success">Approve All Fully Populated Rosters</button>
-				</a>
+				<a href="${pageContext.request.contextPath}/admin/rosters/approveAllFullyPopulated" class="btn btn-lg btn-success">Approve All Fully Populated Rosters</a>
 				&nbsp;
-				<a href="${pageContext.request.contextPath}/admin/rosters/unapproveAll">
-					<button type="button" class="btn btn-lg btn-success">Unapprove All Rosters</button>
-				</a>
+				<a href="${pageContext.request.contextPath}/admin/rosters/unapproveAll" class="btn btn-lg btn-success">Unapprove All Rosters</a>
 			</p>
 			<br/>
 			<table class="table table-striped" id="eventTable">
@@ -54,7 +46,7 @@
 							<td>${event.rosterGenerated ? 'Yes' : 'No'}</td>
 							<td>${event.rosterFullyPopulated ? 'Yes' : 'No'}</td>
 							<td>${event.approved ? 'Yes' : 'No'}</td>
-							<td><a href="${pageContext.request.contextPath}/admin/rosters/${event.id}"><button type="button" class="btn btn-xs btn-primary">View</button></a></td>
+							<td><a href="${pageContext.request.contextPath}/admin/rosters/${event.id}" class="btn btn-xs btn-primary">View</a></td>
 						</tr>
 					</c:forEach>
 				</tbody>

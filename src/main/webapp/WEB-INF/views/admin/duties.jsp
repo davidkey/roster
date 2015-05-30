@@ -16,9 +16,7 @@
 		<h1 class="page-header">Duty Management</h1>
 		<div class="table-responsive">
 			<p>
-				<a href="${pageContext.request.contextPath}/admin/duties/new">
-					<button type="button" class="btn btn-lg btn-success">Add Duty</button>
-				</a>
+				<a href="${pageContext.request.contextPath}/admin/duties/new" class="btn btn-lg btn-success">Add Duty</a>
 			</p>
 			<table class="table table-striped" id="dutyTable">
 				<thead>
@@ -37,7 +35,7 @@
 							<td><c:out value="${duty.name}"/></td>
 							<td><c:out value="${duty.description}"/></td>
 							<td>${duty.sortOrder}</td>
-							<td><a href="${pageContext.request.contextPath}/admin/duties/${duty.id}"><button type="button" class="btn btn-xs btn-primary">Edit</button></a></td>
+							<td><a href="${pageContext.request.contextPath}/admin/duties/${duty.id}" class="btn btn-xs btn-primary">Edit</a></td>
 						</tr>
 					</c:forEach>
 				</tbody>

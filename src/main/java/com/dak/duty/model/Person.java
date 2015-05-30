@@ -100,13 +100,7 @@ public class Person  implements Serializable {
       duties.add(pd);
    }
 
-   /**
-    * This method will become private - use {@link #addOrUpdateDutyAndPreference(Duty, Integer) addOrUpdateDutyAndPreference} instead.
-    * @param duty
-    * @param preference
-    */
    @Transient
-   @Deprecated
    public void addDutyAndPreference(final Duty duty, final Integer preference){
       PersonDuty pd = new PersonDuty();
       pd.setDuty(duty);
