@@ -72,7 +72,7 @@
 	<!-- spring data jpa -->
 	<beans:bean id="jpaVendorAdapter"
 		class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-		<beans:property name="showSql" value="true" />
+		<beans:property name="showSql" value="false" />
 		<beans:property name="generateDdl" value="true" />
 		<beans:property name="database" value="POSTGRESQL" />
 	</beans:bean>
@@ -89,8 +89,8 @@
 				<beans:prop key="hibernate.use_sql_comments">false</beans:prop>
 				<beans:prop key="hibernate.hbm2ddl.auto">update</beans:prop>
 				<beans:prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</beans:prop>
-				<beans:prop key="hibernate.show_sql">true</beans:prop>
-				<beans:prop key="hibernate.format_sql">true</beans:prop>
+				<beans:prop key="hibernate.show_sql">false</beans:prop>
+				<beans:prop key="hibernate.format_sql">false</beans:prop>
 				<!-- caching -->
 				<!-- -->	
 				<beans:prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory</beans:prop>
