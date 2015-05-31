@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.dak.duty.InvalidIdException;
+import com.dak.duty.exception.InvalidIdException;
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.Event;
 import com.dak.duty.model.EventRosterItem;
