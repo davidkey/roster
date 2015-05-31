@@ -11,12 +11,12 @@ import com.dak.duty.repository.DutyRepository;
 @Service
 @Transactional
 public class DutyService {
-   
+
    @Autowired
    DutyRepository dutyRepos;
 
    public void saveOrUpdateDuty(Duty duty){
-      
+
       /**
        * 1) Decrement all sort orders [>] old sort order (if this is an update, not a new item)
        * 2) Increment all sort orders [>=] new / updated duty sort order
@@ -24,10 +24,14 @@ public class DutyService {
        */
       if(duty.getId() > 0){ // if this is an update, not a new entity
          final Duty dutyBeforeChanges = dutyRepos.findOne(duty.getId());
-         dutyRepos.decrementSortOrderAbove(dutyBeforeChanges.getSortOrder());
+
+         if(duty.getSortOrder() != dutyBeforeChanges.getSortOrder()){
+            dutyRepos.decrementSortOrderAboveExcludingDutyId(dutyBeforeChanges.getSortOrder(), duty.getId());
+            dutyRepos.incrementSortOrderAboveAndIncludingExcludingDutyId(duty.getSortOrder(), duty.getId());
+         }
+      } else {
+         dutyRepos.incrementSortOrderAboveAndIncluding(duty.getSortOrder());
       }
-      
-      dutyRepos.incrementSortOrderAboveAndIncluding(duty.getSortOrder());
 
       dutyRepos.save(duty);
    }
