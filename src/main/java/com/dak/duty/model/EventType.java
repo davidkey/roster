@@ -2,6 +2,8 @@ package com.dak.duty.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -15,6 +17,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
@@ -30,6 +34,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import com.dak.duty.model.enums.EventTypeInterval;
 import com.dak.duty.model.exception.IntervalValidationException;
 import com.dak.duty.model.validation.EventTypeIntervalValidation;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
 @Table(name = "event_type")
@@ -63,6 +68,28 @@ public class EventType implements Serializable {
    
    @Column(nullable = true)
    private String intervalDetail;
+   
+   @Temporal(TemporalType.TIME)
+   @Column(nullable = false)
+   @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="h:mm a")
+   private Date startTime = getBlankDate();
+   
+   @Temporal(TemporalType.TIME)
+   @Column(nullable = false)
+   @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="h:mm a")
+   private Date endTime = getBlankDate();
+   
+   @Transient
+   public Date getBlankDate(){
+      Calendar cal = Calendar.getInstance();
+      cal.setTime(new Date(0L));
+      cal.set(Calendar.HOUR, 0);
+      cal.set(Calendar.MINUTE, 0);
+      cal.set(Calendar.SECOND, 0);
+      cal.set(Calendar.MILLISECOND, 0);
+      
+      return cal.getTime();
+   }
    
    public void setInterval(final EventTypeInterval interval){
       if(intervalDetail != null && !EventTypeIntervalValidation.validate(interval, intervalDetail)){
