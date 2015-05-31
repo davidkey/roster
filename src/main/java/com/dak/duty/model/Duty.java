@@ -14,6 +14,7 @@ import javax.validation.constraints.Min;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -25,6 +26,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 @Getter
 @Setter
 @EqualsAndHashCode
+@ToString
 public class Duty implements Serializable {
    private static final long serialVersionUID = 1L;
    
