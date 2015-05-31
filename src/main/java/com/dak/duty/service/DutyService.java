@@ -25,7 +25,7 @@ public class DutyService {
       if(duty.getId() > 0){ // if this is an update, not a new entity
          final Duty dutyBeforeChanges = dutyRepos.findOne(duty.getId());
 
-         if(duty.getSortOrder() != dutyBeforeChanges.getSortOrder()){
+         if(!duty.getSortOrder().equals(dutyBeforeChanges.getSortOrder())){
             dutyRepos.decrementSortOrderAboveExcludingDutyId(dutyBeforeChanges.getSortOrder(), duty.getId());
             dutyRepos.incrementSortOrderAboveAndIncludingExcludingDutyId(duty.getSortOrder(), duty.getId());
          }
