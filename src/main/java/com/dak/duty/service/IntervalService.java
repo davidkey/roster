@@ -46,6 +46,7 @@ public class IntervalService {
          for(DateTime dt = som; dt.compareTo(eom) <= 0; dt = dt.plusDays(1)){
             if(dt.getDayOfWeek() == dayOfWeek){
                dates.add(dt.toDate());
+               dt = dt.plusDays(6);
             }
          }
       } else if(EventTypeInterval.MONTHLY.equals(eti)){
