@@ -195,7 +195,7 @@ public class InitialisationService {
             case "Song Leading":
             case "Opening Prayer":
             case "Closing Prayer":
-            case "Annoucements":
+            case "Announcements":
                sundayAmDuties.add(d);
                sundayPmDuties.add(d);
                wednesdayDuties.add(d);
