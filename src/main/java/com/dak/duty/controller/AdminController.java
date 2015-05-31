@@ -206,8 +206,14 @@ public class AdminController {
       final boolean alreadyExisted = eventType.getId() > 0;
 
       if(result.hasErrors()){
-         // read and implement(?): https://stackoverflow.com/questions/2543797/spring-redirect-after-post-even-with-validation-errors
-         return "admin/eventType"; // is this right? url changes after post... how to fix? FIXME
+         redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.eventType", result);
+         redirectAttributes.addFlashAttribute("eventType", eventType);
+         
+         if(alreadyExisted){
+            return "redirect:/admin/eventTypes/" + eventType.getId();
+         } else {
+            return "redirect:/admin/eventTypes/new";
+         }
       }
 
       /**
@@ -242,7 +248,9 @@ public class AdminController {
    public String getEventTypeById(@PathVariable long eventTypeId, Model model){
       logger.debug("getEventTypeById({})", eventTypeId);
 
-      model.addAttribute("eventType", eventTypeRepos.findOne(eventTypeId));
+      if(!model.containsAttribute("eventType")){
+         model.addAttribute("eventType", eventTypeRepos.findOne(eventTypeId));
+      }
       model.addAttribute("eventTypeIntervals", EventTypeInterval.values());
       model.addAttribute("allPossibleDuties", dutyRepos.findAll());
       return "admin/eventType";
@@ -252,8 +260,10 @@ public class AdminController {
    public String getAddEventType(Model model){
       logger.debug("getAddEventType()");
 
-
-      model.addAttribute("eventType", new EventType());
+      if(!model.containsAttribute("eventType")){
+         model.addAttribute("eventType", new EventType());
+      }
+      
       model.addAttribute("eventTypeIntervals", EventTypeInterval.values());
       model.addAttribute("allPossibleDuties", dutyRepos.findAll());
       return "admin/eventType";
@@ -276,7 +286,14 @@ public class AdminController {
       final boolean alreadyExisted = duty.getId() > 0;
 
       if(result.hasErrors()){
-         return "admin/duty"; // is this right? url changes after post... how to fix? FIXME
+         redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.duty", result);
+         redirectAttributes.addFlashAttribute("duty", duty);
+         
+         if(alreadyExisted){
+            return "redirect:/admin/duties/" + duty.getId();
+         } else {
+            return "redirect:/admin/duties/new";
+         }
       }
 
       dutyService.saveOrUpdateDuty(duty);
@@ -288,7 +305,10 @@ public class AdminController {
    public String getNewDuty(Model model){
       logger.debug("getNewDuty()");
 
-      model.addAttribute("duty", new Duty());
+      if(!model.containsAttribute("duty")){
+         model.addAttribute("duty", new Duty());
+      }
+      
       model.addAttribute("maxSortOrder", dutyRepos.findMaxSortOrder() + 1);
       return "admin/duty";
    }
@@ -297,7 +317,10 @@ public class AdminController {
    public String getEditDuty(@PathVariable Long dutyId, Model model){
       logger.debug("getEditDuty()");
 
-      model.addAttribute("duty", dutyRepos.findOne(dutyId));
+      if(!model.containsAttribute("duty")){
+         model.addAttribute("duty", dutyRepos.findOne(dutyId));
+      }
+      
       model.addAttribute("maxSortOrder", dutyRepos.findMaxSortOrder());
       return "admin/duty";
    }
@@ -317,14 +340,21 @@ public class AdminController {
    @RequestMapping(value = "/people/new", method = RequestMethod.GET)
    public String getAddPerson(Model model){
       logger.debug("getAddPerson()");
-      model.addAttribute("person", new Person());
+      if(!model.containsAttribute("person")){
+         model.addAttribute("person", new Person());
+      }
+      
       return "admin/person";
    }
 
    @RequestMapping(value = "/people/{personId}", method = RequestMethod.GET)
    public String getEditPerson(@PathVariable Long personId, Model model){
       logger.debug("getEditPerson()");
-      model.addAttribute("person", personRepos.findOne(personId));
+      
+      if(!model.containsAttribute("person")){
+         model.addAttribute("person", personRepos.findOne(personId));
+      }
+      
       return "admin/person";
    }
 
@@ -334,8 +364,15 @@ public class AdminController {
       logger.debug("savePerson()");
       final boolean personAlreadyExisted = person.getId() > 0;
 
-      if(result.hasErrors()){
-         return "admin/person"; // is this right? url changes after post... how to fix FIXME
+      if(result.hasErrors()){         
+         redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.person", result);
+         redirectAttributes.addFlashAttribute("person", person);
+         
+         if(personAlreadyExisted){
+            return "redirect:/admin/people/" + person.getId();
+         } else {
+            return "redirect:/admin/people/new";
+         }
       }
 
       personRepos.save(person);

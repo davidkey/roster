@@ -17,6 +17,7 @@ import lombok.Setter;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 @Table(name = "duty")
@@ -34,6 +35,7 @@ public class Duty implements Serializable {
    private long id;
    
    @Column(nullable = false, unique = true)
+   @NotEmpty
    private String name;
    
    @Column(nullable = true)
