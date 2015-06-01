@@ -16,6 +16,8 @@
 		">
 	<!-- DispatcherServlet Context: defines this servlet's request-processing 
 		infrastructure -->
+		
+	<context:property-placeholder location="classpath:jdbc.properties" />	
 
 	<!-- Enables the Spring MVC @Controller programming model -->
 	<annotation-driven>
@@ -63,7 +65,7 @@
 		class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
 		<beans:property name="showSql" value="false" />
 		<beans:property name="generateDdl" value="true" />
-		<beans:property name="database" value="POSTGRESQL" />
+		<beans:property name="database" value="${jdbc.jpa.vendor.database}" />
 	</beans:bean>
 
 	<beans:bean id="entityManagerFactory"
@@ -77,7 +79,7 @@
 			<beans:props>
 				<beans:prop key="hibernate.use_sql_comments">false</beans:prop>
 				<beans:prop key="hibernate.hbm2ddl.auto">update</beans:prop>
-				<beans:prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</beans:prop>
+				<beans:prop key="hibernate.dialect">${jdbc.hibernate.dialect}</beans:prop>
 				<beans:prop key="hibernate.show_sql">false</beans:prop>
 				<beans:prop key="hibernate.format_sql">false</beans:prop>
 				<!-- caching -->
