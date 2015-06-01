@@ -8,7 +8,6 @@
     
     <link rel="stylesheet" type='text/css' href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.3.1/fullcalendar.min.css">
     <!-- <link rel="stylesheet" type='text/css' href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.3.1/fullcalendar.print.css">  -->
-    
     <title>Admin</title>
     
     <style>

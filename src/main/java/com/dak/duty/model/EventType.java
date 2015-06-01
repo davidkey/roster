@@ -30,6 +30,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.dak.duty.model.enums.EventTypeInterval;
 import com.dak.duty.model.exception.IntervalValidationException;
@@ -72,11 +73,13 @@ public class EventType implements Serializable {
    @Temporal(TemporalType.TIME)
    @Column(nullable = false)
    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="h:mm a")
+   @DateTimeFormat(pattern="h:mma") // 12:15am
    private Date startTime = getBlankDate();
    
    @Temporal(TemporalType.TIME)
    @Column(nullable = false)
    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="h:mm a")
+   @DateTimeFormat(pattern="h:mma")
    private Date endTime = getBlankDate();
    
    @Transient

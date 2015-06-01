@@ -6,6 +6,9 @@
 <html lang="en">
 <head>
 <jsp:include page="../shared/header.jsp" />
+
+ <link rel="stylesheet" type='text/css' href="<c:url value="/resources/css/jquery.timepicker.css"/>">
+
 <title>Event Type</title>
 </head>
 
@@ -28,6 +31,38 @@
 				<form:input path="description" class="form-control" placeholder="Sunday AM Worship Service"/>
 				<form:errors path="description" class="alert-danger" />
 			</div>
+			
+			<!-- start time & end time -->
+			<!-- <fmt:formatDate value="${eventType.startTime}" pattern="HH:mm" /> -->
+			<!-- <fmt:formatDate value="${eventType.endTime}" pattern="HH:mm" /> -->
+			
+			<!-- 
+			
+			${eventType.startTime}
+			${eventType.endTime}
+
+			
+			<%--
+						
+			spring evald:
+			<s:eval expression="${eventType.startTime}"/>
+			<s:eval expression="${eventType.endTime}"/>
+			--%>
+			 -->
+			
+			<div class="form-group">
+				<label for="startTime">Start Time</label>
+				<form:input id="startTimePicker" path="startTime" class="form-control" value="${eventType.startTime}" />
+				<form:errors path="startTime" class="alert-danger" />
+			</div>
+			
+			<div class="form-group">
+				<label for="endTime">End Time</label>
+				<form:input id="endTimePicker" path="endTime" class="form-control" value="${eventType.endTime}"/>
+				<form:errors path="endTime" class="alert-danger" />
+			</div>
+			
+			<!-- end start time & end time -->
 			
 			<div class="form-group">
 				<label for="interval">Interval</label>
@@ -95,8 +130,70 @@
 	</div>
 
 	<jsp:include page="../shared/footer.jsp" />
+	<script src="<c:url value="/resources/js/jquery.timepicker.min.js"/>"></script>
 	<script>
 	$(document).ready(function() {
+		
+		function addZero(i) {
+		    if (i < 10) {
+		        i = "0" + i;
+		    }
+		    return i;
+		}
+		
+		function getTimeFromField(field){
+			/** FIXME: this is hideous **/
+			var dateStr = field.attr('value');
+			
+			var d = new Date(dateStr);
+			if(d && d != 'Invalid Date'){
+				var hours = addZero(d.getHours());
+				var mins = addZero(d.getMinutes());
+				
+				dateStr = hours + ":" + mins + ":00";
+			}
+
+			if(dateStr.length === 8){
+				var hour = dateStr.split(':')[0];
+				if(hour > 12){
+					hour -= 12;
+					dateStr = hour + ":" + dateStr.split(':')[1] + 'pm';
+				} else {
+					if(hour == 0){
+						hour = 12;
+					}
+					dateStr = hour + ":" + dateStr.split(':')[1] + 'am';
+				}
+			}
+
+			return dateStr;
+		}
+		
+		/**
+			setting up timepickers for start / end times
+		**/
+		
+		$('#startTimePicker').timepicker({
+			'step': 15
+		});
+		$('#endTimePicker').timepicker({
+			'step': 15
+		});
+		
+		var initStartTime = getTimeFromField($('#startTimePicker'));
+		var initEndTime = getTimeFromField($('#endTimePicker'));
+		
+		$('#startTimePicker').timepicker('setTime', initStartTime);
+		$('#endTimePicker').timepicker('setTime', initEndTime);
+		
+		$('#startTimePicker').on('changeTime', function() {
+		    $('#endTimePicker').timepicker('option', {
+			    	'minTime': $('#startTimePicker').val(),
+			    	'maxTime': '11:45pm',
+			    	'showDuration': true
+		    	}
+		    );
+		});
 		
 		/**
 			Methods for handling interval detail
