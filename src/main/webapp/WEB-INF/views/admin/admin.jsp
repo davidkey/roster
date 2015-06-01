@@ -65,7 +65,7 @@
 	 			},
 	 			defaultDate: moment().format("YYYY-MM-DD"),
 	 			defaultView: 'month',
-	 			editable: true,
+	 			editable: false,
 	 			events: data
 	 		});
 		}

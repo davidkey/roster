@@ -80,10 +80,10 @@ public class EventType implements Serializable {
    private Date endTime = getBlankDate();
    
    @Transient
-   public Date getBlankDate(){
+   private Date getBlankDate(){
       Calendar cal = Calendar.getInstance();
       cal.setTime(new Date(0L));
-      cal.set(Calendar.HOUR, 0);
+      cal.set(Calendar.HOUR_OF_DAY, 0);
       cal.set(Calendar.MINUTE, 0);
       cal.set(Calendar.SECOND, 0);
       cal.set(Calendar.MILLISECOND, 0);

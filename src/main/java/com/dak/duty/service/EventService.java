@@ -57,7 +57,7 @@ public class EventService {
 
       final List<Event> events = eventRepos.findAllByDateEventGreaterThanEqual(startDate);
       for(Event e : events){
-         nodes.add(new EventCalendarNode(e.getId(), e.getEventType().getName(), e.getDateEvent()));
+         nodes.add(new EventCalendarNode(e.getId(), e.getEventType().getName(), e.getDateEvent(), e.getEventType()));
       }
       
       Collections.sort(nodes, new EventCalendarNodeSortByDate());
@@ -72,7 +72,7 @@ public class EventService {
       
       final List<Event> events = eventRepos.findEventsByDateBetween(startDate, endDate);
       for(Event e : events){
-         nodes.add(new EventCalendarNode(e.getId(), e.getEventType().getName(), e.getDateEvent()));
+         nodes.add(new EventCalendarNode(e.getId(), e.getEventType().getName(), e.getDateEvent(), e.getEventType()));
       }
       
       Collections.sort(nodes, new EventCalendarNodeSortByDate());

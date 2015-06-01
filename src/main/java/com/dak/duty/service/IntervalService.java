@@ -114,6 +114,23 @@ public class IntervalService {
       return dt.compareTo(start) >= 0 && dt.compareTo(end) <= 0;
    }
    
+   /**
+    * 
+    * @param hour: 24 hour clock hour-of-day
+    * @param minute: 0-59
+    * @return
+    */
+   public Date getTimeWithoutDate(final int hour, final int minute){
+      Calendar cal = Calendar.getInstance();
+      cal.setTime(new Date(0L));
+      cal.set(Calendar.HOUR_OF_DAY, hour);
+      cal.set(Calendar.MINUTE, minute);
+      cal.set(Calendar.SECOND, 0);
+      cal.set(Calendar.MILLISECOND, 0);
+      
+      return cal.getTime();
+   }
+   
    public EventTypeDetailNode createEventTypeDetailNode(final EventTypeInterval eti, final String detail){
       return new EventTypeDetailNode(eti, detail);
    }

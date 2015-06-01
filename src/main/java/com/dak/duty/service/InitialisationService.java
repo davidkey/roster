@@ -47,6 +47,9 @@ public class InitialisationService {
    @Autowired
    EventRepository eventRepos;
    
+   @Autowired
+   IntervalService intervalService;
+   
    protected void clearAllData(){
       eventRepos.deleteAll();
       eventRepos.flush();
@@ -227,6 +230,8 @@ public class InitialisationService {
       sundayAm.setDuties(sundayAmDuties);
       sundayAm.setInterval(EventTypeInterval.WEEKLY);
       sundayAm.setIntervalDetail(IntervalWeekly.SUNDAY.toString());
+      sundayAm.setStartTime(intervalService.getTimeWithoutDate(9, 30));
+      sundayAm.setEndTime(intervalService.getTimeWithoutDate(11, 30));
       
       final EventType sundayPm = new EventType();
       sundayPm.setName("Sunday PM");
@@ -234,6 +239,8 @@ public class InitialisationService {
       sundayPm.setDuties(sundayPmDuties);
       sundayPm.setInterval(EventTypeInterval.WEEKLY);
       sundayPm.setIntervalDetail(IntervalWeekly.SUNDAY.toString());
+      sundayPm.setStartTime(intervalService.getTimeWithoutDate(18, 30));
+      sundayPm.setEndTime(intervalService.getTimeWithoutDate(20, 0));
       
       final EventType wednesday = new EventType();
       wednesday.setName("Wednesday PM");
@@ -241,6 +248,8 @@ public class InitialisationService {
       wednesday.setDuties(wednesdayDuties);
       wednesday.setInterval(EventTypeInterval.WEEKLY);
       wednesday.setIntervalDetail(IntervalWeekly.WEDNESDAY.toString());
+      wednesday.setStartTime(intervalService.getTimeWithoutDate(19, 30));
+      wednesday.setEndTime(intervalService.getTimeWithoutDate(21, 0));
       
       final List<EventType> eventTypes = new ArrayList<EventType>();
       eventTypes.add(sundayAm);
