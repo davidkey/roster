@@ -9,6 +9,7 @@
     <script src="<c:url value="/resources/jquery/jquery-2.1.4.min.js"/>"></script>
 <!--<![endif]-->
     <script src="<c:url value="/resources/bootstrap/js/bootstrap.min.js"/>"></script>
+    <script src="<c:url value="/resources/js/bootbox.min.js"/>"></script>
     <script type="text/javascript" charset="utf-8" src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.js"></script>
     <script>
     $(function () { 

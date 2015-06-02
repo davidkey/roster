@@ -47,6 +47,9 @@ public class Duty implements Serializable {
    @Column(nullable = false)
    private Integer sortOrder = 1;
    
+   @Column(nullable = false)
+   private Boolean active = true;
+   
    public void setName(String name){
       if(name != null){
          name = name.trim();

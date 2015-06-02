@@ -84,6 +84,9 @@ public class EventType implements Serializable {
    @DateTimeFormat(pattern="h:mma")
    private Date endTime = getBlankDate();
    
+   @Column(nullable = false)
+   private Boolean active = true;
+   
    @Transient
    private Date getBlankDate(){
       Calendar cal = Calendar.getInstance();

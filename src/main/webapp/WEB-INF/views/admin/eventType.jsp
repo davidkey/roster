@@ -32,24 +32,6 @@
 				<form:errors path="description" class="alert-danger" />
 			</div>
 			
-			<!-- start time & end time -->
-			<!-- <fmt:formatDate value="${eventType.startTime}" pattern="HH:mm" /> -->
-			<!-- <fmt:formatDate value="${eventType.endTime}" pattern="HH:mm" /> -->
-			
-			<!-- 
-			
-			${eventType.startTime}
-			${eventType.endTime}
-
-			
-			<%--
-						
-			spring evald:
-			<s:eval expression="${eventType.startTime}"/>
-			<s:eval expression="${eventType.endTime}"/>
-			--%>
-			 -->
-			
 			<div class="form-group">
 				<label for="startTime">Start Time</label>
 				<form:input id="startTimePicker" path="startTime" class="form-control" value="${eventType.startTime}" />
@@ -122,7 +104,7 @@
 			</div>
 			
 			<!-- end duties -->
-
+			<button type="button" class="btn btn-warning" id="deleteMe">Delete Event Type</button>
 			<button type="submit" class="btn btn-default">Save</button>
 		</form:form>
 		
@@ -284,6 +266,33 @@
 			  clonedParent.find('button').remove()
 
 			  clonedParent.insertAfter(parent);
+		});
+		
+		/**
+			Delete logic - todo: clean this up - hideous
+		**/
+		$("#deleteMe").click(function(e, btn){
+			bootbox.confirm("Are you sure you want to delete this event type?", function(result) {
+				if(result){
+					var id = $('#id').val();
+					$.ajax({
+						type: "DELETE",
+						contentType: "application/json",
+						dataType: 'json',
+						url: "<c:url value="/api/eventType"/>",
+						data: JSON.stringify({'id': id}),
+						success: function(data){
+							if(data && data['response'] === 'OK'){
+								bootbox.alert("Deleted successfully!", function() {
+									window.location.href = "<c:url value="/admin/eventTypes/"/>";
+								});
+							} else {
+								bootbox.alert("Delete failed!");
+							}
+						}
+					});
+				}
+			}); 
 		});
 		
 	});

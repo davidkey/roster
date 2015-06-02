@@ -192,7 +192,7 @@ public class AdminController {
    public String getEventTypes(Model model){
       logger.debug("getEventTypes()");
 
-      final List<EventType> eventTypes = eventTypeRepos.findAll();
+      final List<EventType> eventTypes = eventTypeRepos.findByActiveTrue();
       logger.debug("event types found: {}", eventTypes.size());
 
       model.addAttribute("eventTypes", eventTypes);

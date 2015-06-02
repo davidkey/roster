@@ -12,6 +12,7 @@ import com.dak.duty.model.Duty;
 @Repository
 public interface DutyRepository extends JpaRepository<Duty, Long>{
    List<Duty> findAllByOrderByNameAsc();
+   List<Duty> findByActiveTrue();
    
    @Modifying
    @Query("update Duty d set d.sortOrder = d.sortOrder + 1 where d.sortOrder >= ?1")
