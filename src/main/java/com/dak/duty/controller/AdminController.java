@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.dak.duty.exception.InvalidIdException;
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.Event;
 import com.dak.duty.model.EventRosterItem;
@@ -216,30 +215,7 @@ public class AdminController {
          }
       }
 
-      /**
-       * couldn't figure out how to cleanly handle checkboxes for duties, so manually marshalling Duty objects
-       */
-      final List<Duty> duties = eventType.getDuties();
-      final List<Duty> fixedDuties = new ArrayList<Duty>();
-      if(duties != null){
-         for(int i = 0, len = duties.size(); i < len; i++){
-            final long dutyId = duties.get(i).getId();
-            if(dutyId > 0){
-               Duty duty = dutyRepos.findOne(dutyId);
-
-               if(duty == null){
-                  throw new InvalidIdException("Invalid duty id " + dutyId);
-               }
-
-               fixedDuties.add(duty);
-            }
-         }
-
-         eventType.getDuties().clear();
-         eventType.setDuties(fixedDuties);
-      }
-
-      eventTypeRepos.save(eventType);
+      eventService.saveEventType(eventType);
       redirectAttributes.addFlashAttribute("msg_success", alreadyExisted ? "Event Type updated!" : "Event Type added!");
       return "redirect:/admin/eventTypes";
    }

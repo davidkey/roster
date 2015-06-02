@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.dak.duty.model.EventType;
 import com.dak.duty.model.enums.EventTypeInterval;
 import com.dak.duty.model.enums.IntervalWeekly;
+import com.dak.duty.model.exception.IntervalValidationException;
 import com.dak.duty.model.validation.EventTypeIntervalValidation;
 
 @Service
@@ -24,10 +25,14 @@ public class IntervalService {
       return getDaysOfMonthForInterval(monthDate, et.getInterval(), et.getIntervalDetail());
    }
    
-   public List<Date> getDaysOfMonthForInterval(@NonNull final Date monthDate, @NonNull final EventTypeInterval eti, @NonNull final String intervalDetail){
+   public List<Date> getDaysOfMonthForInterval(@NonNull final Date monthDate, @NonNull final EventTypeInterval eti, final String intervalDetail){
       final List<Date> dates = new ArrayList<Date>();
       final DateTime som = getFirstDayOfMonth(getFirstDayOfMonth(getDateTime(sanitizeDate(monthDate))));
       final DateTime eom = getLastDayOfMonth(som);
+      
+      if(intervalDetail == null && !EventTypeInterval.DAILY.equals(eti)){
+         throw new IntervalValidationException("intervalDetail cannot be null when EventTypeInterval =" + eti.toString());
+      }
 
       if(EventTypeInterval.ONCE.equals(eti)){
          final Date d = EventTypeIntervalValidation.strToDate(intervalDetail);

@@ -13,7 +13,7 @@ public class EventTypeIntervalValidation {
   
    
    public static boolean validate(final EventTypeInterval eti, final String value){
-      if(eti == null || value == null){ // could this cause problems depending on hibernate's create order?
+      if(eti == null || (!EventTypeInterval.DAILY.equals(eti) && value == null)){ // could this cause problems depending on hibernate's create order?
          return false;
       }
       

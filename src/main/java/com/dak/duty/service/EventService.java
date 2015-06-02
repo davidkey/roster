@@ -17,6 +17,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dak.duty.exception.InvalidIdException;
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.Event;
 import com.dak.duty.model.EventRoster;
@@ -26,6 +27,7 @@ import com.dak.duty.model.Person;
 import com.dak.duty.model.PersonDuty;
 import com.dak.duty.model.comparable.EventRosterItemSortByDutyOrder;
 import com.dak.duty.model.enums.EventTypeInterval;
+import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.EventTypeRepository;
 import com.dak.duty.repository.PersonRepository;
@@ -51,6 +53,41 @@ public class EventService {
 
    @Autowired
    IntervalService intervalService;
+   
+   @Autowired
+   DutyRepository dutyRepos;
+   
+   public EventType saveEventType(final EventType eventType){
+      
+      if(EventTypeInterval.DAILY.equals(eventType.getInterval())){
+         eventType.setIntervalDetail(null); // clear out interval detail if this is now a daily event type
+      }
+      
+      /**
+       * couldn't figure out how to cleanly handle checkboxes for duties, so manually marshalling Duty objects
+       */
+      final List<Duty> duties = eventType.getDuties();
+      final List<Duty> fixedDuties = new ArrayList<Duty>();
+      if(duties != null){
+         for(int i = 0, len = duties.size(); i < len; i++){
+            final long dutyId = duties.get(i).getId();
+            if(dutyId > 0){
+               Duty duty = dutyRepos.findOne(dutyId);
+
+               if(duty == null){
+                  throw new InvalidIdException("Invalid duty id " + dutyId);
+               }
+
+               fixedDuties.add(duty);
+            }
+         }
+
+         eventType.getDuties().clear();
+         eventType.setDuties(fixedDuties);
+      }
+
+      return eventTypeRepos.save(eventType);
+   }
    
    public List<EventCalendarNode> getAllFutureEventCalendarNodes(final Date startDate){
       final List<EventCalendarNode> nodes = new ArrayList<EventCalendarNode>();

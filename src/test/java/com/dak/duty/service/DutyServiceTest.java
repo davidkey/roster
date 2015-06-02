@@ -4,8 +4,6 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,27 +15,13 @@ import com.dak.duty.repository.DutyRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:/servlet-context-test.xml"})
-//@Transactional(propagation = Propagation.NESTED) // conflicts with tx in dutyservice
-public class DutyServiceTest {
+public class DutyServiceTest extends ServiceTest {
 
    @Autowired
    DutyService dutyService;
 
    @Autowired
-   InitialisationService initService;
-
-   @Autowired
    DutyRepository dutyRepos;
-
-   @Before
-   public void setup(){
-      initService.populateDefaultData();
-   }
-
-   @After
-   public void teardown(){
-      initService.clearAllData();
-   }
 
    @Test
    public void sortOrderTest(){

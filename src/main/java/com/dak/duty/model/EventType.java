@@ -24,6 +24,7 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -42,6 +43,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Getter
 @Setter
+@ToString
 public class EventType implements Serializable {
    private static final long serialVersionUID = 1L;
 
