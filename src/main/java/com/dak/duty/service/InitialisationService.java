@@ -119,7 +119,7 @@ public class InitialisationService {
       RandomDataGenerator randomData = new RandomDataGenerator();
       
       final List<Duty> scrambledDuties = new ArrayList<Duty>(duties);
-      for(int i = 0; i < 100; i++){
+      for(int i = 0; i < 25; i++){
          Person p = new Person();
          p.setActive(true);
          p.setEmailAddress(df.getEmailAddress());
