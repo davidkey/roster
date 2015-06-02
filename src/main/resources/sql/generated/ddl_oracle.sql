@@ -27,6 +27,7 @@
 
     create table duty (
         id bigint not null,
+        active bit not null,
         description varchar(255),
         name varchar(255) not null,
         sortOrder integer not null,
@@ -52,6 +53,7 @@
 
     create table event_type (
         id bigint not null,
+        active bit not null,
         description varchar(255),
         endTime time not null,
         interval varchar(255) not null,
