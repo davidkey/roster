@@ -16,30 +16,11 @@
 		">
 	<!-- DispatcherServlet Context: defines this servlet's request-processing 
 		infrastructure -->
-		
-	<context:property-placeholder location="classpath:jdbc.properties" />	
 
-	<!-- Enables the Spring MVC @Controller programming model -->
-	<annotation-driven>
-		<path-matching registered-suffixes-only="true" />
-		<message-converters> <!-- FIXME: don't use this in production!! -->
-			<beans:bean id="jacksonHttpMessageConverter"
-				class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
-				<beans:property name="prettyPrint" value="true" />
-			</beans:bean>
-			
-			<!-- force utf encoding -->
-			<beans:bean class="org.springframework.http.converter.StringHttpMessageConverter">
-		      <beans:property name="supportedMediaTypes" value = "text/plain;charset=UTF-8" />
-		    </beans:bean>
-		</message-converters>
-	</annotation-driven>
+	<beans:import resource="mvc-context.xml"/>
+	<beans:import resource="jpa-context.xml"/>
 	
-	<!-- <beans:bean class="com.dak.duty.config.SwaggerConfig"></beans:bean>  -->
-
-	<tx:annotation-driven transaction-manager="transactionManager" />
-
-	<jpa:repositories base-package="com.dak.duty.repository" />
+	<context:component-scan base-package="com.dak.duty" />
 
 	<resources mapping="/resources/**" location="/resources/" />
 
@@ -50,66 +31,5 @@
 	</beans:bean>
 	
 	<beans:bean id="rand" class="java.util.Random" />
-
-	<context:component-scan base-package="com.dak.duty" />
-
-	<beans:import resource="db-context.xml"/>
-
-	<beans:bean id="transactionManager"
-		class="org.springframework.orm.jpa.JpaTransactionManager">
-		<beans:property name="entityManagerFactory" ref="entityManagerFactory" />
-	</beans:bean>
-
-	<!-- spring data jpa -->
-	<beans:bean id="jpaVendorAdapter"
-		class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-		<beans:property name="showSql" value="false" />
-		<beans:property name="generateDdl" value="true" />
-		<beans:property name="database" value="${jdbc.jpa.vendor.database}" />
-	</beans:bean>
-
-	<beans:bean id="entityManagerFactory"
-		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-		<beans:property name="dataSource" ref="dataSource" />
-		<beans:property name="jpaVendorAdapter" ref="jpaVendorAdapter" />
-		<!-- spring based scanning for entity classes> -->
-		<beans:property name="packagesToScan" value="com.dak.duty.model" />
-		
-		<beans:property name="jpaProperties">
-			<beans:props>
-				<beans:prop key="hibernate.use_sql_comments">false</beans:prop>
-				<beans:prop key="hibernate.hbm2ddl.auto">update</beans:prop>
-				<beans:prop key="hibernate.dialect">${jdbc.hibernate.dialect}</beans:prop>
-				<beans:prop key="hibernate.show_sql">false</beans:prop>
-				<beans:prop key="hibernate.format_sql">false</beans:prop>
-				<!-- caching -->
-				<!-- -->	
-				<beans:prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory</beans:prop>
-				<beans:prop key="hibernate.cache.use_second_level_cache">true</beans:prop>
-				<beans:prop key="hibernate.cache.max_fetch_depth">4</beans:prop>
-         		<beans:prop key="hibernate.cache.use_query_cache">true</beans:prop>
-         		<beans:prop key="hibernate.cache.use_outer_join">true</beans:prop>
-         		<beans:prop key="net.sf.ehcache.configurationResourceName">/myehcache.xml</beans:prop>
-         		<beans:prop key="javax.persistence.sharedCache.mode">ENABLE_SELECTIVE</beans:prop>
-         		 
-				<!-- // caching -->	
-			</beans:props>
-		</beans:property>
-	</beans:bean>
-	
-	<!-- simple cache manager -->
-	<!--
-	<cache:annotation-driven />
-	
-	<beans:bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">
-	    <beans:property name="caches">
-	        <beans:set>
-	            <beans:bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" name="default"/>
-	            <beans:bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" name="account"/>
-	        </beans:set>
-	    </beans:property>
-	</beans:bean>
-	-->
-
 
 </beans:beans>
