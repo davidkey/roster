@@ -14,8 +14,6 @@
 		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
     	http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd
 		">
-	<!-- DispatcherServlet Context: defines this servlet's request-processing 
-		infrastructure -->
 
 	<beans:import resource="mvc-context.xml"/>
 	<beans:import resource="jpa-context.xml"/>
