@@ -1,5 +1,8 @@
 package com.dak.duty.service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +29,9 @@ public class DutyService {
          final Duty dutyBeforeChanges = dutyRepos.findOne(duty.getId());
 
          if(!duty.getActive() && dutyBeforeChanges.getActive()){ // if we're deactivating this duty ...
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+            
+            duty.setName(duty.getName() + " (deleted @ " + sdf.format(new Date()) + ")"); // change name to show soft delete and to prevent key errors if another with same name added later
             dutyRepos.decrementSortOrderAboveAndIncludingExcludingDutyId(dutyBeforeChanges.getSortOrder(), duty.getId());
          }
          if(duty.getActive() && !duty.getSortOrder().equals(dutyBeforeChanges.getSortOrder())){
