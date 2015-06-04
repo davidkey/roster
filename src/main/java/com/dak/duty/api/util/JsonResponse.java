@@ -13,6 +13,6 @@ public class JsonResponse {
    }
    
    public static enum ResponseStatus {
-      OK, ERROR;
+      OK, WARN, ERROR;
    }
 }
