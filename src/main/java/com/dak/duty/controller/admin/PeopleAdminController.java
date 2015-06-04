@@ -100,7 +100,7 @@ public class PeopleAdminController {
 
       model.addAttribute("personName", person.getNameFirst() + " " + person.getNameLast());
       model.addAttribute("person", person);
-      model.addAttribute("duties", dutyRepos.findAllByOrderByNameAsc());
+      model.addAttribute("duties", dutyRepos.findAllByActiveTrueOrderByNameAsc());
       return "admin/personDuties";
    }
 

@@ -12,6 +12,7 @@ import com.dak.duty.model.Duty;
 @Repository
 public interface DutyRepository extends JpaRepository<Duty, Long>{
    List<Duty> findAllByOrderByNameAsc();
+   List<Duty> findAllByActiveTrueOrderByNameAsc();
    List<Duty> findByActiveTrue();
    
    @Modifying

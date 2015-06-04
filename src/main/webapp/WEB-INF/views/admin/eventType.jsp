@@ -104,7 +104,9 @@
 			</div>
 			
 			<!-- end duties -->
-			<button type="button" class="btn btn-warning" id="deleteMe">Delete Event Type</button>
+			<c:if test="${not empty eventType.id && eventType.id gt 0}">
+				<button type="button" class="btn btn-warning" id="deleteMe">Delete Event Type</button>
+			</c:if>
 			<button type="submit" class="btn btn-default">Save</button>
 		</form:form>
 		

@@ -11,6 +11,7 @@ import com.dak.duty.model.Person;
 
 @Repository
 public interface PersonRepository extends JpaRepository<Person, Long>{
+   public List<Person> findByActiveTrue();
    public List<Person> findByActiveTrueAndDuties_Duty(Duty duty);
    public List<Person> findByActiveTrueAndIdNotIn(Collection<Long> personIds);
    public List<Person> findAllByOrderByNameLastAscNameFirstAsc();

@@ -36,8 +36,10 @@
 				</form:select>
 				<form:errors path="sortOrder" class="alert-danger" />
 			</div>
-
-			<button type="button" class="btn btn-warning" id="deleteMe">Delete Duty</button>
+			
+			<c:if test="${not empty duty.id && duty.id gt 0}">
+				<button type="button" class="btn btn-warning" id="deleteMe">Delete Duty</button>
+			</c:if>
 			<button type="submit" class="btn btn-default">Save</button>
 		</form:form>
 	</div>
