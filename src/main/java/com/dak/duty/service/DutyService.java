@@ -15,17 +15,20 @@ public class DutyService {
    @Autowired
    DutyRepository dutyRepos;
 
-   public void saveOrUpdateDuty(Duty duty){
+   public Duty saveOrUpdateDuty(Duty duty){
 
       /**
        * 1) Decrement all sort orders [>] old sort order (if this is an update, not a new item)
-       * 2) Increment all sort orders [>=] new / updated duty sort order
+       * 2) Increment all sort orders [>=] new / updated duty sort order IF this isn't an inactive duty
        * 3) Persist duty w/ new sort order
        */
       if(duty.getId() > 0){ // if this is an update, not a new entity
          final Duty dutyBeforeChanges = dutyRepos.findOne(duty.getId());
 
-         if(!duty.getSortOrder().equals(dutyBeforeChanges.getSortOrder())){
+         if(!duty.getActive() && dutyBeforeChanges.getActive()){ // if we're deactivating this duty ...
+            dutyRepos.decrementSortOrderAboveAndIncludingExcludingDutyId(dutyBeforeChanges.getSortOrder(), duty.getId());
+         }
+         if(duty.getActive() && !duty.getSortOrder().equals(dutyBeforeChanges.getSortOrder())){
             dutyRepos.decrementSortOrderAboveExcludingDutyId(dutyBeforeChanges.getSortOrder(), duty.getId());
             dutyRepos.incrementSortOrderAboveAndIncludingExcludingDutyId(duty.getSortOrder(), duty.getId());
          }
@@ -33,6 +36,6 @@ public class DutyService {
          dutyRepos.incrementSortOrderAboveAndIncluding(duty.getSortOrder());
       }
 
-      dutyRepos.save(duty);
+      return dutyRepos.save(duty);
    }
 }

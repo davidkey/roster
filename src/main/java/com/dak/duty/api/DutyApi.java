@@ -34,7 +34,8 @@ public class DutyApi {
       
       duty = dutyRepos.findOne(duty.getId());
       duty.setActive(false);
-      dutyRepos.save(duty);
+      duty.setSortOrder(1);
+      duty = dutyService.saveOrUpdateDuty(duty);
       
       return new JsonResponse(ResponseStatus.OK, "Duty " + duty.getId() + " deleted");
    }
@@ -49,7 +50,7 @@ public class DutyApi {
    @RequestMapping(method = RequestMethod.POST)
    public @ResponseBody JsonResponse save(@RequestBody Duty duty){
       logger.debug("duty.save({})", duty);
-      duty = dutyRepos.save(duty);
+      duty = dutyService.saveOrUpdateDuty(duty);
       
       return new JsonResponse(ResponseStatus.OK, "Duty saved with id " + duty.getId());
    }
