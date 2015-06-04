@@ -37,7 +37,7 @@ public class DutyAdminController {
    public String getDuties(Model model){
       logger.debug("getDuties()");
 
-      final List<Duty> duties = dutyRepos.findAll();
+      final List<Duty> duties = dutyRepos.findByActiveTrue();
       logger.debug("duties found: {}", duties.size());
 
       model.addAttribute("duties", duties);

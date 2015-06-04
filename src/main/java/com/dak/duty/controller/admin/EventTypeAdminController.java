@@ -78,7 +78,7 @@ public class EventTypeAdminController {
          model.addAttribute("eventType", eventTypeRepos.findOne(eventTypeId));
       }
       model.addAttribute("eventTypeIntervals", EventTypeInterval.values());
-      model.addAttribute("allPossibleDuties", dutyRepos.findAll());
+      model.addAttribute("allPossibleDuties", dutyRepos.findByActiveTrue());
       return "admin/eventType";
    }
 
@@ -91,7 +91,7 @@ public class EventTypeAdminController {
       }
       
       model.addAttribute("eventTypeIntervals", EventTypeInterval.values());
-      model.addAttribute("allPossibleDuties", dutyRepos.findAll());
+      model.addAttribute("allPossibleDuties", dutyRepos.findByActiveTrue());
       return "admin/eventType";
    }
 }

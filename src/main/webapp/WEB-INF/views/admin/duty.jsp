@@ -37,10 +37,39 @@
 				<form:errors path="sortOrder" class="alert-danger" />
 			</div>
 
+			<button type="button" class="btn btn-warning" id="deleteMe">Delete Duty</button>
 			<button type="submit" class="btn btn-default">Save</button>
 		</form:form>
 	</div>
 	<jsp:include page="../shared/footer.jsp" />
+	<script>
+		/**
+		Delete logic - todo: clean this up - hideous
+		**/
+		$("#deleteMe").click(function(e, btn){
+			bootbox.confirm("Are you sure you want to delete this event type?", function(result) {
+				if(result){
+					var id = $('#id').val();
+					$.ajax({
+						type: "DELETE",
+						contentType: "application/json",
+						dataType: 'json',
+						url: "<c:url value="/api/duty"/>",
+						data: JSON.stringify({'id': id}),
+						success: function(data){
+							if(data && data['response'] === 'OK'){
+								bootbox.alert("Deleted successfully!", function() {
+									window.location.href = "<c:url value="/admin/duties/"/>";
+								});
+							} else {
+								bootbox.alert("Delete failed!");
+							}
+						}
+					});
+				}
+			}); 
+		});
+	</script>
 </body>
 
 </html>
