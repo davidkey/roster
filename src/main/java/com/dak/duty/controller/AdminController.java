@@ -69,7 +69,7 @@ public class AdminController {
    @Autowired
    IntervalService intervalService;
 
-   @RequestMapping(value = "/", method = RequestMethod.GET)
+   @RequestMapping(method = RequestMethod.GET)
    public String getAdminHome(Model model){
       logger.debug("getAdminHome()");
       return "admin/admin";
