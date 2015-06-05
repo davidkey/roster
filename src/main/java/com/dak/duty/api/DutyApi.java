@@ -67,6 +67,9 @@ public class DutyApi {
       final List<Duty> allActiveDuties = dutyRepos.findByActiveTrue();
       final List<Duty> dutiesToUpdate = new ArrayList<Duty>();
       
+      int minSortOrder = Integer.MAX_VALUE;
+      int maxSortOrder = Integer.MIN_VALUE;
+      
       for(Duty duty : allActiveDuties){
          if(sortOrderSet.containsKey(duty.getId())){
             final int newSortOrder = sortOrderSet.get(duty.getId());
@@ -76,9 +79,21 @@ public class DutyApi {
                duty.setSortOrder(newSortOrder);
                dutiesToUpdate.add(duty);
             }
+            
+            if(newSortOrder < minSortOrder){
+               minSortOrder = newSortOrder;
+            }
+            
+            if(newSortOrder > maxSortOrder){
+               maxSortOrder = newSortOrder;
+            }
          } else {
             return new JsonResponse(ResponseStatus.ERROR, "Duty " + duty.getId() + " was not included in sort. Action cancelled.");
          }
+      }
+      
+      if(minSortOrder != 1 || maxSortOrder != allActiveDuties.size()){
+         return new JsonResponse(ResponseStatus.ERROR, "Invalid sort order sequence");
       }
       
       if(dutiesToUpdate.size() > 0){
