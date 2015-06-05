@@ -51,7 +51,6 @@
 	<script src="<c:url value="/resources/jquery-ui/jquery-ui.min.js"/>"></script>
 	<script>
 	$(document).ready(function() {
-	    //Helper function to keep table row from collapsing when being sorted
 	    var fixHelperModified = function(e, tr) {
 	        var $originals = tr.children();
 	        var $helper = tr.clone();
@@ -62,7 +61,6 @@
 	        return $helper;
 	    };
 
-	    //Make diagnosis table sortable
 	    $("#dutyTable tbody").sortable({
 	        helper: fixHelperModified,
 	        stop: function(event,ui) {
@@ -93,17 +91,30 @@
 	}
 	
 	function updateServiceWithNewSorts(tableID){
-		console.log('updateServiceWithNewSorts');
 		var sortArray = [];
 		
 		 $(tableID + " tr.dutyRow").each(function(index, obj) {
-			var id = parseInt($(obj).find('.dutyId').html());
-			sortArray[id] = index + 1;
+			var id = (parseInt($(obj).find('.dutyId').html()));
+			sortArray[index] = {'id': id, 'sortOrder' : (index + 1)};
 		 });
 		 
-		 console.log(sortArray);
-		 
-		 
+		 $.ajax({
+				type: "POST",
+				contentType: "application/json",
+				dataType: 'json',
+				url: "<c:url value="/api/duty/sortOrder"/>",
+				data: JSON.stringify(sortArray),
+				success: function(data, textStatus, xhr){
+					if(xhr.status === 200 && data && data['response'] === 'OK'){
+						//console.log('order saved OK');
+					} else {
+						bootbox.alert("Error updating order: " + xhr.status + ' ' + data['detail']);
+					}
+				},
+				error: function(xhr, textStatus, errorThrown){
+					bootbox.alert("Error updating order: " + xhr.status + ' ' + textStatus);
+				}
+			});
 	}
 	
 	</script>

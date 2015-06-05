@@ -37,7 +37,7 @@ public class DutyAdminController {
    public String getDuties(Model model){
       logger.debug("getDuties()");
 
-      final List<Duty> duties = dutyRepos.findByActiveTrue();
+      final List<Duty> duties = dutyRepos.findByActiveTrueOrderBySortOrderAsc();
       logger.debug("duties found: {}", duties.size());
 
       model.addAttribute("duties", duties);
