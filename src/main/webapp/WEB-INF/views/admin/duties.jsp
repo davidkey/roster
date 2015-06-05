@@ -8,7 +8,7 @@
 <title>Duty Management</title>
 <style>
 .ui-sortable tr {     cursor:pointer; }    
-.ui-sortable tr:hover {     background:rgba(244,251,17,0.45); } 
+.ui-sortable tr:hover {     background:rgba(244,251,17,0.45) !important; } 
 </style>
 </head>
 
