@@ -40,7 +40,6 @@ public class InitialisationService {
    public static final DateTimeFormatter fmt = DateTimeFormat.forPattern("MM/dd/yyyy");
    
    @Autowired
-   @Setter
    BCryptPasswordEncoder encoder;
    
    @Autowired
