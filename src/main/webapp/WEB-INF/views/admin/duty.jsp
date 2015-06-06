@@ -56,12 +56,12 @@
 						type: "DELETE",
 						contentType: "application/json",
 						dataType: 'json',
-						url: "<c:url value="/api/duty"/>",
+						url: WEB_ROOT() + "/api/duty";
 						data: JSON.stringify({'id': id}),
 						success: function(data){
 							if(data && data['response'] === 'OK'){
 								bootbox.alert("Deleted successfully!", function() {
-									window.location.href = "<c:url value="/admin/duties/"/>";
+									window.location.href = WEB_ROOT() + "/admin/duties/";
 								});
 							} else {
 								bootbox.alert("Delete failed!");
