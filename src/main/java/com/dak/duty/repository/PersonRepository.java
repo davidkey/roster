@@ -16,4 +16,5 @@ public interface PersonRepository extends JpaRepository<Person, Long>{
    public List<Person> findByActiveTrueAndIdNotIn(Collection<Long> personIds);
    public List<Person> findAllByOrderByNameLastAscNameFirstAsc();
    public Person findByEmailAddress(String emailAddress);
+   public List<Person> findByRoles_Role(String roleName);
 }

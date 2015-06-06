@@ -7,7 +7,6 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import lombok.NonNull;
-import lombok.Setter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +72,10 @@ public class InitialisationService {
       dutyRepos.flush();
    }
    
+   public boolean initSetupComplete(){
+      return personRepos.findByRoles_Role("ROLE_ADMIN").size() > 0;
+   }
+   
    public void populateDefaultData(){
       logger.info("populateDefaultData");
       clearAllData();
@@ -97,7 +100,7 @@ public class InitialisationService {
       
    }
    
-   protected void createDefaultAdminUser(final String email, final String password){
+   public void createDefaultAdminUser(final String email, final String password){
       logger.info("createDefaultAdminUser({},******)", email);
       
       Person person = new Person();
