@@ -95,7 +95,7 @@
         add constraint UK_dunk58vf3o8hxdjjspls1jrl  unique (name);
 
     alter table person 
-        add constraint UK_8awmj38lti0eu2c51nwdi75xt  unique (emailAddress);
+        add constraint UK_16j3oat1osvcnt3kgq1dwyrxp  unique (nameFirst, nameLast);
 
     alter table event 
         add constraint FK_lwfysucxfvfn3d017d8gdjlju 
