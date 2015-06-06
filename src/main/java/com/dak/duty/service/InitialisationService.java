@@ -3,6 +3,7 @@ package com.dak.duty.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import javax.transaction.Transactional;
 
 import lombok.NonNull;
@@ -10,12 +11,14 @@ import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.Event;
 import com.dak.duty.model.EventType;
 import com.dak.duty.model.Person;
+import com.dak.duty.model.PersonRole;
 import com.dak.duty.model.enums.EventTypeInterval;
 import com.dak.duty.model.enums.IntervalWeekly;
 import com.dak.duty.repository.DutyRepository;
@@ -34,6 +37,9 @@ public class InitialisationService {
 
    private static final Logger logger = LoggerFactory.getLogger(InitialisationService.class);
    public static final DateTimeFormatter fmt = DateTimeFormat.forPattern("MM/dd/yyyy");
+   
+   @Autowired
+   BCryptPasswordEncoder encoder;
    
    @Autowired
    EventTypeRepository eventTypeRepos;
@@ -86,6 +92,30 @@ public class InitialisationService {
       logger.debug("defaultEvents: {}", defaultEvents);
       eventRepos.save(defaultEvents);
       
+      createDefaultAdminUser("davidkey@gmail.com", "password");
+      
+   }
+   
+   protected void createDefaultAdminUser(final String email, final String password){
+      //BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+      
+      Person person = new Person();
+      person.setEmailAddress(email);
+      person.setPassword(encoder.encode(password));
+      person.setNameFirst("Admin");
+      person.setNameLast("User");
+      person.setActive(true);
+      
+      final PersonRole adminRole = new PersonRole();
+      adminRole.setRole("ROLE_ADMIN");
+      
+      final PersonRole userRole = new PersonRole();
+      userRole.setRole("ROLE_USER");
+      
+      person.addRole(adminRole);
+      person.addRole(userRole);
+      
+      personRepos.save(person);
    }
    
    protected List<Event> getDefaultEvents(final List<EventType> eventTypes){
@@ -114,6 +144,9 @@ public class InitialisationService {
    }
    
    protected List<Person> getDefaultPeople(final List<Duty> duties){
+      
+      
+      
       final List<Person> people = new ArrayList<Person>();
       DataFactory df = new DataFactory();
       RandomDataGenerator randomData = new RandomDataGenerator();
@@ -125,6 +158,11 @@ public class InitialisationService {
          p.setEmailAddress(df.getEmailAddress());
          p.setNameFirst(df.getFirstName());
          p.setNameLast(df.getLastName());
+         
+         final PersonRole personRole = new PersonRole();
+         personRole.setRole("ROLE_USER");
+
+         p.addRole(personRole);
          
          Collections.shuffle(scrambledDuties);
          final int numDuties = randomData.nextInt(2, scrambledDuties.size()-1);

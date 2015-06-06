@@ -16,7 +16,7 @@
         	<sec:authorize access="isAuthenticated()"> 
 	          <ul class="nav navbar-nav navbar-right">
 	            <li><a href="#"><sec:authentication property="principal.username" /></a></li>
-	            <li><a href="<c:url value="j_spring_security_logout" />">Log Out</a></li>
+	            <li><a id="logoutLink" href="#">Log Out</a>
 	          </ul>
 	        </sec:authorize>
 	        <sec:authorize access="isAnonymous()"> 

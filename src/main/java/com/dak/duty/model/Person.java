@@ -36,7 +36,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
-@Table(name = "person", uniqueConstraints={@UniqueConstraint(columnNames={"nameFirst", "nameLast"})})
+@Table(name = "person", uniqueConstraints={@UniqueConstraint(columnNames={"emailAddress"})})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Getter
 @Setter
@@ -59,9 +59,13 @@ public class Person  implements Serializable {
    @NotEmpty
    private String nameLast;
 
-   @Column(nullable = true) // can either be null OR a valid email address
+   @Column(nullable = false) // can either be null OR a valid email address
+   @NotEmpty
    @Email
    private String emailAddress;
+   
+   @Column(nullable=false)
+   private String password = "NOT_A_REAL_PASSWORD";
 
    @Column(nullable = false)
    private Boolean active = true;
@@ -77,9 +81,25 @@ public class Person  implements Serializable {
    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
    private Set<PersonDuty> duties;
    
+   @OneToMany(mappedBy="person", fetch=FetchType.EAGER)
+   @JsonManagedReference
+   @Cascade({CascadeType.ALL})
+   @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+   private Set<PersonRole> roles;
+   
    @PreUpdate
    protected void onUpdate() {
       lastUpdated = new Date();
+   }
+   
+   @Transient 
+   public void addRole(final PersonRole personRole){
+      if(roles == null){
+         roles = new HashSet<PersonRole>();
+      }
+      
+      personRole.setPerson(this);
+      roles.add(personRole);
    }
    
    @Transient

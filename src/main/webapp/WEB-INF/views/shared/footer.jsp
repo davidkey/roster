@@ -12,4 +12,4 @@
     <script src="<c:url value="/resources/js/bootbox.min.js"/>"></script>
     <script type="text/javascript" charset="utf-8" src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.js"></script>
     <script type="text/javascript" src="<c:url value="/resources/app/setActiveNav.js"/>"></script>
-    
+    <script type="text/javascript" src="<c:url value="/resources/app/logout.js"/>"></script>
