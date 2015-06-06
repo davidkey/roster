@@ -97,7 +97,7 @@ public class InitialisationService {
    }
    
    protected void createDefaultAdminUser(final String email, final String password){
-      //BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+      logger.info("createDefaultAdminUser({},******)", email);
       
       Person person = new Person();
       person.setEmailAddress(email);
@@ -144,9 +144,6 @@ public class InitialisationService {
    }
    
    protected List<Person> getDefaultPeople(final List<Duty> duties){
-      
-      
-      
       final List<Person> people = new ArrayList<Person>();
       DataFactory df = new DataFactory();
       RandomDataGenerator randomData = new RandomDataGenerator();

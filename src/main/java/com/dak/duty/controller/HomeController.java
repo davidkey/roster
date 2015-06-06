@@ -35,12 +35,4 @@ public class HomeController {
 		
 		return "home";
 	}
-	
-	/*
-	@RequestMapping(value = "/logout")
-	public String logout(){
-	   
-	   return "redirect:/j_spring_security_logout";
-	}
-	*/
 }
