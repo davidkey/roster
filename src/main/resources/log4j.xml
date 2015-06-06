@@ -48,13 +48,15 @@
 		<level value="warn" />
 	</logger>
 	
-		<!-- Application Loggers -->
+	<!-- Application Loggers -->
 	<logger name="com.dak">
 		<level value="debug" />
 	</logger>
 	
-
-
+	<logger name="com.dak.duty.util.SchemaGenerator">
+		<level value="error"/>
+		<appender-ref ref="console" />
+	</logger>
 
 	<!-- Root Logger -->
 	<root>
