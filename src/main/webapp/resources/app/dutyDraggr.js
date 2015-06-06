@@ -39,6 +39,13 @@ $(document).ready(function() {
 	}
 	
 	function updateServiceWithNewSorts(tableID){
+		var csrfParameter = $("meta[name='_csrf_parameter']").attr("content");
+		var csrfHeader = $("meta[name='_csrf_header']").attr("content");
+		var csrfToken = $("meta[name='_csrf']").attr("content");
+		
+		var headers = {};
+		headers[csrfHeader] = csrfToken;
+		
 		var sortArray = [];
 		
 		 $(tableID + " tr.dutyRow").each(function(index, obj) {
@@ -51,6 +58,7 @@ $(document).ready(function() {
 				contentType: "application/json",
 				dataType: 'json',
 				url: WEB_ROOT() + "/api/duty/sortOrder",
+				headers: headers,
 				data: JSON.stringify(sortArray),
 				success: function(data, textStatus, xhr){
 					if(xhr.status === 200 && data && data['response'] === 'OK'){

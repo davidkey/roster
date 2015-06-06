@@ -67,21 +67,22 @@
 			<version>${org.springframework-version}</version>
 		</dependency>
 
+		<!-- spring security -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
-			<version>3.2.5.RELEASE</version>
+			<version>4.0.1.RELEASE</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-config</artifactId>
-			<version>3.2.5.RELEASE</version>
+			<version>4.0.1.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-taglibs</artifactId>
-			<version>3.2.5.RELEASE</version>
+			<version>4.0.1.RELEASE</version>
 		</dependency>
 
 		<!-- commons -->

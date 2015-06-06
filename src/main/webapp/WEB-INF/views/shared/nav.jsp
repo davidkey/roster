@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container-fluid">
         <div class="navbar-header">
@@ -12,6 +13,18 @@
           <a class="navbar-brand" href="#" title="${display_version}">Duty Roster</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
+        	<sec:authorize access="isAuthenticated()"> 
+	          <ul class="nav navbar-nav navbar-right">
+	            <li><a href="#"><sec:authentication property="principal.username" /></a></li>
+	            <li><a href="<c:url value="j_spring_security_logout" />">Log Out</a></li>
+	          </ul>
+	        </sec:authorize>
+	        <sec:authorize access="isAnonymous()"> 
+	          <ul class="nav navbar-nav navbar-right">
+	            <li><a href="<c:url value="j_spring_security_logout" />">Log In</a></li>
+	          </ul>
+	        </sec:authorize>
+	        
           <form class="navbar-form navbar-right">
             <input type="text" class="form-control" placeholder="Search...">
           </form>

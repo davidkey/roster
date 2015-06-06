@@ -19,7 +19,7 @@
 		</layout>
 	</appender>
 
-	<!-- 3rdparty Loggers -->
+	<!-- 3rdparty Loggers 
 	<logger name="org.springframework.core">
 		<level value="error" />
 	</logger>
@@ -35,9 +35,10 @@
 	<logger name="org.springframework.web">
 		<level value="error" />
 	</logger>
+	-->
 
 	<logger name="org.springframework">
-		<level value="error" />
+		<level value="debug" />
 	</logger>
 
 	<logger name="org.hibernate">
@@ -46,6 +47,10 @@
 	
 	<logger name="net.sf.ehcache">
 		<level value="warn" />
+	</logger>
+	
+	<logger name="net.bull.javamelody">
+		<level value="error" />
 	</logger>
 	
 	<!-- Application Loggers -->
