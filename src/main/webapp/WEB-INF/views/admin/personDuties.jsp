@@ -19,7 +19,7 @@
 		<h1 class="page-header">Manage Duties for <c:out value="${personName}"/></h1>
 
 		<form method="POST">
-			<input type="hidden" name="hidVal" value="david"/>
+			<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 			<c:forEach var="duty" items="${duties}">
 				<s:eval expression="person.getPreferenceForDuty(duty)" var="currentPreferenceRanking" />
 				<div class="form-group">
