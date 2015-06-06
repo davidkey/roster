@@ -36,7 +36,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
-@Table(name = "person", uniqueConstraints={@UniqueConstraint(columnNames={"emailAddress"})})
+@Table(name = "person", uniqueConstraints={@UniqueConstraint(columnNames={"nameFirst", "nameLast"})})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Getter
 @Setter
