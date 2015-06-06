@@ -71,19 +71,19 @@ public class InitialisationService {
       clearAllData();
       
       final List<Duty> defaultDuties = getDefaultDuties();
-      logger.info("defaultDuties: {}", defaultDuties);
+      logger.debug("defaultDuties: {}", defaultDuties);
       dutyRepos.save(defaultDuties);
       
       final List<EventType> defaultEventTypes = getDefaultEventTypes(defaultDuties);
-      logger.info("defaultEventTypes: {}", defaultEventTypes);
+      logger.debug("defaultEventTypes: {}", defaultEventTypes);
       eventTypeRepos.save(defaultEventTypes);
       
       final List<Person> defaultPeople = getDefaultPeople(defaultDuties); 
-      logger.info("defaultPeople: {}", defaultPeople);
+      logger.debug("defaultPeople: {}", defaultPeople);
       personRepos.save(defaultPeople);
       
       final List<Event> defaultEvents = getDefaultEvents(defaultEventTypes);
-      logger.info("defaultEvents: {}", defaultEvents);
+      logger.debug("defaultEvents: {}", defaultEvents);
       eventRepos.save(defaultEvents);
       
    }
