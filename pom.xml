@@ -498,7 +498,6 @@
 			      </execution>
 			    </executions>
 			    <configuration>
-			      <classpathScope>test</classpathScope>
 			      <mainClass>com.dak.duty.util.SchemaGenerator</mainClass>
 			      <arguments>
 			        <argument>com.dak.duty.model</argument>
