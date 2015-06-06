@@ -15,6 +15,7 @@
     	http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd
 		">
 
+	<beans:import resource="security-context.xml"/>
 	<beans:import resource="mvc-context.xml"/>
 	<beans:import resource="jpa-context.xml"/>
 	

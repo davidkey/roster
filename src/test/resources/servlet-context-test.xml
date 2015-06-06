@@ -20,12 +20,7 @@
 	<!-- Enables the Spring MVC @Controller programming model -->
 	<annotation-driven>
 		<path-matching registered-suffixes-only="true" />
-		<message-converters> <!-- FIXME: don't use this in production!! -->
-			<beans:bean id="jacksonHttpMessageConverter"
-				class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
-				<beans:property name="prettyPrint" value="true" />
-			</beans:bean>
-			
+		<message-converters> 
 			<!-- force utf encoding -->
 			<beans:bean class="org.springframework.http.converter.StringHttpMessageConverter">
 		      <beans:property name="supportedMediaTypes" value = "text/plain;charset=UTF-8" />
@@ -95,19 +90,9 @@
 		</beans:property>
 	</beans:bean>
 	
-	<!-- simple cache manager -->
-	<!--
-	<cache:annotation-driven />
 	
-	<beans:bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">
-	    <beans:property name="caches">
-	        <beans:set>
-	            <beans:bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" name="default"/>
-	            <beans:bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" name="account"/>
-	        </beans:set>
-	    </beans:property>
+	<beans:bean id="encoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+		<beans:constructor-arg name="strength" value="11" />
 	</beans:bean>
-	-->
-
-
+	
 </beans:beans>

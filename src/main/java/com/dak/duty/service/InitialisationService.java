@@ -7,6 +7,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import lombok.NonNull;
+import lombok.Setter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,7 @@ public class InitialisationService {
    public static final DateTimeFormatter fmt = DateTimeFormat.forPattern("MM/dd/yyyy");
    
    @Autowired
+   @Setter
    BCryptPasswordEncoder encoder;
    
    @Autowired

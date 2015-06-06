@@ -31,6 +31,10 @@
         drop 
         foreign key FK_22rv0lnc3d47vilwenms8one7;
 
+    alter table person_role 
+        drop 
+        foreign key FK_hefqmfkjf44xhk60kx0pts8p5;
+
     drop table if exists duty;
 
     drop table if exists event;
@@ -44,6 +48,8 @@
     drop table if exists person;
 
     drop table if exists person_duty;
+
+    drop table if exists person_role;
 
     create table duty (
         id bigint not null auto_increment,
@@ -95,6 +101,7 @@
         lastUpdated datetime not null,
         nameFirst varchar(255) not null,
         nameLast varchar(255) not null,
+        password varchar(255) not null,
         primary key (id)
     );
 
@@ -103,6 +110,13 @@
         adjustedPreference integer not null,
         preference integer not null,
         duty_id bigint not null,
+        person_id bigint not null,
+        primary key (id)
+    );
+
+    create table person_role (
+        id bigint not null auto_increment,
+        role varchar(255),
         person_id bigint not null,
         primary key (id)
     );
@@ -117,7 +131,7 @@
         add constraint UK_dunk58vf3o8hxdjjspls1jrl  unique (name);
 
     alter table person 
-        add constraint UK_16j3oat1osvcnt3kgq1dwyrxp  unique (nameFirst, nameLast);
+        add constraint UK_8awmj38lti0eu2c51nwdi75xt  unique (emailAddress);
 
     alter table event 
         add constraint FK_lwfysucxfvfn3d017d8gdjlju 
@@ -156,5 +170,10 @@
 
     alter table person_duty 
         add constraint FK_22rv0lnc3d47vilwenms8one7 
+        foreign key (person_id) 
+        references person (id);
+
+    alter table person_role 
+        add constraint FK_hefqmfkjf44xhk60kx0pts8p5 
         foreign key (person_id) 
         references person (id);

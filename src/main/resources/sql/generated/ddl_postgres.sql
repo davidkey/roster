@@ -23,6 +23,9 @@
     alter table person_duty 
         drop constraint FK_22rv0lnc3d47vilwenms8one7;
 
+    alter table person_role 
+        drop constraint FK_hefqmfkjf44xhk60kx0pts8p5;
+
     drop table if exists duty cascade;
 
     drop table if exists event cascade;
@@ -37,6 +40,8 @@
 
     drop table if exists person_duty cascade;
 
+    drop table if exists person_role cascade;
+
     drop sequence duty_id_seq;
 
     drop sequence eri_id_seq;
@@ -44,6 +49,8 @@
     drop sequence event_id_seq;
 
     drop sequence eventtype_id_seq;
+
+    drop sequence perrole_id_seq;
 
     drop sequence person_duty_id_seq;
 
@@ -99,6 +106,7 @@
         lastUpdated datetime not null,
         nameFirst varchar(255) not null,
         nameLast varchar(255) not null,
+        password varchar(255) not null,
         primary key (id)
     );
 
@@ -107,6 +115,13 @@
         adjustedPreference integer not null,
         preference integer not null,
         duty_id bigint not null,
+        person_id bigint not null,
+        primary key (id)
+    );
+
+    create table person_role (
+        id bigint not null,
+        role varchar(255),
         person_id bigint not null,
         primary key (id)
     );
@@ -121,7 +136,7 @@
         add constraint UK_dunk58vf3o8hxdjjspls1jrl  unique (name);
 
     alter table person 
-        add constraint UK_16j3oat1osvcnt3kgq1dwyrxp  unique (nameFirst, nameLast);
+        add constraint UK_8awmj38lti0eu2c51nwdi75xt  unique (emailAddress);
 
     alter table event 
         add constraint FK_lwfysucxfvfn3d017d8gdjlju 
@@ -163,6 +178,11 @@
         foreign key (person_id) 
         references person;
 
+    alter table person_role 
+        add constraint FK_hefqmfkjf44xhk60kx0pts8p5 
+        foreign key (person_id) 
+        references person;
+
     create sequence duty_id_seq;
 
     create sequence eri_id_seq;
@@ -170,6 +190,8 @@
     create sequence event_id_seq;
 
     create sequence eventtype_id_seq;
+
+    create sequence perrole_id_seq;
 
     create sequence person_duty_id_seq;
 
