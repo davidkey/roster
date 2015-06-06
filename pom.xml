@@ -312,7 +312,6 @@
 			<scope>provided</scope>
 		</dependency>
 		
-		
 		<!-- swagger-spring - for rest api docs 
 		<dependency>
 			<groupId>com.mangofactory</groupId>
@@ -458,7 +457,7 @@
 					</nonFilteredFileExtensions>
 					<webResources>
 						<resource>
-							<directory>src/main/webapp</directory>
+							<directory>src/main/webapp/WEB-INF</directory>
 							<filtering>true</filtering>
 						</resource>
 					</webResources>
@@ -466,16 +465,15 @@
 						<manifestEntries>
 							<Specification-Title>${project.name}</Specification-Title>
 							<Specification-Version>${project.version}</Specification-Version>
-							<!-- Variables set by Hudson -->
 							<Build-Number>${BUILD_NUMBER}</Build-Number>
 							<Build-Date>${BUILD_ID}</Build-Date>
 							<Build-Time>${maven.build.timestamp}</Build-Time>
 							<SCM-Revision>${GIT_COMMIT}</SCM-Revision>
-							<!-- Next one for potential usage in the next AppInfo versions -->
 							<Job-Name>${JOB_NAME}</Job-Name>
 							<Implementation-Version>${project.version}.${GIT_COMMIT}</Implementation-Version>
 						</manifestEntries>
 					</archive>
+					<warSourceExcludes>resources/app/*.js</warSourceExcludes>
 				</configuration>
 			</plugin>
 
@@ -504,6 +502,38 @@
 			      </arguments>
 			    </configuration>
 			  </plugin>
+			  
+			<plugin>
+				<groupId>com.samaxes.maven</groupId>
+				<artifactId>minify-maven-plugin</artifactId>
+				<version>1.7.2</version>
+				<executions>
+					<execution>
+						<id>default-minify</id>
+						<phase>prepare-package</phase>
+						<configuration>
+							<charset>UTF-8</charset>
+							<skipMerge>true</skipMerge> <!-- do not create one big file -->
+							<nosuffix>true</nosuffix> <!-- do not use suffix like 'min' -->
+							
+							<!-- <cssSourceDir>css</cssSourceDir>
+							<cssSourceIncludes>
+							    <cssSourceInclude>*.css</cssSourceInclude>
+							</cssSourceIncludes>
+							-->
+							
+							<jsSourceDir>resources/app</jsSourceDir>
+							<jsSourceIncludes>
+							    <jsSourceInclude>*.js</jsSourceInclude>
+							</jsSourceIncludes>
+						
+						</configuration>
+						<goals>
+						    <goal>minify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
 		</plugins>
 	</build>
