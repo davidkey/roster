@@ -15,6 +15,7 @@ public interface DutyRepository extends JpaRepository<Duty, Long>{
    List<Duty> findAllByActiveTrueOrderByNameAsc();
    List<Duty> findByActiveTrue();
    List<Duty> findByActiveTrueOrderBySortOrderAsc();
+   List<Duty> findByNameContainsIgnoreCaseAndActiveTrue(String name);
    
    @Modifying
    @Query("update Duty d set d.sortOrder = d.sortOrder + 1 where d.sortOrder >= ?1 and d.active = true")

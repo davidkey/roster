@@ -17,4 +17,6 @@ public interface EventTypeRepository extends JpaRepository<EventType, Long>{
    
    @Query("select et from EventType et where et.id not in (select e.eventType from Event e)")
    public List<EventType> getEventTypesWithNoEvents();
+   
+   public List<EventType> findByNameContainsIgnoreCaseAndActiveTrue(String name);
 }

@@ -26,7 +26,7 @@
 	        </sec:authorize>
 	        
           <form class="navbar-form navbar-right">
-            <input type="text" class="form-control" placeholder="Search...">
+            <input type="text" id="autocomplete" class="form-control" placeholder="Search...">
           </form>
         </div>
       </div>
