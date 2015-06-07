@@ -28,8 +28,7 @@ public class HomeController {
    @RequestMapping(value = "/", method = RequestMethod.GET)
    public String home(Locale locale, Model model) {
       if(!initService.initSetupComplete()){
-         logger.debug("creating default admin user");
-         initService.createDefaultAdminUser("davidkey@gmail.com", "password");
+         return "redirect:/setup";
       }
 
       logger.info("Welcome home! The client locale is {}.", locale);
