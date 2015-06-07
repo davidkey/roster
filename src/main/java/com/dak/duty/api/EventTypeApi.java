@@ -3,6 +3,7 @@ package com.dak.duty.api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +19,7 @@ import com.dak.duty.service.EventService;
 
 @Controller
 @RequestMapping("/api/eventType")
+@PreAuthorize("hasRole('ROLE_USER')")
 public class EventTypeApi {
 
    private static final Logger logger = LoggerFactory.getLogger(EventTypeApi.class);
@@ -28,6 +30,7 @@ public class EventTypeApi {
    @Autowired
    EventService eventService;
    
+   @PreAuthorize("hasRole('ROLE_ADMIN')")
    @RequestMapping(method = RequestMethod.DELETE)
    public @ResponseBody JsonResponse delete(@RequestBody EventType eventType){
       logger.debug("eventType.delete({})", eventType);
@@ -46,6 +49,7 @@ public class EventTypeApi {
       return eventTypeRepos.findOne(id);
    }
    
+   @PreAuthorize("hasRole('ROLE_ADMIN')")
    @RequestMapping(method = RequestMethod.POST)
    public @ResponseBody JsonResponse save(@RequestBody EventType eventType){
       logger.debug("eventType.save({})", eventType);

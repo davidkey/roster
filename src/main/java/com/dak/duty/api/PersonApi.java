@@ -3,6 +3,7 @@ package com.dak.duty.api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +19,7 @@ import com.dak.duty.service.PersonService;
 
 @Controller
 @RequestMapping("/api/person")
+@PreAuthorize("hasRole('ROLE_USER')")
 public class PersonApi {
    
    private static final Logger logger = LoggerFactory.getLogger(PersonApi.class);
@@ -28,6 +30,7 @@ public class PersonApi {
    @Autowired
    PersonService personService;
    
+   @PreAuthorize("hasRole('ROLE_ADMIN')")
    @RequestMapping(method = RequestMethod.DELETE)
    public @ResponseBody JsonResponse delete(@RequestBody Person person){
       logger.debug("person.delete({})", person);
@@ -46,6 +49,7 @@ public class PersonApi {
       return personRepos.findOne(id);
    }
    
+   @PreAuthorize("hasRole('ROLE_ADMIN')")
    @RequestMapping(method = RequestMethod.POST)
    public @ResponseBody JsonResponse save(@RequestBody Person person){
       logger.debug("person.save({})", person);

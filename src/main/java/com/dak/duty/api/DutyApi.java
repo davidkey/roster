@@ -3,9 +3,11 @@ package com.dak.duty.api;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +24,7 @@ import com.dak.duty.service.DutyService;
 
 @Controller
 @RequestMapping("/api/duty")
+@PreAuthorize("hasRole('ROLE_USER')")
 public class DutyApi {
    
    private static final Logger logger = LoggerFactory.getLogger(DutyApi.class);
@@ -32,6 +35,7 @@ public class DutyApi {
    @Autowired
    DutyService dutyService;
    
+   @PreAuthorize("hasRole('ROLE_ADMIN')")
    @RequestMapping(method = RequestMethod.DELETE)
    public @ResponseBody JsonResponse delete(@RequestBody Duty duty){
       logger.debug("duty.delete({})", duty);
@@ -51,6 +55,7 @@ public class DutyApi {
       return dutyRepos.findOne(id);
    }
    
+   @PreAuthorize("hasRole('ROLE_ADMIN')")
    @RequestMapping(method = RequestMethod.POST)
    public @ResponseBody JsonResponse save(@RequestBody Duty duty){
       logger.debug("duty.save({})", duty);
@@ -59,6 +64,7 @@ public class DutyApi {
       return new JsonResponse(ResponseStatus.OK, "Duty saved with id " + duty.getId());
    }
    
+   @PreAuthorize("hasRole('ROLE_ADMIN')")
    @RequestMapping(value = "/sortOrder", method = RequestMethod.POST)
    public @ResponseBody JsonResponse saveSortOrder(@RequestBody List<SortOrder> params){
       logger.debug("duty.saveSortOrder({})", params);
