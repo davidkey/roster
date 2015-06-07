@@ -14,7 +14,7 @@
 		<logout invalidate-session="true" logout-success-url="/" delete-cookies="JSESSIONID" logout-url="/logout" />
 	</http>
 
-	<authentication-manager>
+	<authentication-manager alias="authenticationManager">
 		<authentication-provider user-service-ref="dutyUserDetailsService">
 			<password-encoder ref="encoder" />
 		</authentication-provider>
