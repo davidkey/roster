@@ -100,14 +100,14 @@ public class InitialisationService {
       
    }
    
-   public void createDefaultAdminUser(final String email, final String password){
+   public void createDefaultAdminUser(final String email, final String password, final String lastName, final String firstName){
       logger.info("createDefaultAdminUser({},******)", email);
       
       Person person = new Person();
       person.setEmailAddress(email);
       person.setPassword(encoder.encode(password));
-      person.setNameFirst("Admin");
-      person.setNameLast("User");
+      person.setNameFirst(firstName);
+      person.setNameLast(lastName);
       person.setActive(true);
       
       final PersonRole adminRole = new PersonRole();
@@ -120,6 +120,10 @@ public class InitialisationService {
       person.addRole(userRole);
       
       personRepos.save(person);
+   }
+   
+   public void createDefaultAdminUser(final String email, final String password){
+      createDefaultAdminUser(email, password, "USER", "ADMIN");
    }
    
    protected List<Event> getDefaultEvents(final List<EventType> eventTypes){

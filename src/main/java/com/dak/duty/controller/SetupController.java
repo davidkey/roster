@@ -11,7 +11,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,9 +19,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.dak.duty.form.SetupForm;
-import com.dak.duty.model.Person;
-import com.dak.duty.model.PersonRole;
+import com.dak.duty.model.Email;
 import com.dak.duty.repository.PersonRepository;
+import com.dak.duty.service.EmailService;
+import com.dak.duty.service.InitialisationService;
 
 @Controller
 @RequestMapping("/setup")
@@ -31,10 +31,13 @@ public class SetupController {
    private static final Logger logger = LoggerFactory.getLogger(SetupController.class);
 
    @Autowired
-   PersonRepository personRepos;
-
+   EmailService emailService;
+   
    @Autowired
-   BCryptPasswordEncoder encoder;
+   InitialisationService initService;
+   
+   @Autowired
+   PersonRepository personRepos;
    
    @Autowired
    @Qualifier("authenticationManager")
@@ -57,26 +60,19 @@ public class SetupController {
          model.addAttribute("setupForm", form);
          return "setup/setup";
       }
-
-      Person person = new Person();
-      person.setActive(true);
-      person.setEmailAddress(form.getEmailAddress().trim());
-      person.setNameFirst(form.getNameFirst().trim());
-      person.setNameLast(form.getNameLast().trim());
-      person.setPassword(encoder.encode(form.getPassword()));
       
-      PersonRole adminRole = new PersonRole();
-      adminRole.setRole("ROLE_ADMIN");
+      // create admin user
+      initService.createDefaultAdminUser(form.getEmailAddress().trim(), form.getPassword(), form.getNameLast().trim(), form.getNameFirst().trim());
       
-      PersonRole userRole = new PersonRole();
-      userRole.setRole("ROLE_USER");
+      // log in as newly created user
+      doAutoLogin(form.getEmailAddress().trim(), form.getPassword(), request);
       
-      person.addRole(adminRole);
-      person.addRole(userRole);
-      
-      personRepos.save(person);
-
-      doAutoLogin(person.getEmailAddress(), form.getPassword(), request);
+      // send welcome email
+      try {
+         emailService.send(new Email("admin@duty.dak.rocks", form.getEmailAddress().trim(), "Welcome to Duty Roster!", "We hope you like it!"));
+      } catch (Exception e){
+         logger.error("error: {}", e);
+      }
 
       return "redirect:/admin";
    }
