@@ -46,13 +46,12 @@ public class HomeController {
    @RequestMapping(value = "/login", method = RequestMethod.GET)
    public String getLogin(
          @RequestParam(value = "error", required = false) String error, 
-         @RequestParam(value = "logout", required = false) String logout,
          Model model, HttpServletRequest request){
 
       if (error != null) {
          model.addAttribute("error", "Invalid username and password!");
       }
-      
+
       return "login";
    }
 }
