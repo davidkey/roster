@@ -56,7 +56,7 @@
 						type: "DELETE",
 						contentType: "application/json",
 						dataType: 'json',
-						url: WEB_ROOT() + "/api/duty";
+						url: WEB_ROOT() + "/api/duty",
 						data: JSON.stringify({'id': id}),
 						success: function(data){
 							if(data && data['response'] === 'OK'){
