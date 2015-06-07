@@ -181,6 +181,9 @@ $(document).ready(function() {
 							} else {
 								bootbox.alert("Delete failed!");
 							}
+						},
+						error: function(xhr, textStatus, errorThrown){
+							bootbox.alert("Error deleting event type: " + xhr.status + ' ' + textStatus);
 						}
 					});
 				}

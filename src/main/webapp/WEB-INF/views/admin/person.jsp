@@ -43,10 +43,52 @@
 			<button type="submit" class="btn btn-default">Save</button>
 		</form:form>
 		
-		
+		<c:if test="${not empty person.id}">
+			<hr/>
+			<div class="form-group">
+					<label for="password">Set Password</label>
+					<input id="password" type="password" class="form-control"/>
+					<form:errors path="password" class="alert-danger" />
+					<button id="setPassword" class="btn btn-default">Set Password</button> 
+			</div>
+		</c:if>
 	</div>
 
 	<jsp:include page="../shared/footer.jsp" />
+	<script>
+	$(document).ready(function() {
+		$( "#setPassword" ).click(function(e, btn) {
+			var csrfParameter = $("meta[name='_csrf_parameter']").attr("content");
+			var csrfHeader = $("meta[name='_csrf_header']").attr("content");
+			var csrfToken = $("meta[name='_csrf']").attr("content");
+			
+			var headers = {};
+			headers[csrfHeader] = csrfToken;
+			
+			var id = $('#id').val();
+			var password = $('#password').val();
+			
+			$.ajax({
+				type: "POST",
+				contentType: "application/json",
+				dataType: 'json',
+				url: WEB_ROOT() + "/api/person/password",
+				headers: headers,
+				data: JSON.stringify({'id': id, 'password': password}),
+				success: function(data){
+					if(data && data['response'] === 'OK'){
+						bootbox.alert("Password updated!");
+					} else {
+						bootbox.alert("Error setting password!");
+					}
+				},
+				error: function(xhr, textStatus, errorThrown){
+					bootbox.alert("Error setting password: " + xhr.status + ' ' + textStatus);
+				}
+			});
+		});
+	});
+	</script>
 </body>
 
 </html>

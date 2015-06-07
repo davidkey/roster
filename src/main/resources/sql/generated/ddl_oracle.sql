@@ -79,7 +79,7 @@
         lastUpdated datetime not null,
         nameFirst varchar(255) not null,
         nameLast varchar(255) not null,
-        password varchar(255) not null,
+        password varchar(60) not null,
         primary key (id)
     );
 

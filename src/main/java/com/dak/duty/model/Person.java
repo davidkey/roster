@@ -63,7 +63,7 @@ public class Person  implements Serializable {
    @Email
    private String emailAddress;
    
-   @Column(nullable=false)
+   @Column(nullable=false, length=60)
    private String password = "NOT_A_REAL_PASSWORD";
 
    @Column(nullable = false)

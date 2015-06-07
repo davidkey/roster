@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +30,9 @@ public class PersonApi {
    
    @Autowired
    PersonService personService;
+   
+   @Autowired
+   BCryptPasswordEncoder encoder;
    
    @PreAuthorize("hasRole('ROLE_ADMIN')")
    @RequestMapping(method = RequestMethod.DELETE)
@@ -56,5 +60,20 @@ public class PersonApi {
       person = personRepos.save(person);
       
       return new JsonResponse(ResponseStatus.OK, "Person saved with id " + person.getId());
+   }
+   
+   @PreAuthorize("hasRole('ROLE_ADMIN')")
+   @RequestMapping(value = "/password", method = RequestMethod.POST)
+   public @ResponseBody JsonResponse setPassword(@RequestBody Person person){
+      logger.debug("setPassword.save({})", person.getId());
+      
+      Person personToUpdate = personRepos.findOne(person.getId());
+      if(personToUpdate != null){
+         personToUpdate.setPassword(encoder.encode(person.getPassword()));
+         personToUpdate = personRepos.save(personToUpdate);
+         return new JsonResponse(ResponseStatus.OK, "Password updated for Person " + personToUpdate.getId());
+      } else {
+         return new JsonResponse(ResponseStatus.ERROR, "Person not found - id " + person.getId());
+      }
    }
 }
