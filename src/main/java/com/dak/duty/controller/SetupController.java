@@ -50,7 +50,10 @@ public class SetupController {
    @RequestMapping(method = RequestMethod.POST)
    public String postSetup(@Valid SetupForm form, BindingResult bindingResult, Model model, HttpServletRequest request){
       logger.info("postSetup({})", form);
-      if (bindingResult.hasErrors()) {
+      if (bindingResult.hasErrors() || !form.getPassword().equals(form.getConfirmPassword())) {
+         if(!form.getPassword().equals(form.getConfirmPassword())){
+            bindingResult.rejectValue("confirmPassword", null, "Passwords must match!");
+         }
          model.addAttribute("setupForm", form);
          return "setup/setup";
       }

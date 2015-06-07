@@ -28,4 +28,8 @@ public class SetupForm {
    @Size(min=6, max=64)
    @NotEmpty
    private String password;
+   
+   @Size(min=6, max=64)
+   @NotEmpty
+   private String confirmPassword;
 }

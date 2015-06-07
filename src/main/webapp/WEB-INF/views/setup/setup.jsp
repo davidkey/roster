@@ -37,6 +37,11 @@
 				<form:input type="password" path="password" class="form-control" />
 				<form:errors path="password" class="alert-danger" />
 			</div>
+			<div class="form-group">
+				<label for="confirmPassword">Confirm Password</label> 
+				<form:input type="password" path="confirmPassword" class="form-control" />
+				<form:errors path="confirmPassword" class="alert-danger" />
+			</div>
 			<button type="submit" id="submit" class="btn btn-lg btn-success btn-block">Get Started</button>
 		</form:form>
 		
