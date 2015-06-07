@@ -17,6 +17,7 @@
 	<!-- DispatcherServlet Context: defines this servlet's request-processing 
 		infrastructure -->
 
+	<beans:import resource="security-context-test.xml"/>
 	<!-- Enables the Spring MVC @Controller programming model -->
 	<annotation-driven>
 		<path-matching registered-suffixes-only="true" />
