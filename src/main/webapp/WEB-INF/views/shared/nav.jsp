@@ -16,6 +16,9 @@
         	<sec:authorize access="isAuthenticated()"> 
 	          <ul class="nav navbar-nav navbar-right">
 	            <li><a href="#"><sec:authentication property="principal.username" /></a></li>
+	            <sec:authorize url="/user">
+					<li><a href="<c:url value="/user"/>">Exit Admin</a></li>
+				</sec:authorize>
 	            <li><a id="logoutLink" href="#">Log Out</a>
 	          </ul>
 	        </sec:authorize>

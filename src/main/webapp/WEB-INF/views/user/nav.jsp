@@ -27,6 +27,9 @@
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<li class="active"><a href="#"><sec:authentication property="principal.username" /></a></li>
+				<sec:authorize url="/admin">
+					<li><a href="<c:url value="/admin"/>">Admin</a></li>
+				</sec:authorize>
 			</ul>
 		</div>
 		<!--/.nav-collapse -->
