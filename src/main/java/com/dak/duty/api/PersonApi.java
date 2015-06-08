@@ -1,8 +1,6 @@
 package com.dak.duty.api;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.dak.duty.api.util.DutyNode;
 import com.dak.duty.api.util.JsonResponse;
 import com.dak.duty.api.util.JsonResponse.ResponseStatus;
-import com.dak.duty.model.Event;
-import com.dak.duty.model.EventRosterItem;
 import com.dak.duty.model.Person;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.PersonRepository;
@@ -73,20 +69,7 @@ public class PersonApi {
    @RequestMapping(value="/{id}/upcomingDuties", method = RequestMethod.GET)
    @PreAuthorize("#p.emailAddress == authentication.name or hasRole('ROLE_ADMIN')")
    public @ResponseBody List<DutyNode> getUpcomingDuties(@PathVariable("id") @P("p") Person person){
-      List<DutyNode> myDuties = new ArrayList<DutyNode>();
-
-      List<Event> eventsWithPerson = eventRepos.findAllByRoster_PersonAndDateEventGreaterThanEqual(person, intervalService.getCurrentSystemDate());
-
-      for(Event event : eventsWithPerson){
-         Set<EventRosterItem> roster = event.getRoster();
-         for(EventRosterItem eri : roster){
-            if(eri.getPerson().getId() == person.getId()){
-               myDuties.add(new DutyNode(event.getName(), event.getDateEvent(), eri.getDuty().getName()));
-            }
-         }
-      }
-
-      return myDuties;
+      return personService.getUpcomingDuties(person);
    }
 
 

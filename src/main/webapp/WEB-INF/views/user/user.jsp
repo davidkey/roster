@@ -19,11 +19,15 @@
 
 		<!-- Main component for a primary marketing message or call to action -->
 		<div class="jumbotron">
-			<h1>Navbar example</h1>
-			<p>This example is a quick exercise to illustrate how the default, static and fixed to top navbar work. It includes the responsive CSS and HTML, so it also adapts to your viewport and device.</p>
-			<p>To see the difference between static and fixed top navbars, just scroll.</p>
+			<h1><c:out value="${personName}"/>,</h1>
 			<p>
-				<a class="btn btn-lg btn-primary" href="../../components/#navbar" role="button">View navbar docs &raquo;</a>
+				Welcome to the Duty Roster.
+			</p>
+			<p>
+				Take a look at the navigation bar above to see what your options are.
+			</p>
+			<p>
+				<a class="btn btn-lg btn-primary" href="#" role="button">View upcoming duties &raquo;</a>
 			</p>
 		</div>
 

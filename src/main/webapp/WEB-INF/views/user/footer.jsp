@@ -8,3 +8,14 @@
 <!--<![endif]-->
 <script src="<c:url value="/resources/bootstrap/js/bootstrap.min.js"/>"></script>
 <script src="<c:url value="/resources/js/bootbox.min.js"/>"></script>
+<script>
+$(document).ready(function() {
+	function updateDutyCount(){
+		$.get(WEB_ROOT() + "/user/upcomingDuties/count", function( data ) {
+			$( "#upcomingDutiesCount" ).html( data );
+		});
+	}
+
+	updateDutyCount();
+});
+</script>

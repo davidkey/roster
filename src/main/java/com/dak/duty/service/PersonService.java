@@ -17,11 +17,15 @@ import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dak.duty.api.util.DutyNode;
 import com.dak.duty.exception.UsernameAlreadyExists;
 import com.dak.duty.model.Duty;
+import com.dak.duty.model.Event;
 import com.dak.duty.model.EventRoster;
+import com.dak.duty.model.EventRosterItem;
 import com.dak.duty.model.Person;
 import com.dak.duty.model.PersonDuty;
+import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.PersonRepository;
 
 @Service
@@ -30,13 +34,35 @@ public class PersonService {
 
    @Autowired
    PersonRepository personRepos;
+   
+   @Autowired
+   EventRepository eventRepos;
+   
+   @Autowired
+   IntervalService intervalService;
 
    @Autowired
    Random rand;
+   
+   public List<DutyNode> getUpcomingDuties (final Person person){
+      List<DutyNode> myDuties = new ArrayList<DutyNode>();
+
+      List<Event> eventsWithPerson = eventRepos.findAllByRoster_PersonAndDateEventGreaterThanEqual(person, intervalService.getCurrentSystemDate());
+
+      for(Event event : eventsWithPerson){
+         Set<EventRosterItem> roster = event.getRoster();
+         for(EventRosterItem eri : roster){
+            if(eri.getPerson().getId() == person.getId()){
+               myDuties.add(new DutyNode(event.getName(), event.getDateEvent(), eri.getDuty().getName()));
+            }
+         }
+      }
+
+      return myDuties;
+   }
 
    @Transactional
    public Iterable<Person> save(Iterable<Person> people){
-
       if(people != null){
          for(Person person : people){
             // business logic to prevent duplicate email addresses
@@ -56,7 +82,6 @@ public class PersonService {
 
    @Transactional
    public Person save(Person person){
-
       // business logic to prevent duplicate email addresses
       // we couldn't do this in a unique index because we allow nulls
       if(person.getEmailAddress() != null && person.getEmailAddress().length() > 0){

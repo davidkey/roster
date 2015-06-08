@@ -13,7 +13,7 @@
 			<ul class="nav navbar-nav">
 				<li class="active"><a href="<c:url value="/user/"/>">Home</a></li>
 				<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-					Upcoming Duties <span class="label label-primary">15</span> <span class="caret"></span>
+					Upcoming Duties <span id="upcomingDutiesCount" class="label label-primary"></span> <span class="caret"></span>
 				</a>
 					<ul class="dropdown-menu" role="menu">
 						<li><a href="#">This Week</a></li>
