@@ -33,51 +33,45 @@ import com.dak.duty.service.PersonService;
 @RequestMapping("/api/person")
 @PreAuthorize("hasRole('ROLE_USER')")
 public class PersonApi {
-   
+
    private static final Logger logger = LoggerFactory.getLogger(PersonApi.class);
-   
+
    @Autowired
    PersonRepository personRepos;
-   
+
    @Autowired
    PersonService personService;
-   
+
    @Autowired
    EventRepository eventRepos;
-   
+
    @Autowired
    BCryptPasswordEncoder encoder;
-   
+
    @PreAuthorize("hasRole('ROLE_ADMIN')")
    @RequestMapping(method = RequestMethod.DELETE)
    public @ResponseBody JsonResponse delete(@RequestBody Person person){
       logger.debug("person.delete({})", person);
-      
+
       person = personRepos.findOne(person.getId());
       person.setActive(false);
       personRepos.save(person);
-      
+
       return new JsonResponse(ResponseStatus.OK, "Person " + person.getId() + " deleted");
    }
-   
+
    @RequestMapping(value="/{id}", method = RequestMethod.GET)
    public @ResponseBody Person get(@PathVariable("id") Long id){
       logger.debug("person.get({})", id);
-      
+
       return personRepos.findOne(id);
    }
-   
+
    @RequestMapping(value="/{id}/upcomingDuties", method = RequestMethod.GET)
-   //public @ResponseBody List<DutyNode> getUpcomingDuties(@PathVariable("id") Long personId){
-      //return getUpcomingDuties(personRepos.findOne(personId));
-   public @ResponseBody List<DutyNode> getUpcomingDuties(@PathVariable("id") Person person){
-      return getUpcomingDuties2(person);
-   }
-   
    @PreAuthorize("#p.emailAddress == authentication.name or hasRole('ROLE_ADMIN')")
-   public List<DutyNode> getUpcomingDuties2(@NonNull @P("p") Person person){
+   public @ResponseBody List<DutyNode> getUpcomingDuties(@PathVariable("id") @P("p") Person person){
       List<DutyNode> myDuties = new ArrayList<DutyNode>();
-      
+
       List<Event> eventsWithPerson = eventRepos.findAllByRoster_Person(person);
 
       for(Event event : eventsWithPerson){
@@ -88,24 +82,25 @@ public class PersonApi {
             }
          }
       }
-      
+
       return myDuties;
    }
-   
+
+
    @PreAuthorize("hasRole('ROLE_ADMIN')")
    @RequestMapping(method = RequestMethod.POST)
    public @ResponseBody JsonResponse save(@RequestBody Person person){
       logger.debug("person.save({})", person);
       person = personRepos.save(person);
-      
+
       return new JsonResponse(ResponseStatus.OK, "Person saved with id " + person.getId());
    }
-   
+
    @PreAuthorize("hasRole('ROLE_ADMIN')")
    @RequestMapping(value = "/password", method = RequestMethod.POST)
    public @ResponseBody JsonResponse setPassword(@RequestBody Person person){
       logger.debug("setPassword.save({})", person.getId());
-      
+
       Person personToUpdate = personRepos.findOne(person.getId());
       if(personToUpdate != null){
          personToUpdate.setPassword(encoder.encode(person.getPassword()));
