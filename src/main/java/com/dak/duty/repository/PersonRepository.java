@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.Person;
+import com.dak.duty.model.enums.Role;
 
 @Repository
 @RepositoryDefinition(domainClass = Person.class, idClass = Long.class)
@@ -18,6 +19,6 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
    public List<Person> findByActiveTrueAndIdNotIn(Collection<Long> personIds);
    public List<Person> findAllByOrderByNameLastAscNameFirstAsc();
    public Person findByEmailAddress(String emailAddress);
-   public List<Person> findByRoles_Role(String roleName);
+   public List<Person> findByRoles_Role(Role role);
    public List<Person> findByNameLastContainingIgnoreCaseOrNameFirstContainingIgnoreCase(String nameLast, String nameFirst);
 }

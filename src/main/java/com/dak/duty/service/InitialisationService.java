@@ -77,7 +77,7 @@ public class InitialisationService {
    }
    
    public boolean initSetupComplete(){
-      return personRepos.findByRoles_Role("ROLE_ADMIN").size() > 0;
+      return personRepos.findByRoles_Role(Role.ROLE_ADMIN).size() > 0;
    }
    
    public void populateDefaultData(){
