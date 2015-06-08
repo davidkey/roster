@@ -43,7 +43,7 @@
 			<button type="submit" class="btn btn-default">Save</button>
 		</form:form>
 		
-		<c:if test="${not empty person.id}">
+		<c:if test="${person.id gt 0}">
 			<hr/>
 			<div class="form-group">
 					<label for="password">Set Password</label>
