@@ -7,9 +7,11 @@
 	<!-- build info: ${display_version} -->
 	<jsp:include page="../shared/favicon.jsp" />
 	
-	<!-- Bootstrap -->
+	<!-- Bootstrap --><!--
 	<link href="<c:url value="/resources/bootstrap/css/bootstrap.min.css"/>" rel="stylesheet">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+	 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css"> -->
+	<link href="<c:url value="/resources/css/themes/bootstrap.css"/>" rel="stylesheet">
+	<link href="<c:url value="/resources/css/themes/bootswatch.min.css"/>" rel="stylesheet">
 	<link href="<c:url value="/resources/css/dashboard.css"/>" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.css">
 	<link href="<c:url value="/resources/css/jquery.autocomplete.css"/>" rel="stylesheet">

@@ -24,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.Person;
+import com.dak.duty.model.PersonRole;
 import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.PersonRepository;
 
@@ -65,7 +66,11 @@ public class PeopleAdminController {
             return "redirect:/admin/people/new";
          }
       }
-
+      
+      PersonRole userRole = new PersonRole();
+      userRole.setRole("ROLE_USER");
+      person.addRole(userRole);
+      
       personRepos.save(person);
       redirectAttributes.addFlashAttribute("msg_success", personAlreadyExisted ? "Person updated!" : "Person added!");
       return "redirect:/admin/people";

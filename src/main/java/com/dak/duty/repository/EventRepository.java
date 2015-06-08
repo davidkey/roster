@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import com.dak.duty.model.Event;
 import com.dak.duty.model.EventType;
+import com.dak.duty.model.Person;
 
 @Repository
 @RepositoryDefinition(domainClass = Event.class, idClass = Long.class)
@@ -40,4 +41,6 @@ public interface EventRepository extends JpaRepository<Event, Long>{
    public List<Event> findEventsByDateBetween(final Date startDate, final Date endDate);
    
    public List<Event> findAllByDateEventGreaterThanEqual(final Date d);
+   
+   public List<Event> findAllByRoster_Person(Person person);
 }

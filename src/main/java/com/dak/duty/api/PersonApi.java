@@ -1,8 +1,15 @@
 package com.dak.duty.api;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import lombok.NonNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -12,9 +19,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.dak.duty.api.util.DutyNode;
 import com.dak.duty.api.util.JsonResponse;
 import com.dak.duty.api.util.JsonResponse.ResponseStatus;
+import com.dak.duty.model.Event;
+import com.dak.duty.model.EventRosterItem;
 import com.dak.duty.model.Person;
+import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.service.PersonService;
 
@@ -30,6 +41,9 @@ public class PersonApi {
    
    @Autowired
    PersonService personService;
+   
+   @Autowired
+   EventRepository eventRepos;
    
    @Autowired
    BCryptPasswordEncoder encoder;
@@ -51,6 +65,31 @@ public class PersonApi {
       logger.debug("person.get({})", id);
       
       return personRepos.findOne(id);
+   }
+   
+   @RequestMapping(value="/{id}/upcomingDuties", method = RequestMethod.GET)
+   //public @ResponseBody List<DutyNode> getUpcomingDuties(@PathVariable("id") Long personId){
+      //return getUpcomingDuties(personRepos.findOne(personId));
+   public @ResponseBody List<DutyNode> getUpcomingDuties(@PathVariable("id") Person person){
+      return getUpcomingDuties2(person);
+   }
+   
+   @PreAuthorize("#p.emailAddress == authentication.name or hasRole('ROLE_ADMIN')")
+   public List<DutyNode> getUpcomingDuties2(@NonNull @P("p") Person person){
+      List<DutyNode> myDuties = new ArrayList<DutyNode>();
+      
+      List<Event> eventsWithPerson = eventRepos.findAllByRoster_Person(person);
+
+      for(Event event : eventsWithPerson){
+         Set<EventRosterItem> roster = event.getRoster();
+         for(EventRosterItem eri : roster){
+            if(eri.getPerson().getId() == person.getId()){
+               myDuties.add(new DutyNode(event.getName(), event.getDateEvent(), eri.getDuty().getName()));
+            }
+         }
+      }
+      
+      return myDuties;
    }
    
    @PreAuthorize("hasRole('ROLE_ADMIN')")

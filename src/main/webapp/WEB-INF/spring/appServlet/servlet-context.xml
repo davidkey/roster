@@ -31,4 +31,5 @@
 	
 	<beans:bean id="rand" class="java.util.Random" />
 
+	
 </beans:beans>
