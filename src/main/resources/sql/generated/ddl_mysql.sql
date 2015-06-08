@@ -116,7 +116,7 @@
 
     create table person_role (
         id bigint not null auto_increment,
-        role varchar(255),
+        role varchar(255) not null,
         person_id bigint not null,
         primary key (id)
     );

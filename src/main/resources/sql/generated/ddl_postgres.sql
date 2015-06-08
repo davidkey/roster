@@ -121,7 +121,7 @@
 
     create table person_role (
         id bigint not null,
-        role varchar(255),
+        role varchar(255) not null,
         person_id bigint not null,
         primary key (id)
     );

@@ -25,6 +25,7 @@ import com.dak.duty.model.EventRosterItem;
 import com.dak.duty.model.Person;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.PersonRepository;
+import com.dak.duty.service.IntervalService;
 import com.dak.duty.service.PersonService;
 
 @Controller
@@ -42,6 +43,9 @@ public class PersonApi {
 
    @Autowired
    EventRepository eventRepos;
+   
+   @Autowired
+   IntervalService intervalService;
 
    @Autowired
    BCryptPasswordEncoder encoder;
@@ -53,7 +57,7 @@ public class PersonApi {
 
       person = personRepos.findOne(person.getId());
       person.setActive(false);
-      personRepos.save(person);
+      personService.save(person);
 
       return new JsonResponse(ResponseStatus.OK, "Person " + person.getId() + " deleted");
    }
@@ -71,7 +75,7 @@ public class PersonApi {
    public @ResponseBody List<DutyNode> getUpcomingDuties(@PathVariable("id") @P("p") Person person){
       List<DutyNode> myDuties = new ArrayList<DutyNode>();
 
-      List<Event> eventsWithPerson = eventRepos.findAllByRoster_Person(person);
+      List<Event> eventsWithPerson = eventRepos.findAllByRoster_PersonAndDateEventGreaterThanEqual(person, intervalService.getCurrentSystemDate());
 
       for(Event event : eventsWithPerson){
          Set<EventRosterItem> roster = event.getRoster();
@@ -90,7 +94,8 @@ public class PersonApi {
    @RequestMapping(method = RequestMethod.POST)
    public @ResponseBody JsonResponse save(@RequestBody Person person){
       logger.debug("person.save({})", person);
-      person = personRepos.save(person);
+      
+      person = personService.save(person);
 
       return new JsonResponse(ResponseStatus.OK, "Person saved with id " + person.getId());
    }
@@ -103,7 +108,7 @@ public class PersonApi {
       Person personToUpdate = personRepos.findOne(person.getId());
       if(personToUpdate != null){
          personToUpdate.setPassword(encoder.encode(person.getPassword()));
-         personToUpdate = personRepos.save(personToUpdate);
+         personToUpdate = personService.save(personToUpdate);
          return new JsonResponse(ResponseStatus.OK, "Password updated for Person " + personToUpdate.getId());
       } else {
          return new JsonResponse(ResponseStatus.ERROR, "Person not found - id " + person.getId());

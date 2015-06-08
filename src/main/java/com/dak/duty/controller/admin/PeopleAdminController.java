@@ -28,6 +28,7 @@ import com.dak.duty.model.PersonRole;
 import com.dak.duty.model.enums.Role;
 import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.PersonRepository;
+import com.dak.duty.service.PersonService;
 
 @Controller
 @RequestMapping("/admin/people")
@@ -37,6 +38,9 @@ public class PeopleAdminController {
    
    @Autowired
    PersonRepository personRepos;
+   
+   @Autowired
+   PersonService personService;
    
    @Autowired
    DutyRepository dutyRepos;
@@ -72,7 +76,7 @@ public class PeopleAdminController {
       userRole.setRole(Role.ROLE_USER);
       person.addRole(userRole);
       
-      personRepos.save(person);
+      personService.save(person);
       redirectAttributes.addFlashAttribute("msg_success", personAlreadyExisted ? "Person updated!" : "Person added!");
       return "redirect:/admin/people";
    }
@@ -146,7 +150,7 @@ public class PeopleAdminController {
       }
 
       if(personUpdated){
-         personRepos.save(person);
+         personService.save(person);
       }
 
       redirectAttributes.addFlashAttribute("msg_success", "Duties updated!");

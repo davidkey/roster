@@ -9,12 +9,15 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 
+import javax.transaction.Transactional;
+
 import lombok.NonNull;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dak.duty.exception.UsernameAlreadyExists;
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.EventRoster;
 import com.dak.duty.model.Person;
@@ -30,6 +33,42 @@ public class PersonService {
 
    @Autowired
    Random rand;
+
+   @Transactional
+   public Iterable<Person> save(Iterable<Person> people){
+
+      if(people != null){
+         for(Person person : people){
+            // business logic to prevent duplicate email addresses
+            // we couldn't do this in a unique index because we allow nulls
+            if(person.getEmailAddress() != null && person.getEmailAddress().length() > 0){
+               Person personWithThisEmailAddress = personRepos.findByEmailAddress(person.getEmailAddress());
+
+               if(personWithThisEmailAddress != null && personWithThisEmailAddress.getId() != person.getId()){
+                  throw new UsernameAlreadyExists(personWithThisEmailAddress.getEmailAddress());
+               }
+            }
+         }
+      }
+      
+      return personRepos.save(people);
+   }
+
+   @Transactional
+   public Person save(Person person){
+
+      // business logic to prevent duplicate email addresses
+      // we couldn't do this in a unique index because we allow nulls
+      if(person.getEmailAddress() != null && person.getEmailAddress().length() > 0){
+         Person personWithThisEmailAddress = personRepos.findByEmailAddress(person.getEmailAddress());
+
+         if(personWithThisEmailAddress != null && personWithThisEmailAddress.getId() != person.getId()){
+            throw new UsernameAlreadyExists(personWithThisEmailAddress.getEmailAddress());
+         }
+      }
+
+      return personRepos.save(person);
+   }
 
    public Person getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster){
       final List<Person> people = personRepos.findByActiveTrueAndDuties_Duty(duty);//personRepos.findAll();

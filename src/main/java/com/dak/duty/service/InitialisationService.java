@@ -57,6 +57,9 @@ public class InitialisationService {
    @Autowired
    IntervalService intervalService;
    
+   @Autowired
+   PersonService personService;
+   
    protected void clearAllData(){
       logger.info("clearAllData");
       
@@ -91,7 +94,7 @@ public class InitialisationService {
       
       final List<Person> defaultPeople = getDefaultPeople(defaultDuties); 
       logger.debug("defaultPeople: {}", defaultPeople);
-      personRepos.save(defaultPeople);
+      personService.save(defaultPeople);
       
       final List<Event> defaultEvents = getDefaultEvents(defaultEventTypes);
       logger.debug("defaultEvents: {}", defaultEvents);
@@ -120,7 +123,7 @@ public class InitialisationService {
       person.addRole(adminRole);
       person.addRole(userRole);
       
-      personRepos.save(person);
+      personService.save(person);
    }
    
    public void createDefaultAdminUser(final String email, final String password){
