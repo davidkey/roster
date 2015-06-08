@@ -23,4 +23,12 @@
 	<Match>
        <Class name="com.dak.duty.util.SchemaGenerator" />
     </Match>
+    	<Match>
+		<Package name="~.*\.api\.util"/>
+		<Bug pattern="EI_EXPOSE_REP"/>
+	</Match>
+	<Match>
+		<Package name="~.*\.api\.util"/>
+		<Bug pattern="EI_EXPOSE_REP2"/>
+	</Match>
 </FindBugsFilter>
