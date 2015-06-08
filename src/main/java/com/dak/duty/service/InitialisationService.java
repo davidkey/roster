@@ -21,6 +21,7 @@ import com.dak.duty.model.Person;
 import com.dak.duty.model.PersonRole;
 import com.dak.duty.model.enums.EventTypeInterval;
 import com.dak.duty.model.enums.IntervalWeekly;
+import com.dak.duty.model.enums.Role;
 import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.EventTypeRepository;
@@ -111,10 +112,10 @@ public class InitialisationService {
       person.setActive(true);
       
       final PersonRole adminRole = new PersonRole();
-      adminRole.setRole("ROLE_ADMIN");
+      adminRole.setRole(Role.ROLE_ADMIN);
       
       final PersonRole userRole = new PersonRole();
-      userRole.setRole("ROLE_USER");
+      userRole.setRole(Role.ROLE_USER);
       
       person.addRole(adminRole);
       person.addRole(userRole);
@@ -165,7 +166,7 @@ public class InitialisationService {
          p.setNameLast(df.getLastName());
          
          final PersonRole personRole = new PersonRole();
-         personRole.setRole("ROLE_USER");
+         personRole.setRole(Role.ROLE_USER);
 
          p.addRole(personRole);
          

@@ -25,6 +25,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.Person;
 import com.dak.duty.model.PersonRole;
+import com.dak.duty.model.enums.Role;
 import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.PersonRepository;
 
@@ -68,7 +69,7 @@ public class PeopleAdminController {
       }
       
       PersonRole userRole = new PersonRole();
-      userRole.setRole("ROLE_USER");
+      userRole.setRole(Role.ROLE_USER);
       person.addRole(userRole);
       
       personRepos.save(person);

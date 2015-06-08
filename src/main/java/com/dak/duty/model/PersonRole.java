@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,9 +17,11 @@ import javax.persistence.Table;
 
 import lombok.Getter;
 import lombok.Setter;
+
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import com.dak.duty.model.enums.Role;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
@@ -39,5 +43,7 @@ public class PersonRole implements Serializable {
    @JsonBackReference
    private Person person;
    
-   private String role;
+   @Enumerated(EnumType.STRING)
+   @Column(nullable = false)
+   private Role role;
 }

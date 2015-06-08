@@ -33,6 +33,7 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
@@ -64,6 +65,7 @@ public class Person  implements Serializable {
    private String emailAddress;
    
    @Column(nullable=false, length=60)
+   @JsonIgnore
    private String password = "NOT_A_REAL_PASSWORD";
 
    @Column(nullable = false)

@@ -59,10 +59,11 @@ public class PersonApi {
    }
 
    @RequestMapping(value="/{id}", method = RequestMethod.GET)
-   public @ResponseBody Person get(@PathVariable("id") Long id){
-      logger.debug("person.get({})", id);
+   @PreAuthorize("#p.emailAddress == authentication.name or hasRole('ROLE_ADMIN')")
+   public @ResponseBody Person get(@PathVariable("id") @P("p") Person person){
+      logger.debug("person.get({})", person.getId());
 
-      return personRepos.findOne(id);
+      return person;
    }
 
    @RequestMapping(value="/{id}/upcomingDuties", method = RequestMethod.GET)

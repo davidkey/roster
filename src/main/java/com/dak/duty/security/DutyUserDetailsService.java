@@ -43,7 +43,7 @@ public class DutyUserDetailsService implements UserDetailsService {
       Set<GrantedAuthority> setAuths = new HashSet<GrantedAuthority>();
 
       for (PersonRole personRole : personRoles) {
-          setAuths.add(new SimpleGrantedAuthority(personRole.getRole()));
+          setAuths.add(new SimpleGrantedAuthority(personRole.getRole().toString()));
       }
 
       List<GrantedAuthority> result = new ArrayList<GrantedAuthority>(setAuths);
