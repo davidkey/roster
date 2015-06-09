@@ -34,23 +34,50 @@ public class MailMessage implements Serializable {
    @Column(nullable = false)
    private long id;
 
+   @Column(columnDefinition="text")
    private String recipient;
+   
+   @Column(columnDefinition="text")
    private String sender;
 
-   @Column(name = "fromAddress")
+   @Column(name = "fromAddress", columnDefinition="text")
    private String from;
+   
+   @Column(columnDefinition="text")
    private String subject;
+   
+   @Column(columnDefinition="text")
    private String bodyPlain; 
+   
+   @Column(columnDefinition="text")
    private String strippedText; 
+   
+   @Column(columnDefinition="text")
    private String strippedSignature;
+   
+   @Column(columnDefinition="text")
    private String bodyHtml;
+   
+   @Column(columnDefinition="text")
    private String strippedHtml; 
+   
    private int attachmentCount; 
+   
+   @Column(columnDefinition="text")
    private String attachementX; 
+   
    private int timestamp;
+   
+   @Column(columnDefinition="text")
    private String token;
+   
+   @Column(columnDefinition="text")
    private String signature;
+   
+   @Column(columnDefinition="text")
    private String messageHeaders; 
+   
+   @Column(columnDefinition="text")
    private String contentIdMap; 
 
 }
