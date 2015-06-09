@@ -53,6 +53,10 @@
 		<level value="error" />
 	</logger>
 	
+	<logger name="org.springframework.beans.TypeConverterDelegate">
+	    <level value="error" />
+	</logger>
+	
 	<!-- Application Loggers -->
 	<logger name="com.dak">
 		<level value="debug" />

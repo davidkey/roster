@@ -1,10 +1,16 @@
 package com.dak.duty.controller.admin;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import javax.validation.Valid;
 
+import lombok.NonNull;
+
+import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -15,28 +21,39 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 
+import com.dak.duty.exception.MailValidationException;
 import com.dak.duty.model.MailMessage;
 import com.dak.duty.repository.MailMessageRepository;
 
 @Controller
 @RequestMapping("/mail")
 public class MailMessageController {
-   
+
    @Autowired
    MailMessageRepository mailMessageRepos;
-   
+
+   @Value("${email.mailgun.apiKey}")
+   private String mailgunApiKey;
+
    private static final Logger logger = LoggerFactory.getLogger(MailMessageController.class);
 
    @RequestMapping(method = RequestMethod.POST)
    public @ResponseBody Boolean postMessage(@ModelAttribute @Valid MailMessage mailMessage){
       logger.debug("postMessage({})", mailMessage);
-      
+
+      if(mailgunApiKey != null && mailgunApiKey.length() > 0){
+         final String mySig = encode(mailgunApiKey, String.valueOf(mailMessage.getTimestamp()) + mailMessage.getToken());
+         if(!mySig.equals(mailMessage.getSignature())){
+            throw new MailValidationException("Signatures don't match!");
+         }
+      }
+
       mailMessageRepos.save(mailMessage);
       return true;
    }
-   
+
    @InitBinder(value="mailMessage")
-   public void bind(WebDataBinder dataBinder, WebRequest webRequest, 
+   private void bind(WebDataBinder dataBinder, WebRequest webRequest, 
          @RequestParam(value="body-plain", required=false) String bodyPlain,
          @RequestParam(value="stripped-text", required=false) String strippedText,
          @RequestParam(value="stripped-signature", required=false) String strippedSignature,
@@ -46,9 +63,9 @@ public class MailMessageController {
          @RequestParam(value="attachment-x", required=false) String attachementX,
          @RequestParam(value="message-headers", required=false) String messageHeaders,
          @RequestParam(value="content-id-map", required=false) String contentIdMap) {
-      
+
       MailMessage mailMessage = (MailMessage) dataBinder.getTarget();
-      
+
       mailMessage.setBodyPlain(bodyPlain);
       mailMessage.setStrippedText(strippedText);
       mailMessage.setStrippedSignature(strippedSignature);
@@ -58,5 +75,17 @@ public class MailMessageController {
       mailMessage.setAttachementX(attachementX);
       mailMessage.setMessageHeaders(messageHeaders);
       mailMessage.setContentIdMap(contentIdMap);
+   }
+
+   private String encode(@NonNull final String key, @NonNull final String data) {
+      try{
+         Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+         SecretKeySpec secret_key = new SecretKeySpec(key.getBytes("UTF-8"), "HmacSHA256");
+         sha256_HMAC.init(secret_key);
+
+         return Hex.encodeHexString(sha256_HMAC.doFinal(data.getBytes("UTF-8")));
+      } catch (Exception e){
+         throw new MailValidationException("Could not encode!");
+      }
    }
 }
