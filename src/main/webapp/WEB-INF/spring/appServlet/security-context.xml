@@ -5,6 +5,8 @@
 	http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
 	<http pattern="/resources" security="none" />
+	<http pattern="/mail" security="none" />
+
 	<http>
 		<intercept-url pattern="/login" access="permitAll" />
 		<intercept-url pattern="/logout" access="permitAll" />

@@ -45,6 +45,8 @@
 
     drop table if exists event_type_duty;
 
+    drop table if exists mail_msg;
+
     drop table if exists person;
 
     drop table if exists person_duty;
@@ -92,6 +94,27 @@
     create table event_type_duty (
         event_type_id bigint not null,
         duties_id bigint not null
+    );
+
+    create table mail_msg (
+        id bigint not null auto_increment,
+        attachementX varchar(255),
+        attachmentCount integer not null,
+        bodyHtml varchar(255),
+        bodyPlain varchar(255),
+        contentIdMap varchar(255),
+        fromAddress varchar(255),
+        messageHeaders varchar(255),
+        recipient varchar(255),
+        sender varchar(255),
+        signature varchar(255),
+        strippedHtml varchar(255),
+        strippedSignature varchar(255),
+        strippedText varchar(255),
+        subject varchar(255),
+        timestamp integer not null,
+        token varchar(255),
+        primary key (id)
     );
 
     create table person (
