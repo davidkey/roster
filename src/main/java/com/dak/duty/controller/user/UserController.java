@@ -1,7 +1,6 @@
 package com.dak.duty.controller.user;
 
 import java.security.Principal;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +42,13 @@ public class UserController {
       
       Person p = personRepos.findByEmailAddress(principal.getName());
       return personService.getUpcomingDuties(p).size();
+   }
+   
+   @RequestMapping(value = "/upcomingDuties", method = RequestMethod.GET)
+   public String getUpcomingDutiesAll(Principal principal, Model model){
+      logger.debug("getUpcomingDutiesCount()");
+      model.addAttribute("upcomingDuties", personService.getUpcomingDuties(personRepos.findByEmailAddress(principal.getName())));
+      return "user/duties";
    }
    
 }

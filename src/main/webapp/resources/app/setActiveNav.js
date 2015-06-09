@@ -3,21 +3,15 @@
     	function capitalize(input){
     		return input.replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
     	}
-
+    	
     	function setCurrentActivePage(){
-    		var pathname = window.location.pathname; 
-    		var pieces = pathname.split('/');
-    		var section = pieces[2];
-    		if(section === 'admin' && pieces[3]){
-    			section  = pieces[3];
-    		}
-    		var activePage = 'navAdmin';
-    		if(section){
-    			activePage = 'nav' + capitalize(section);
-    		}
+    		var pieces = window.location.pathname.split('/');
+    		var navBarId = pieces[2] === 'admin' ? 'navsidebar' : 'navbar';
+    		var activePage = 'nav' + capitalize(pieces[3] ? pieces[3] : pieces[2]);
+
     		
-    		$('#navsidebar ul li.active').removeClass('active');
-    		$('#navsidebar ul #' + activePage).addClass('active');
+    		$('#' + navBarId + ' ul li.active').removeClass('active');
+    		$('#' + navBarId + ' ul #' + activePage).addClass('active');
     	}
     	
     	setCurrentActivePage();

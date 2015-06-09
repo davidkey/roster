@@ -8,6 +8,8 @@
 <!--<![endif]-->
 <script src="<c:url value="/resources/bootstrap/js/bootstrap.min.js"/>"></script>
 <script src="<c:url value="/resources/js/bootbox.min.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/resources/app/setActiveNav.js"/>"></script>
+<script type="text/javascript" src="<c:url value="/resources/app/logout.js"/>"></script>
 <script>
 $(document).ready(function() {
 	function updateDutyCount(){

@@ -27,7 +27,7 @@
 				Take a look at the navigation bar above to see what your options are.
 			</p>
 			<p>
-				<a class="btn btn-lg btn-primary" href="#" role="button">View upcoming duties &raquo;</a>
+				<a class="btn btn-lg btn-primary" href="<c:url value="/user/upcomingDuties"/>" role="button">View upcoming duties &raquo;</a>
 			</p>
 		</div>
 

@@ -58,7 +58,7 @@ public class PersonService {
    public List<DutyNode> getUpcomingDuties (final Person person){
       List<DutyNode> myDuties = new ArrayList<DutyNode>();
 
-      List<Event> eventsWithPerson = eventRepos.findAllByRoster_PersonAndDateEventGreaterThanEqual(person, intervalService.getCurrentSystemDate());
+      List<Event> eventsWithPerson = eventRepos.findAllByRoster_PersonAndDateEventGreaterThanEqualOrderByDateEventAsc(person, intervalService.getCurrentSystemDate());
 
       for(Event event : eventsWithPerson){
          Set<EventRosterItem> roster = event.getRoster();
