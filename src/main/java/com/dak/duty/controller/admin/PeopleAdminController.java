@@ -24,8 +24,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.Person;
-import com.dak.duty.model.PersonRole;
-import com.dak.duty.model.enums.Role;
 import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.service.PersonService;
@@ -72,9 +70,10 @@ public class PeopleAdminController {
          }
       }
       
-      PersonRole userRole = new PersonRole();
-      userRole.setRole(Role.ROLE_USER);
-      person.addRole(userRole);
+      if(!personAlreadyExisted){
+         person.addRoles(personService.getDefaultRoles());
+      }
+    
       
       personService.save(person);
       redirectAttributes.addFlashAttribute("msg_success", personAlreadyExisted ? "Person updated!" : "Person added!");

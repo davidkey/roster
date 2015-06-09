@@ -25,6 +25,8 @@ import com.dak.duty.model.EventRoster;
 import com.dak.duty.model.EventRosterItem;
 import com.dak.duty.model.Person;
 import com.dak.duty.model.PersonDuty;
+import com.dak.duty.model.PersonRole;
+import com.dak.duty.model.enums.Role;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.PersonRepository;
 
@@ -43,6 +45,15 @@ public class PersonService {
 
    @Autowired
    Random rand;
+   
+   public List<PersonRole> getDefaultRoles(){
+      final List<PersonRole> personRoles = new ArrayList<PersonRole>();
+      PersonRole userRole = new PersonRole();
+      userRole.setRole(Role.ROLE_USER);
+      personRoles.add(userRole);
+      
+      return personRoles;
+   }
    
    public List<DutyNode> getUpcomingDuties (final Person person){
       List<DutyNode> myDuties = new ArrayList<DutyNode>();

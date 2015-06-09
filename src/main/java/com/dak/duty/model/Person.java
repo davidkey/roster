@@ -3,6 +3,7 @@ package com.dak.duty.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -35,6 +36,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "person", uniqueConstraints={@UniqueConstraint(columnNames={"nameFirst", "nameLast"})})
@@ -65,7 +67,6 @@ public class Person  implements Serializable {
    private String emailAddress;
    
    @Column(nullable=false, length=60)
-   @JsonIgnore
    private String password = "NOT_A_REAL_PASSWORD";
 
    @Column(nullable = false)
@@ -93,6 +94,16 @@ public class Person  implements Serializable {
       lastUpdated = new Date();
    }
    
+   @JsonIgnore
+   public String getPassword(){
+      return this.password;
+   }
+   
+   @JsonProperty
+   public void setPassword(final String password){
+      this.password = password;
+   }
+   
    @Transient 
    public void addRole(final PersonRole personRole){
       if(roles == null){
@@ -101,6 +112,15 @@ public class Person  implements Serializable {
       
       personRole.setPerson(this);
       roles.add(personRole);
+   }
+   
+   @Transient
+   public void addRoles(final List<PersonRole> roles){
+      if(roles != null){
+         for(PersonRole pr : roles){
+            this.addRole(pr);
+         }
+      }
    }
    
    @Transient
