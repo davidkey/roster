@@ -25,12 +25,15 @@ public class EmailService {
    @Value("${email.mailgun.host}")
    private String mailgunHost;
 
+   @Value("${email.mailgun.to}")
+   private String testEmailAddress;
+
    public boolean send(Email email) {
       if(mailgunApiKey == null || mailgunHost == null){
          logger.error("no apikey and/or host defined for mailgun");
          return false;
       }
-      
+
       if(email.getFrom() == null || email.getTo() == null || email.getSubject() == null || email.getMessage() == null){
          logger.error("required email field is missing!");
          return false;
@@ -44,8 +47,12 @@ public class EmailService {
       MultivaluedMapImpl formData = new MultivaluedMapImpl();
       formData.add("from", email.getFrom());
 
-      for(String to : email.getTo()){
-         formData.add("to", to);
+      if(testEmailAddress != null && testEmailAddress.length() > 0){
+         formData.add("to", testEmailAddress);
+      } else {
+         for(String to : email.getTo()){
+            formData.add("to", to);
+         }
       }
 
       if(email.getCc() != null){
