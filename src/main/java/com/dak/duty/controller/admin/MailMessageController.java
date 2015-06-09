@@ -1,5 +1,7 @@
 package com.dak.duty.controller.admin;
 
+import java.util.Date;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.validation.Valid;
@@ -62,7 +64,8 @@ public class MailMessageController {
          @RequestParam(value="attachment-count", required=false) Integer attachmentCount,
          @RequestParam(value="attachment-x", required=false) String attachementX,
          @RequestParam(value="message-headers", required=false) String messageHeaders,
-         @RequestParam(value="content-id-map", required=false) String contentIdMap) {
+         @RequestParam(value="content-id-map", required=false) String contentIdMap,
+         @RequestParam(value="timestamp", required=false) int timestamp) {
 
       MailMessage mailMessage = (MailMessage) dataBinder.getTarget();
 
@@ -75,6 +78,11 @@ public class MailMessageController {
       mailMessage.setAttachementX(attachementX);
       mailMessage.setMessageHeaders(messageHeaders);
       mailMessage.setContentIdMap(contentIdMap);
+      mailMessage.setTimestamp(timestamp);
+      
+      if(timestamp > 0){
+         mailMessage.setTimestampDate(new Date(timestamp * 1000L));
+      }
    }
 
    private String encode(@NonNull final String key, @NonNull final String data) {

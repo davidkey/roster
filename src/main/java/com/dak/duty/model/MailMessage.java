@@ -1,6 +1,7 @@
 package com.dak.duty.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -67,6 +68,8 @@ public class MailMessage implements Serializable {
    private String attachementX; 
    
    private int timestamp;
+   
+   private Date timestampDate;
    
    @Column(columnDefinition="text")
    private String token;

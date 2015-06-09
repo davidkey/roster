@@ -120,6 +120,7 @@
         strippedText text,
         subject text,
         timestamp integer not null,
+        timestampDate datetime,
         token text,
         primary key (id)
     );
