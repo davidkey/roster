@@ -76,7 +76,7 @@ public class PersonApi {
    @PreAuthorize("hasRole('ROLE_ADMIN')")
    @RequestMapping(method = RequestMethod.POST)
    public @ResponseBody JsonResponse save(@RequestBody Person person){
-      logger.debug("person.save({})", person);
+      logger.debug("person.save({})", person.getEmailAddress());
       
       person = personService.save(person);
 
