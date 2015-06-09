@@ -90,6 +90,11 @@ public class PersonApi {
 
       Person personToUpdate = personRepos.findOne(person.getId());
       if(personToUpdate != null){
+         if(!personService.isPasswordValid(person.getPassword())){
+            return new JsonResponse(ResponseStatus.ERROR, 
+                  "Password does not meet requirements: " + personService.getPasswordRequirements());
+         }
+         
          personToUpdate.setPassword(encoder.encode(person.getPassword()));
          personToUpdate = personService.save(personToUpdate);
          return new JsonResponse(ResponseStatus.OK, "Password updated for Person " + personToUpdate.getId());

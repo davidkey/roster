@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.dak.duty.exception.InvalidPasswordException;
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.Event;
 import com.dak.duty.model.EventType;
@@ -105,7 +106,11 @@ public class InitialisationService {
    }
    
    public void createDefaultAdminUser(final String email, final String password, final String lastName, final String firstName){
-      logger.info("createDefaultAdminUser({},******)", email);
+      logger.info("createDefaultAdminUser({})", email);
+      
+      if(!personService.isPasswordValid(password)){
+         throw new InvalidPasswordException(personService.getPasswordRequirements());
+      }
       
       Person person = new Person();
       person.setEmailAddress(email);

@@ -5,7 +5,12 @@
 <html lang="en">
 <head>
 <jsp:include page="../shared/header.jsp" />
-<title>Add / Edit Person</title>
+<c:if test="${person.id gt 0}">
+	<title>Edit <c:out value="${person.nameFirst}"/> <c:out value="${person.nameLast}"/></title>
+</c:if>
+<c:if test="${person.id eq 0}">
+	<title>Add Person</title>
+</c:if>
 </head>
 
 <body>
@@ -55,40 +60,7 @@
 	</div>
 
 	<jsp:include page="../shared/footer.jsp" />
-	<script>
-	$(document).ready(function() {
-		$( "#setPassword" ).click(function(e, btn) {
-			var csrfParameter = $("meta[name='_csrf_parameter']").attr("content");
-			var csrfHeader = $("meta[name='_csrf_header']").attr("content");
-			var csrfToken = $("meta[name='_csrf']").attr("content");
-			
-			var headers = {};
-			headers[csrfHeader] = csrfToken;
-			
-			var id = $('#id').val();
-			var password = $('#password').val();
-			
-			$.ajax({
-				type: "POST",
-				contentType: "application/json",
-				dataType: 'json',
-				url: WEB_ROOT() + "/api/person/password",
-				headers: headers,
-				data: JSON.stringify({'id': id, 'password': password}),
-				success: function(data){
-					if(data && data['response'] === 'OK'){
-						bootbox.alert("Password updated!");
-					} else {
-						bootbox.alert("Error setting password!");
-					}
-				},
-				error: function(xhr, textStatus, errorThrown){
-					bootbox.alert("Error setting password: " + xhr.status + ' ' + textStatus);
-				}
-			});
-		});
-	});
-	</script>
+	<script type="text/javascript" src="<c:url value="/resources/app/savepassword.js"/>"></script>
 </body>
 
 </html>

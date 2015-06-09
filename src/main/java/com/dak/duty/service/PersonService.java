@@ -55,6 +55,14 @@ public class PersonService {
       return personRoles;
    }
    
+   public boolean isPasswordValid(final String password){
+      return password != null && password.length() >= 6;
+   }
+   
+   public String getPasswordRequirements(){
+      return "Password must be at least 6 digits";
+   }
+   
    public List<DutyNode> getUpcomingDuties (final Person person){
       List<DutyNode> myDuties = new ArrayList<DutyNode>();
 
