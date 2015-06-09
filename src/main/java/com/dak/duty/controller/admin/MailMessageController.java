@@ -84,6 +84,8 @@ public class MailMessageController {
          sha256_HMAC.init(secret_key);
 
          return Hex.encodeHexString(sha256_HMAC.doFinal(data.getBytes("UTF-8")));
+      } catch (RuntimeException re) {
+         throw re;
       } catch (Exception e){
          throw new MailValidationException("Could not encode!");
       }
