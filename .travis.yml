@@ -1,0 +1,2 @@
+# see http://docs.travis-ci.com/user/languages/java/
+language: java
