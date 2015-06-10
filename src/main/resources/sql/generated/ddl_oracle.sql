@@ -78,6 +78,7 @@
 
     create table mail_msg (
         id bigint not null,
+        active bit,
         attachementX text,
         attachmentCount integer not null,
         bodyHtml text,
@@ -85,6 +86,7 @@
         contentIdMap text,
         fromAddress text,
         messageHeaders text,
+        read bit,
         recipient text,
         sender text,
         signature text,
