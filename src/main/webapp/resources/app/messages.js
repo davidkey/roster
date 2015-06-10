@@ -37,6 +37,7 @@ $(document).ready(function() {
 				row.removeClass('warning');
 				row.addClass('active');
 				row.find('.msgIsRead').html("true");
+				row.find('.changeReadStatus').text('Mark Unread');
 			},
 			error: function(xhr, textStatus, errorThrown){
 				//
@@ -55,6 +56,7 @@ $(document).ready(function() {
 				row.removeClass('active');
 				row.addClass('warning');
 				row.find('.msgIsRead').html("false");
+				row.find('.changeReadStatus').text('Mark Read');
 			},
 			error: function(xhr, textStatus, errorThrown){
 				//
@@ -121,10 +123,8 @@ $(document).ready(function() {
 		var msg = getMsgMetadata(this);
 		if(msg.read === 'true'){
 			markMsgAsUnread(msg.id, row);
-			$(this).text("Mark Read");
 		} else {
 			markMsgAsRead(msg.id, row);
-			$(this).text("Mark Unread");
 		}
 	});
 
