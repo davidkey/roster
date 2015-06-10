@@ -27,14 +27,34 @@ $(document).ready(function() {
 		});
 	}
 
-	// post msg.read to server
-	function markMsgAsRead(msgId){
+	// post msg.read(true) to server
+	function markMsgAsRead(msgId, row){
 		$.ajax({
 			type: "POST",
 			url: WEB_ROOT() + "/api/message/" + msgId + '/read',
 			headers: getCsrfHeaders(),
 			success: function(data){
+				row.removeClass('warning');
+				row.addClass('active');
+				row.find('.msgIsRead').html("true");
+			},
+			error: function(xhr, textStatus, errorThrown){
 				//
+			},
+			dataType: 'json'
+		});
+	}
+
+	// post msg.read(false) to server
+	function markMsgAsUnread(msgId, row){
+		$.ajax({
+			type: "POST",
+			url: WEB_ROOT() + "/api/message/" + msgId + '/unread',
+			headers: getCsrfHeaders(),
+			success: function(data){
+				row.removeClass('active');
+				row.addClass('warning');
+				row.find('.msgIsRead').html("false");
 			},
 			error: function(xhr, textStatus, errorThrown){
 				//
@@ -75,16 +95,47 @@ $(document).ready(function() {
 		$(this).parent().parent();
 	});
 
+	function findRowById(msgId){
+		var row = null;
+		$('.msgId').each(function(){
+			if($(this).text() === msgId){
+				row = $(this).parent();
+				return false;
+			}
+		});
+		
+		return row;
+	}
+
 	$( "#closeMsg" ).click(function(e) {
-		if( ! $('#msgModalIsRead').val() ){
-			markMsgAsRead($('#msgModalMsgId').val());
+		if( $('#msgModalIsRead').val() === 'false' ){
+			var msgId = $('#msgModalMsgId').val();
+			var row = findRowById(msgId);
+			markMsgAsRead(msgId, row);
 		}
 
+	});
+
+	$( "#changeReadStatus" ).click(function(e){
+		var row = $(this).parent().parent();
+		var msg = getMsgMetadata(this);
+		if(msg.read === 'true'){
+			markMsgAsUnread(msg.id, row);
+			$(this).text("Mark Read");
+		} else {
+			markMsgAsRead(msg.id, row);
+			$(this).text("Mark Unread");
+		}
 	});
 
 	$( "#deleteMsg" ).click(function(e) {
 		var row = $(this).parent().parent();
 		var msgId = getMsgMetadata(this).id;	
-		deleteMsg(msgId, row);
+
+		bootbox.confirm("Are you sure you want to delete this message?", function(result) {
+			if(result){
+				deleteMsg(msgId, row);
+			}
+		}); 
 	});
 });

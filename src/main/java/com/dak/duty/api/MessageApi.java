@@ -1,5 +1,6 @@
 package com.dak.duty.api;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,11 @@ public class MessageApi {
 
    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
    public @ResponseBody MailMessage getMessage(@PathVariable("id") MailMessage msg){
+      if(msg.getBodyPlain() != null){
+         msg.setBodyPlain(StringEscapeUtils.escapeHtml4(msg.getBodyPlain()));
+      } else {
+         msg.setBodyPlain("[no content]");
+      }
       
       return msg;
    }
@@ -38,6 +44,15 @@ public class MessageApi {
       msg.setRead(true);
       messageRepos.save(msg);
       return new JsonResponse(ResponseStatus.OK, "Message " + msg.getId() + " marked as read");
+   }
+   
+   @RequestMapping(value = "/{id}/unread", method = RequestMethod.POST)
+   public @ResponseBody JsonResponse markAsUnread(@PathVariable("id") MailMessage msg){
+      logger.debug("markAsRead({})", msg.getId());
+      
+      msg.setRead(false);
+      messageRepos.save(msg);
+      return new JsonResponse(ResponseStatus.OK, "Message " + msg.getId() + " marked as unread");
    }
    
    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)

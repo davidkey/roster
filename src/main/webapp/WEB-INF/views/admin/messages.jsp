@@ -46,6 +46,7 @@
 						<th>Received</th>
 						<th></th>
 						<th></th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -66,6 +67,15 @@
 							<td class="msgTimestamp"><fmt:formatDate value="${message.timestampDate}" pattern="yyyy-MM-dd hh:mm aaa" /></td>
 							<td><button id="readMsg" class="btn btn-sm btn-success">Read</button></td>
 							<td><button id="deleteMsg" class="btn btn-sm btn-danger">Delete</button></td>
+							<c:choose>
+								<c:when test="${message.read}">
+							<td><button id="changeReadStatus" class="btn btn-sm">Mark as Unread</button></td>
+								</c:when>
+								<c:otherwise>
+							<td><button id="changeReadStatus" class="btn btn-sm">Mark as Read</button></td>
+								</c:otherwise>
+							</c:choose>
+							
 						</tr>
 					</c:forEach>
 				</tbody>
