@@ -1,6 +1,8 @@
 package com.dak.duty.controller.admin;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -9,6 +11,7 @@ import javax.validation.Valid;
 import lombok.NonNull;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +48,13 @@ public class MailMessageController {
 
       if(mailgunApiKey != null && mailgunApiKey.length() > 0){
          final String mySig = encode(mailgunApiKey, String.valueOf(mailMessage.getTimestamp()) + mailMessage.getToken());
-         if(!mySig.equals(mailMessage.getSignature())){
+         if(mySig == null || !mySig.equals(mailMessage.getSignature())){
             throw new MailValidationException("Signatures don't match!");
+         }
+         
+         final List<MailMessage> msgsWithSameSignature = mailMessageRepos.findAllBySignature(mySig);
+         if(!CollectionUtils.isEmpty(msgsWithSameSignature)){
+            throw new MailValidationException("Mail message with this signature already received!");
          }
       }
 

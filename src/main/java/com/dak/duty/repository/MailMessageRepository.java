@@ -11,4 +11,5 @@ import com.dak.duty.model.MailMessage;
 @Repository
 public interface MailMessageRepository extends JpaRepository<MailMessage, Long>{
    List<MailMessage> findAllByActiveTrue(Sort sort);
+   List<MailMessage> findAllBySignature(String signature);
 }
