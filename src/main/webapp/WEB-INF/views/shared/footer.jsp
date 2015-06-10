@@ -15,3 +15,4 @@
     <script type="text/javascript" src="<c:url value="/resources/app/logout.js"/>"></script>
 	<script type="text/javascript" src="<c:url value="/resources/js/jquery.autocomplete.min.js"/>"></script>
 	<script type="text/javascript" src="<c:url value="/resources/app/autocomplete.js"/>"></script>
+	<script type="text/javascript" src="<c:url value="/resources/app/csrf.js"/>"></script>

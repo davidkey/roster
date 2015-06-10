@@ -1,0 +1,51 @@
+package com.dak.duty.api;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.dak.duty.api.util.JsonResponse;
+import com.dak.duty.api.util.JsonResponse.ResponseStatus;
+import com.dak.duty.model.MailMessage;
+import com.dak.duty.repository.MailMessageRepository;
+
+@Controller
+@RequestMapping("/api/message")
+@PreAuthorize("hasRole('ROLE_ADMIN')") // will need to open up at least part of this to user so they can "post" messages to admin(s)
+public class MessageApi {
+   
+   private static final Logger logger = LoggerFactory.getLogger(MessageApi.class);
+   
+   @Autowired
+   MailMessageRepository messageRepos;
+
+   @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+   public @ResponseBody MailMessage getMessage(@PathVariable("id") MailMessage msg){
+      
+      return msg;
+   }
+   
+   @RequestMapping(value = "/{id}/read", method = RequestMethod.POST)
+   public @ResponseBody JsonResponse markAsRead(@PathVariable("id") MailMessage msg){
+      logger.debug("markAsRead({})", msg.getId());
+      
+      msg.setRead(true);
+      messageRepos.save(msg);
+      return new JsonResponse(ResponseStatus.OK, "Message " + msg.getId() + " marked as read");
+   }
+   
+   @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+   public @ResponseBody JsonResponse delete(@PathVariable("id") MailMessage msg){
+      logger.debug("delete({})", msg.getId());
+      
+      msg.setActive(false);
+      messageRepos.save(msg);
+      return new JsonResponse(ResponseStatus.OK, "Message " + msg.getId() + " deleted");
+   }
+}

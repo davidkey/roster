@@ -44,6 +44,7 @@
             <li id="navPeople"><a href="<c:url value="/admin/people/"/>">People</a></li>
             <li id="navEventTypes"><a href="<c:url value="/admin/eventTypes/"/>">Event Scheduling</a></li>
             <li id="navDuties"><a href="<c:url value="/admin/duties/"/>">Duty Management</a></li>
+            <li id="navMessages"><a href="<c:url value="/admin/messages/"/>">Messages</a></li>
           </ul>
           <ul class="nav nav-sidebar">
             <li id="navSettings"><a href="<c:url value="/admin/settings/"/>">Settings</a></li>
