@@ -69,10 +69,10 @@
 							<td><button class="btn btn-sm btn-danger deleteMsg">Delete</button></td>
 							<c:choose>
 								<c:when test="${message.read}">
-							<td><button class="btn btn-sm changeReadStatus">Mark as Unread</button></td>
+							<td><button class="btn btn-sm changeReadStatus">Mark Unread</button></td>
 								</c:when>
 								<c:otherwise>
-							<td><button class="btn btn-sm changeReadStatus">Mark as Read</button></td>
+							<td><button class="btn btn-sm changeReadStatus">Mark Read</button></td>
 								</c:otherwise>
 							</c:choose>
 							
