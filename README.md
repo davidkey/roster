@@ -1,5 +1,5 @@
 # Duty #
-[![Build Status](https://dak.rocks/jenkins/buildStatus/icon?job=BUILD_DUTY_ROSTER)](https://github.com/davidkey/roster)
+[![Build Status](https://travis-ci.org/davidkey/roster.svg?branch=master)](https://travis-ci.org/davidkey/roster)
 ### What is this repository for? ###
 
 Generating and managing duty rosters. Primarily useful for churches.
