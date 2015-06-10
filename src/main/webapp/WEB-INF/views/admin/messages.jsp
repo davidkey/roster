@@ -65,14 +65,14 @@
 							<td>${message.sender}</td>
 							<td>${message.subject}</td>
 							<td class="msgTimestamp"><fmt:formatDate value="${message.timestampDate}" pattern="yyyy-MM-dd hh:mm aaa" /></td>
-							<td><button id="readMsg" class="btn btn-sm btn-success">Read</button></td>
-							<td><button id="deleteMsg" class="btn btn-sm btn-danger">Delete</button></td>
+							<td><button class="btn btn-sm btn-success readMsg">Read</button></td>
+							<td><button class="btn btn-sm btn-danger deleteMsg">Delete</button></td>
 							<c:choose>
 								<c:when test="${message.read}">
-							<td><button id="changeReadStatus" class="btn btn-sm">Mark as Unread</button></td>
+							<td><button class="btn btn-sm changeReadStatus">Mark as Unread</button></td>
 								</c:when>
 								<c:otherwise>
-							<td><button id="changeReadStatus" class="btn btn-sm">Mark as Read</button></td>
+							<td><button class="btn btn-sm changeReadStatus">Mark as Read</button></td>
 								</c:otherwise>
 							</c:choose>
 							

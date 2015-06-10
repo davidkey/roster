@@ -90,7 +90,7 @@ $(document).ready(function() {
 		$('#msgModal').modal();
 	}
 
-	$( "#readMsg" ).click(function(e) {
+	$( ".readMsg" ).click(function(e) {
 		getMsg(getMsgMetadata(this));
 		$(this).parent().parent();
 	});
@@ -116,7 +116,7 @@ $(document).ready(function() {
 
 	});
 
-	$( "#changeReadStatus" ).click(function(e){
+	$( ".changeReadStatus" ).click(function(e){
 		var row = $(this).parent().parent();
 		var msg = getMsgMetadata(this);
 		if(msg.read === 'true'){
@@ -128,7 +128,7 @@ $(document).ready(function() {
 		}
 	});
 
-	$( "#deleteMsg" ).click(function(e) {
+	$( ".deleteMsg" ).click(function(e) {
 		var row = $(this).parent().parent();
 		var msgId = getMsgMetadata(this).id;	
 
