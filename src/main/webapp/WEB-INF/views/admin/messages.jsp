@@ -62,8 +62,8 @@
 						
 							<td style="display:none;" class="msgId">${message.id}</td>
 							<td style="display:none;" class="msgIsRead">${message.read}</td>
-							<td>${message.sender}</td>
-							<td>${message.subject}</td>
+							<td><c:out value="${message.sender}"/></td>
+							<td><c:out value="${message.subject}"/></td>
 							<td class="msgTimestamp"><fmt:formatDate value="${message.timestampDate}" pattern="yyyy-MM-dd hh:mm aaa" /></td>
 							<td><button class="btn btn-sm btn-success readMsg">Read</button></td>
 							<td><button class="btn btn-sm btn-danger deleteMsg">Delete</button></td>
