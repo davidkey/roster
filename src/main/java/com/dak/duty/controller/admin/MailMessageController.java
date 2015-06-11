@@ -50,7 +50,7 @@ public class MailMessageController {
       return true;
    }
 
-   @InitBinder(value="mailMessage")
+   @InitBinder(value="MailgunMailMessage")
    private void bind(WebDataBinder dataBinder, WebRequest webRequest, 
          @RequestParam(value="body-plain", required=false) String bodyPlain,
          @RequestParam(value="stripped-text", required=false) String strippedText,
