@@ -7,7 +7,6 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -33,24 +32,21 @@ public class MailMessageController {
    @Autowired
    EmailService<MailgunMailMessage> emailService;
 
-   @Value("${email.mailgun.apiKey}")
-   private String mailgunApiKey;
-
    private static final Logger logger = LoggerFactory.getLogger(MailMessageController.class);
 
    @RequestMapping(method = RequestMethod.POST)
-   public @ResponseBody Boolean postMessage(@ModelAttribute @Valid MailgunMailMessage mailMessage){
-      logger.debug("postMessage({})", mailMessage);
+   public @ResponseBody Boolean postMessage(@ModelAttribute @Valid MailgunMailMessage mailgunMailMessage){
+      logger.debug("postMessage({})", mailgunMailMessage);
 
-      if(!emailService.validateIncoming(mailMessage)){
+      if(!emailService.validateIncoming(mailgunMailMessage)){
          throw new MailValidationException("Email validation failed!");
       }
       
-      mailMessageRepos.save(mailMessage);
+      mailMessageRepos.save(mailgunMailMessage);
       return true;
    }
 
-   @InitBinder(value="MailgunMailMessage")
+   @InitBinder(value="mailgunMailMessage")
    private void bind(WebDataBinder dataBinder, WebRequest webRequest, 
          @RequestParam(value="body-plain", required=false) String bodyPlain,
          @RequestParam(value="stripped-text", required=false) String strippedText,
@@ -63,21 +59,21 @@ public class MailMessageController {
          @RequestParam(value="content-id-map", required=false) String contentIdMap,
          @RequestParam(value="timestamp", required=false) int timestamp) {
 
-      MailgunMailMessage mailMessage = (MailgunMailMessage) dataBinder.getTarget();
+      MailgunMailMessage mailgunMailMessage = (MailgunMailMessage) dataBinder.getTarget();
 
-      mailMessage.setBodyPlain(bodyPlain);
-      mailMessage.setStrippedText(strippedText);
-      mailMessage.setStrippedSignature(strippedSignature);
-      mailMessage.setBodyHtml(bodyHtml);
-      mailMessage.setStrippedHtml(strippedHtml);
-      mailMessage.setAttachmentCount(attachmentCount == null ? 0 : attachmentCount);
-      mailMessage.setAttachementX(attachementX);
-      mailMessage.setMessageHeaders(messageHeaders);
-      mailMessage.setContentIdMap(contentIdMap);
-      mailMessage.setTimestamp(timestamp);
+      mailgunMailMessage.setBodyPlain(bodyPlain);
+      mailgunMailMessage.setStrippedText(strippedText);
+      mailgunMailMessage.setStrippedSignature(strippedSignature);
+      mailgunMailMessage.setBodyHtml(bodyHtml);
+      mailgunMailMessage.setStrippedHtml(strippedHtml);
+      mailgunMailMessage.setAttachmentCount(attachmentCount == null ? 0 : attachmentCount);
+      mailgunMailMessage.setAttachementX(attachementX);
+      mailgunMailMessage.setMessageHeaders(messageHeaders);
+      mailgunMailMessage.setContentIdMap(contentIdMap);
+      mailgunMailMessage.setTimestamp(timestamp);
       
       if(timestamp > 0){
-         mailMessage.setTimestampDate(new Date(timestamp * 1000L));
+         mailgunMailMessage.setTimestampDate(new Date(timestamp * 1000L));
       }
    }
 }
