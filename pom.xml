@@ -117,6 +117,11 @@
 			<version>1.1.0.Final</version>
 		</dependency>
 				
+		<dependency>
+			<groupId>javax.interceptor</groupId>
+			<artifactId>javax.interceptor-api</artifactId>
+			<version>1.2</version>
+		</dependency>
 			
 
 		<!-- commons -->
@@ -453,22 +458,6 @@
 				</configuration>
 			</plugin>
 			
-			<!--<plugin>  see https://stackoverflow.com/questions/283489/is-there-a-way-to-hide-maven-2-target-folder-in-eclipse-3 
-			    <artifactId>maven-clean-plugin</artifactId>
-			    <configuration>
-			        <excludeDefaultDirectories>true</excludeDefaultDirectories>
-			        <filesets>
-			            <fileset>
-			                <directory>target</directory>
-			                <includes>
-			                    <include>**/*</include>
-			                </includes>
-			            </fileset>
-			        </filesets>
-			    </configuration>
-			</plugin>
-			-->
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
@@ -564,7 +553,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
 		</plugins>
 	</build>
 	<reporting>
@@ -582,6 +570,37 @@
 					<xmlOutputDirectory>target/site</xmlOutputDirectory>
 				</configuration>
 			</plugin>
+			<plugin>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<configuration>
+					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+					<dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.7</version>
+				<configuration>
+					<formats>
+						<format>html</format>
+						<format>xml</format>
+					</formats>
+					<instrumentation>
+						<ignoreTrivial>true</ignoreTrivial>                 
+					</instrumentation>
+				</configuration>
+			</plugin>
+			<plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-javadoc-plugin</artifactId>
+		        <version>2.10.3</version>
+		        <configuration>
+		        	<failOnError>false</failOnError>
+		        	<show>public</show>
+		        	<classpath>target/dutyRoster/WEB-INF/lib</classpath>
+		        </configuration>
+	        </plugin>
 		</plugins>
 	</reporting>
 </project>
