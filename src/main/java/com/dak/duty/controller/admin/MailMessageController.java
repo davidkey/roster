@@ -57,7 +57,7 @@ public class MailMessageController {
          @RequestParam(value="attachment-x", required=false) String attachementX,
          @RequestParam(value="message-headers", required=false) String messageHeaders,
          @RequestParam(value="content-id-map", required=false) String contentIdMap,
-         @RequestParam(value="timestamp", required=false) int timestamp) {
+         @RequestParam(value="timestamp", required=false) Integer timestamp) {
 
       MailgunMailMessage mailgunMailMessage = (MailgunMailMessage) dataBinder.getTarget();
 
@@ -70,9 +70,9 @@ public class MailMessageController {
       mailgunMailMessage.setAttachementX(attachementX);
       mailgunMailMessage.setMessageHeaders(messageHeaders);
       mailgunMailMessage.setContentIdMap(contentIdMap);
-      mailgunMailMessage.setTimestamp(timestamp);
       
-      if(timestamp > 0){
+      if(timestamp != null){
+         mailgunMailMessage.setTimestamp(timestamp);
          mailgunMailMessage.setTimestampDate(new Date(timestamp * 1000L));
       }
    }
