@@ -1,16 +1,9 @@
 package com.dak.duty.controller.admin;
 
 import java.util.Date;
-import java.util.List;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import javax.validation.Valid;
 
-import lombok.NonNull;
-
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +19,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 
 import com.dak.duty.exception.MailValidationException;
-import com.dak.duty.model.MailMessage;
+import com.dak.duty.model.MailgunMailMessage;
 import com.dak.duty.repository.MailMessageRepository;
+import com.dak.duty.service.EmailService;
 
 @Controller
 @RequestMapping("/mail")
@@ -35,6 +29,9 @@ public class MailMessageController {
 
    @Autowired
    MailMessageRepository mailMessageRepos;
+   
+   @Autowired
+   EmailService<MailgunMailMessage> emailService;
 
    @Value("${email.mailgun.apiKey}")
    private String mailgunApiKey;
@@ -42,21 +39,13 @@ public class MailMessageController {
    private static final Logger logger = LoggerFactory.getLogger(MailMessageController.class);
 
    @RequestMapping(method = RequestMethod.POST)
-   public @ResponseBody Boolean postMessage(@ModelAttribute @Valid MailMessage mailMessage){
+   public @ResponseBody Boolean postMessage(@ModelAttribute @Valid MailgunMailMessage mailMessage){
       logger.debug("postMessage({})", mailMessage);
 
-      if(mailgunApiKey != null && mailgunApiKey.length() > 0){
-         final String mySig = encode(mailgunApiKey, String.valueOf(mailMessage.getTimestamp()) + mailMessage.getToken());
-         if(mySig == null || !mySig.equals(mailMessage.getSignature())){
-            throw new MailValidationException("Signatures don't match!");
-         }
-         
-         final List<MailMessage> msgsWithSameSignature = mailMessageRepos.findAllBySignature(mySig);
-         if(!CollectionUtils.isEmpty(msgsWithSameSignature)){
-            throw new MailValidationException("Mail message with this signature already received!");
-         }
+      if(!emailService.validateIncoming(mailMessage)){
+         throw new MailValidationException("Email validation failed!");
       }
-
+      
       mailMessageRepos.save(mailMessage);
       return true;
    }
@@ -74,7 +63,7 @@ public class MailMessageController {
          @RequestParam(value="content-id-map", required=false) String contentIdMap,
          @RequestParam(value="timestamp", required=false) int timestamp) {
 
-      MailMessage mailMessage = (MailMessage) dataBinder.getTarget();
+      MailgunMailMessage mailMessage = (MailgunMailMessage) dataBinder.getTarget();
 
       mailMessage.setBodyPlain(bodyPlain);
       mailMessage.setStrippedText(strippedText);
@@ -89,20 +78,6 @@ public class MailMessageController {
       
       if(timestamp > 0){
          mailMessage.setTimestampDate(new Date(timestamp * 1000L));
-      }
-   }
-
-   private String encode(@NonNull final String key, @NonNull final String data) {
-      try{
-         Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
-         SecretKeySpec secret_key = new SecretKeySpec(key.getBytes("UTF-8"), "HmacSHA256");
-         sha256_HMAC.init(secret_key);
-
-         return Hex.encodeHexString(sha256_HMAC.doFinal(data.getBytes("UTF-8")));
-      } catch (RuntimeException re) {
-         throw re;
-      } catch (Exception e){
-         throw new MailValidationException("Could not encode!");
       }
    }
 }

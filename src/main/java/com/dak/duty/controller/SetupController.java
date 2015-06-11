@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.dak.duty.form.SetupForm;
 import com.dak.duty.model.Email;
+import com.dak.duty.model.MailgunMailMessage;
 import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.service.EmailService;
 import com.dak.duty.service.InitialisationService;
@@ -31,7 +32,7 @@ public class SetupController {
    private static final Logger logger = LoggerFactory.getLogger(SetupController.class);
 
    @Autowired
-   EmailService emailService;
+   EmailService<MailgunMailMessage> emailService;
    
    @Autowired
    InitialisationService initService;

@@ -38,6 +38,10 @@
 	-->
 
 	<logger name="org.springframework">
+		<level value="info" />
+	</logger>
+	
+	<logger name="org.springframework.web.servlet.DispatcherServlet">
 		<level value="debug" />
 	</logger>
 

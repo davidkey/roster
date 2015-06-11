@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dak.duty.api.util.JsonResponse;
 import com.dak.duty.api.util.JsonResponse.ResponseStatus;
-import com.dak.duty.model.MailMessage;
+import com.dak.duty.model.MailgunMailMessage;
 import com.dak.duty.repository.MailMessageRepository;
 
 @Controller
@@ -27,7 +27,7 @@ public class MessageApi {
    MailMessageRepository messageRepos;
 
    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-   public @ResponseBody MailMessage getMessage(@PathVariable("id") MailMessage msg){
+   public @ResponseBody MailgunMailMessage getMessage(@PathVariable("id") MailgunMailMessage msg){
       if(msg.getBodyPlain() != null){
          msg.setBodyPlain(StringEscapeUtils.escapeHtml4(msg.getBodyPlain()));
       } else {
@@ -38,7 +38,7 @@ public class MessageApi {
    }
    
    @RequestMapping(value = "/{id}/read", method = RequestMethod.POST)
-   public @ResponseBody JsonResponse markAsRead(@PathVariable("id") MailMessage msg){
+   public @ResponseBody JsonResponse markAsRead(@PathVariable("id") MailgunMailMessage msg){
       logger.debug("markAsRead({})", msg.getId());
       
       msg.setRead(true);
@@ -47,7 +47,7 @@ public class MessageApi {
    }
    
    @RequestMapping(value = "/{id}/unread", method = RequestMethod.POST)
-   public @ResponseBody JsonResponse markAsUnread(@PathVariable("id") MailMessage msg){
+   public @ResponseBody JsonResponse markAsUnread(@PathVariable("id") MailgunMailMessage msg){
       logger.debug("markAsRead({})", msg.getId());
       
       msg.setRead(false);
@@ -56,7 +56,7 @@ public class MessageApi {
    }
    
    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-   public @ResponseBody JsonResponse delete(@PathVariable("id") MailMessage msg){
+   public @ResponseBody JsonResponse delete(@PathVariable("id") MailgunMailMessage msg){
       logger.debug("delete({})", msg.getId());
       
       msg.setActive(false);
