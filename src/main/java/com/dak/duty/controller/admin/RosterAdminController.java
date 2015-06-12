@@ -112,4 +112,14 @@ public class RosterAdminController {
       redirectAttributes.addFlashAttribute("msg_success", numAffected + " rosters unapproved!");
       return "redirect:/admin/rosters";
    }
+   
+   @RequestMapping(value = "/fillEmptySlots", method = RequestMethod.GET)
+   public String fillEmptySlots(Model model, final RedirectAttributes redirectAttributes){
+      logger.debug("fillEmptySlots()");
+
+      final int numAffected = eventService.fillEmptySlots();
+
+      redirectAttributes.addFlashAttribute("msg_success", numAffected + " empty slots filled!");
+      return "redirect:/admin/rosters";
+   }
 }

@@ -113,8 +113,12 @@ public class PersonService {
 
       return personRepos.save(person);
    }
-
+   
    public Person getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster){
+      return getPersonForDuty(duty, currentEventRoster, new HashSet<Person>());
+   }
+
+   public Person getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster, @NonNull final Set<Person> peopleExcluded){
       final List<Person> people = personRepos.findByActiveTrueAndDuties_Duty(duty);//personRepos.findAll();
 
       if(people == null || people.size() == 0){
@@ -126,7 +130,7 @@ public class PersonService {
       final Map<Person, Integer> personPreferenceRanking = new HashMap<Person, Integer>();
       for(Person person : people){
          if(!CollectionUtils.isEmpty(peopleAlreadyServing) && peopleAlreadyServing.contains(person)){
-            if(getPeopleServingDuty(duty, currentEventRoster).contains(person)){  
+            if(getPeopleServingDuty(duty, currentEventRoster).contains(person) || peopleExcluded.contains(person)){  
                // if this person is already doing THIS exact duty today, don't let them do it again!
                personPreferenceRanking.put(person, -1);
             } else { 

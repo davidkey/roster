@@ -14,6 +14,8 @@ import javax.transaction.Transactional;
 import lombok.NonNull;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +40,8 @@ import com.dak.duty.service.container.comparable.EventCalendarNodeSortByDate;
 @Service
 @Transactional
 public class EventService {
+   
+   private static final Logger logger = LoggerFactory.getLogger(EventService.class);
 
    @Autowired
    PersonRepository personRepos;
@@ -53,16 +57,98 @@ public class EventService {
 
    @Autowired
    IntervalService intervalService;
-   
+
    @Autowired
    DutyRepository dutyRepos;
+
+   /**
+    * Attempt to fill any empty slots in any current and future events.
+    * @return number of slots filled
+    */
+   public int fillEmptySlots(){
+
+      int slotsFilled = 0;
+      final List<Event> allCurrentAndFutureEvents = eventRepos.findAllByDateEventGreaterThanEqual(intervalService.getCurrentSystemDate());
+
+      for(Event event : allCurrentAndFutureEvents){
+         if(!event.isRosterFullyPopulated()){
+            slotsFilled += fillEmptySlots(event);
+         }
+      }
+
+      return slotsFilled;
+   }
+
    
-   public EventType saveEventType(final EventType eventType){
+   /**
+    * Attempts to fill any empty slots in Event.
+    * @param event
+    * @return number of slots filled
+    */
+   public int fillEmptySlots(final Event event){
+      return fillEmptySlots(event, new HashSet<Person>());
+   }
+   
+   /**
+    * Attempts to fill any empty slots in Event, exluding Person.
+    * @param event
+    * @param person : person to exclude from duty
+    * @return number of slots filled
+    */
+   public int fillEmptySlots(final Event event, final Person person){
+      final Set<Person> singlePersonSet = new HashSet<Person>(1);
+      singlePersonSet.add(person);
       
+      return fillEmptySlots(event, singlePersonSet);
+   }
+
+   /**
+    * Attempts to fill any empty slots in Event, excluding certain people
+    * @param event : Event to fill
+    * @param peopleExcluded : Set of People to exclude from duty
+    * @return number of slots filled
+    */
+   public int fillEmptySlots(@NonNull final Event event, @NonNull Set<Person> peopleExcluded) { // boolean ??
+      if(event.isRosterFullyPopulated()){
+         return 0; // nothing to fill
+      }
+
+      EventRoster currentEventRoster = new EventRoster(event, event.getRoster()); // need to populate (as much as we can...) from event.getRoster()
+
+      int slotsFilled = 0;
+      for(int i = 0; i < currentEventRoster.getDutiesAndPeople().size(); i++){
+         final Person currentPerson = currentEventRoster.getDutiesAndPeople().get(i).getValue();
+
+         if(currentPerson == null){ // empty slot
+            final Duty currentDuty = currentEventRoster.getDutiesAndPeople().get(i).getKey();
+            final Person personForDuty = personService.getPersonForDuty(currentDuty, currentEventRoster, peopleExcluded);
+
+            if(personForDuty != null){ // if we found a candidate, add them to Event Roster
+               EventRosterItem eri = new EventRosterItem();
+               eri.setDuty(currentDuty);
+               eri.setPerson(personForDuty);
+               eri.setEvent(event);
+
+               event.addEventRosterItem(eri);
+               slotsFilled++;
+            }
+         }
+      }
+
+      if(slotsFilled > 0){
+         event.setApproved(false); // un-approve !!
+         eventRepos.save(event);
+      }
+
+      return slotsFilled;
+   }
+
+   public EventType saveEventType(final EventType eventType){
+
       if(EventTypeInterval.DAILY.equals(eventType.getInterval())){
          eventType.setIntervalDetail(null); // clear out interval detail if this is now a daily event type
       }
-      
+
       /**
        * couldn't figure out how to cleanly handle checkboxes for duties, so manually marshalling Duty objects
        */
@@ -88,19 +174,25 @@ public class EventService {
 
       return eventTypeRepos.save(eventType);
    }
-   
+
    public boolean optPersonAndDutyOutOfEvent(@NonNull final Person person, @NonNull final Duty duty, @NonNull final Event event){
       for(EventRosterItem eri : event.getRoster()){
          if(eri.getDuty().getId() == duty.getId() && eri.getPerson().getId() == person.getId()){
             event.getRoster().remove(eri);
             eventRepos.save(event);
+            
+            // try to repopulate hole in roster 
+            // SHOULD THIS HAPPEN AUTOMATICALLY OR BE A MANUAL STEP? Maybe this should be a setting somewhere ...
+            boolean slotFilled = this.fillEmptySlots(event, person) == 1;
+            logger.debug("optPersonAndDutyOutOfEvent() - was slot replaced successfully ? {}", slotFilled);
+            
             return true;
          }
       }
-      
+
       return false;
    }
-   
+
    public List<EventCalendarNode> getAllFutureEventCalendarNodes(final Date startDate){
       final List<EventCalendarNode> nodes = new ArrayList<EventCalendarNode>();
 
@@ -108,22 +200,22 @@ public class EventService {
       for(Event e : events){
          nodes.add(new EventCalendarNode(e.getId(), e.getEventType().getName(), e.getDateEvent(), e.getEventType()));
       }
-      
+
       Collections.sort(nodes, new EventCalendarNodeSortByDate());
       return nodes;
    }
-   
+
    public List<EventCalendarNode> getEventCalendarNodesForMonth(final Date monthDate){
       final List<EventCalendarNode> nodes = new ArrayList<EventCalendarNode>();
-      
+
       final Date startDate = intervalService.getFirstDayOfMonth(monthDate);
       final Date endDate = intervalService.getLastDayOfMonth(startDate);
-      
+
       final List<Event> events = eventRepos.findEventsByDateBetween(startDate, endDate);
       for(Event e : events){
          nodes.add(new EventCalendarNode(e.getId(), e.getEventType().getName(), e.getDateEvent(), e.getEventType()));
       }
-      
+
       Collections.sort(nodes, new EventCalendarNodeSortByDate());
       return nodes;
    }

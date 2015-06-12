@@ -23,6 +23,8 @@
 				<a href="${pageContext.request.contextPath}/admin/rosters/approveAllFullyPopulated" class="btn btn-lg btn-success">Approve All Fully Populated Rosters</a>
 				&nbsp;
 				<a href="${pageContext.request.contextPath}/admin/rosters/unapproveAll" class="btn btn-lg btn-success">Unapprove All Rosters</a>
+				&nbsp;
+				<a href="${pageContext.request.contextPath}/admin/rosters/fillEmptySlots" class="btn btn-lg btn-success">Fill empty slots</a>
 			</p>
 			<br/>
 			<table class="table table-striped" id="eventTable">
