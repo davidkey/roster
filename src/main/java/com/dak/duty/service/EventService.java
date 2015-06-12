@@ -32,8 +32,8 @@ import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.EventTypeRepository;
 import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.service.IntervalService.EventTypeDetailNode;
-import com.dak.duty.service.container.comparable.EventCalendarNodeSortByDate;
 import com.dak.duty.service.container.EventCalendarNode;
+import com.dak.duty.service.container.comparable.EventCalendarNodeSortByDate;
 
 @Service
 @Transactional
@@ -87,6 +87,18 @@ public class EventService {
       }
 
       return eventTypeRepos.save(eventType);
+   }
+   
+   public boolean optPersonAndDutyOutOfEvent(@NonNull final Person person, @NonNull final Duty duty, @NonNull final Event event){
+      for(EventRosterItem eri : event.getRoster()){
+         if(eri.getDuty().getId() == duty.getId() && eri.getPerson().getId() == person.getId()){
+            event.getRoster().remove(eri);
+            eventRepos.save(event);
+            return true;
+         }
+      }
+      
+      return false;
    }
    
    public List<EventCalendarNode> getAllFutureEventCalendarNodes(final Date startDate){

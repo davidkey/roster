@@ -72,7 +72,7 @@ public class PersonService {
          Set<EventRosterItem> roster = event.getRoster();
          for(EventRosterItem eri : roster){
             if(eri.getPerson().getId() == person.getId()){
-               myDuties.add(new DutyNode(event.getName(), event.getDateEvent(), eri.getDuty().getName()));
+               myDuties.add(new DutyNode(event.getName(), event.getDateEvent(), eri.getDuty().getName(), eri.getDuty().getId(), eri.getEvent().getId()));
             }
          }
       }
