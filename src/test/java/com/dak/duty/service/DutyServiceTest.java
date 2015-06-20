@@ -17,6 +17,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.dak.duty.exception.SortOrderException;
 import com.dak.duty.model.Duty;
 import com.dak.duty.repository.DutyRepository;
+import com.dak.duty.repository.OrganisationRepository;
 import com.dak.duty.service.container.SortOrder;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -28,6 +29,9 @@ public class DutyServiceTest extends ServiceTest {
 
    @Autowired
    DutyRepository dutyRepos;
+   
+   @Autowired
+   OrganisationRepository orgRepos;
    
    @Test
    public void sortOrderCountShouldMatchDutyCount(){
@@ -75,6 +79,7 @@ public class DutyServiceTest extends ServiceTest {
       newDuty.setDescription("new duty");
       newDuty.setName("new duty");
       newDuty.setSortOrder(1);
+      newDuty.setOrganisation(orgRepos.findAll().get(0));
       dutyService.saveOrUpdateDuty(newDuty);
 
       assertTrue("Sort order not incrementing correctly", dutyRepos.findOne(maxDuty.getId()).getSortOrder() == originalMinSortOrder + 1);
@@ -100,6 +105,7 @@ public class DutyServiceTest extends ServiceTest {
    public void testBrokenSequenceVerification(){
       Duty duty = new Duty();
       duty.setName("testBrokenSequenceVerification");
+      duty.setOrganisation(orgRepos.findAll().get(0));
       duty.setSortOrder(dutyRepos.findMaxSortOrder() + 2); // out of sequence
       duty = dutyService.saveOrUpdateDuty(duty);
 
@@ -111,6 +117,7 @@ public class DutyServiceTest extends ServiceTest {
    public void testSortOrderAfterSoftDeleteOfFirstSortOrder(){
       Duty duty = new Duty();
       duty.setName("delete me please");
+      duty.setOrganisation(orgRepos.findAll().get(0));
       duty.setSortOrder(1);
 
       duty = dutyService.saveOrUpdateDuty(duty);
@@ -125,6 +132,7 @@ public class DutyServiceTest extends ServiceTest {
    public void testSortOrderAfterSoftDeleteOfLastSortOrder(){
       Duty duty = new Duty();
       duty.setName("delete me please");
+      duty.setOrganisation(orgRepos.findAll().get(0));
       duty.setSortOrder(dutyRepos.findMaxSortOrder() + 1);
 
       duty = dutyService.saveOrUpdateDuty(duty);
