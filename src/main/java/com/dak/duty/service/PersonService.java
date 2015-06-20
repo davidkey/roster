@@ -121,7 +121,7 @@ public class PersonService {
    public Person getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster, @NonNull final Set<Person> peopleExcluded){
       final List<Person> people = personRepos.findByActiveTrueAndDuties_Duty(duty);//personRepos.findAll();
 
-      if(people == null || people.size() == 0){
+      if(CollectionUtils.isEmpty(people)){
          return null;
       }
 
@@ -154,7 +154,7 @@ public class PersonService {
       }
 
       // if we haven't found any candidates ...
-      if(listOfPeopleTimesPreferenceRanking.size() == 0){
+      if(listOfPeopleTimesPreferenceRanking.isEmpty()){
          // ... we'll need to include people that served last time and / or have already served today
          for (Map.Entry<Person, Integer> entry : personPreferenceRanking.entrySet()) {
             Person key = entry.getKey();

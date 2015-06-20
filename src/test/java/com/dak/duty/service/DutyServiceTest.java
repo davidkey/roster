@@ -159,7 +159,7 @@ public class DutyServiceTest extends ServiceTest {
          }
       }
 
-      return duties.size() == 0 || min == 1 && max == sortOrders.size();
+      return duties.isEmpty() || (min == 1 && max == sortOrders.size());
    }
 
    private Duty getDutyWithMinSortOrder(){
