@@ -1,5 +1,10 @@
 package com.dak.duty.service;
 
+import static com.dak.duty.repository.specification.PersonSpecs.hasRole;
+import static com.dak.duty.repository.specification.PersonSpecs.isActive;
+import static com.dak.duty.repository.specification.PersonSpecs.sameOrg;
+import static org.springframework.data.jpa.domain.Specifications.where;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,6 +13,10 @@ import javax.transaction.Transactional;
 
 import lombok.NonNull;
 
+import org.apache.commons.math3.random.RandomDataGenerator;
+import org.fluttercode.datafactory.impl.DataFactory;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +39,6 @@ import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.EventTypeRepository;
 import com.dak.duty.repository.OrganisationRepository;
 import com.dak.duty.repository.PersonRepository;
-
-import org.apache.commons.math3.random.RandomDataGenerator;
-import org.fluttercode.datafactory.impl.DataFactory;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 @Service
 @Transactional
@@ -84,7 +88,7 @@ public class InitialisationService {
    }
    
    public boolean initSetupComplete(){
-      return personRepos.findByRoles_Role(Role.ROLE_ADMIN).size() > 0;
+      return !personRepos.findAll(where(isActive()).and(sameOrg()).and(hasRole(Role.ROLE_ADMIN))).isEmpty();
    }
    
    public void populateDefaultData(){

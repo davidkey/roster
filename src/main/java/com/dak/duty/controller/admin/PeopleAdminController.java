@@ -1,5 +1,9 @@
 package com.dak.duty.controller.admin;
 
+import static com.dak.duty.repository.specification.PersonSpecs.orderByNameLastAscNameFirstAsc;
+import static com.dak.duty.repository.specification.PersonSpecs.sameOrg;
+import static org.springframework.data.jpa.domain.Specifications.where;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -47,7 +51,8 @@ public class PeopleAdminController {
    public String getPeople(Model model){
       logger.debug("getPeople()");
 
-      final List<Person> people = personRepos.findAllByOrderByNameLastAscNameFirstAsc();
+      final List<Person> people = personRepos.findAll(where(sameOrg()).and(orderByNameLastAscNameFirstAsc()));
+      
       logger.debug("people found: {}", people.size());
 
       model.addAttribute("people", people);

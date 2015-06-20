@@ -10,7 +10,7 @@ public class MyInterceptor extends EmptyInterceptor {
    
    @Override
    public String onPrepareStatement(String sql){
-      logger.debug("onPrepareStatement: {}", sql);
+      logger.debug("onPrepareStatement: {}", sql); 
       return sql;
    }
 }

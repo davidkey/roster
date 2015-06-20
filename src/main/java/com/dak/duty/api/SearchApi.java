@@ -1,5 +1,11 @@
 package com.dak.duty.api;
 
+import static com.dak.duty.repository.specification.PersonSpecs.isActive;
+import static com.dak.duty.repository.specification.PersonSpecs.nameFirstLike;
+import static com.dak.duty.repository.specification.PersonSpecs.nameLastLike;
+import static com.dak.duty.repository.specification.PersonSpecs.sameOrg;
+import static org.springframework.data.jpa.domain.Specifications.where;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +51,13 @@ public class SearchApi {
       final List<AutocompleteNode> nodes = new ArrayList<AutocompleteNode>();
       
       // find and add people
-      final List<Person> people = personRepos.findByNameLastContainingIgnoreCaseOrNameFirstContainingIgnoreCase(searchString, searchString); // this shows disabled users
+      //final List<Person> people = personRepos.findByNameLastContainingIgnoreCaseOrNameFirstContainingIgnoreCase(searchString, searchString); // this shows disabled users
+      final List<Person> people = personRepos.findAll(
+            where(isActive())
+            .and(sameOrg())
+            .and(
+                  where(nameFirstLike(searchString)).or(nameLastLike(searchString))
+            ));
       for(Person p : people){
          nodes.add(new AutocompleteNode(p.getNameLast() + ", " + p.getNameFirst(), "/admin/people/" + p.getId()));
       }

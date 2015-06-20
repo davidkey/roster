@@ -55,7 +55,6 @@ public class PersonApi {
    @RequestMapping(value = "/all", method = RequestMethod.GET)
    public @ResponseBody List<Person> getAll(){
       logger.debug("person.getAll()");
-
       return personRepos.findAll(where(isActive()).and(sameOrg()));
    }
 

@@ -1,5 +1,10 @@
 package com.dak.duty.service;
 
+import static com.dak.duty.repository.specification.PersonSpecs.hasDuty;
+import static com.dak.duty.repository.specification.PersonSpecs.isActive;
+import static com.dak.duty.repository.specification.PersonSpecs.sameOrg;
+import static org.springframework.data.jpa.domain.Specifications.where;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,6 +20,7 @@ import lombok.NonNull;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.dak.duty.api.util.DutyNode;
@@ -29,6 +35,7 @@ import com.dak.duty.model.PersonRole;
 import com.dak.duty.model.enums.Role;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.PersonRepository;
+import com.dak.duty.security.CustomUserDetails;
 
 @Service
 //@Transactional
@@ -119,8 +126,7 @@ public class PersonService {
    }
 
    public Person getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster, @NonNull final Set<Person> peopleExcluded){
-      final List<Person> people = personRepos.findByActiveTrueAndDuties_Duty(duty);//personRepos.findAll();
-
+      final List<Person> people =  personRepos.findAll(where(isActive()).and(sameOrg()).and(hasDuty(duty)));
       if(CollectionUtils.isEmpty(people)){
          return null;
       }
@@ -207,5 +213,9 @@ public class PersonService {
       }
 
       return -1;
+   }
+   
+   public Person getAuthenticatedPerson(){
+      return ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson();
    }
 }

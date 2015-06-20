@@ -59,7 +59,7 @@
          		<beans:prop key="hibernate.cache.use_outer_join">true</beans:prop>
          		<beans:prop key="net.sf.ehcache.configurationResourceName">/myehcache.xml</beans:prop>
          		<beans:prop key="javax.persistence.sharedCache.mode">ENABLE_SELECTIVE</beans:prop>
-         		<beans:prop key="hibernate.ejb.interceptor">com.dak.duty.repository.intercepter.MyInterceptor</beans:prop>
+         		<!-- <beans:prop key="hibernate.ejb.interceptor">com.dak.duty.repository.intercepter.MyInterceptor</beans:prop> -->
 				<!-- // caching -->	
 			</beans:props>
 		</beans:property>

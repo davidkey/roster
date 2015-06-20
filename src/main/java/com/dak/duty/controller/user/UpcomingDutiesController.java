@@ -5,6 +5,7 @@ import java.security.Principal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -25,6 +26,7 @@ import com.dak.duty.service.PersonService;
 
 @Controller
 @RequestMapping("/user/upcomingDuties")
+@PreAuthorize("hasRole('ROLE_USER')")
 public class UpcomingDutiesController {
    
    private static final Logger logger = LoggerFactory.getLogger(UpcomingDutiesController.class);
@@ -48,14 +50,13 @@ public class UpcomingDutiesController {
    public @ResponseBody int getUpcomingDutiesCount(Principal principal){
       logger.debug("getUpcomingDutiesCount()");
       
-      Person p = personRepos.findByEmailAddress(principal.getName());
-      return personService.getUpcomingDuties(p).size();
+      return personService.getUpcomingDuties(personService.getAuthenticatedPerson()).size(); 
    }
    
    @RequestMapping(method = RequestMethod.GET)
    public String getUpcomingDutiesAll(Principal principal, Model model){
       logger.debug("getUpcomingDutiesCount()");
-      model.addAttribute("upcomingDuties", personService.getUpcomingDuties(personRepos.findByEmailAddress(principal.getName())));
+      model.addAttribute("upcomingDuties", personService.getUpcomingDuties(personService.getAuthenticatedPerson()));
       return "user/duties";
    }
    
@@ -63,7 +64,7 @@ public class UpcomingDutiesController {
    public @ResponseBody JsonResponse optOut(@ModelAttribute("dutyId") Duty duty, @ModelAttribute("eventId") Event event, Principal principal){
       logger.debug("optOut()");
       
-      final Person person = personRepos.findByEmailAddress(principal.getName());
+      final Person person = personService.getAuthenticatedPerson();
       
       if(eventService.optPersonAndDutyOutOfEvent(person, duty, event)){
          return new JsonResponse(ResponseStatus.OK, "Opted out.");

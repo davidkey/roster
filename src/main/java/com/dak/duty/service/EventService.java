@@ -1,5 +1,9 @@
 package com.dak.duty.service;
 
+import static com.dak.duty.repository.specification.PersonSpecs.isActive;
+import static com.dak.duty.repository.specification.PersonSpecs.sameOrg;
+import static org.springframework.data.jpa.domain.Specifications.where;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -33,6 +37,7 @@ import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.EventTypeRepository;
 import com.dak.duty.repository.PersonRepository;
+import com.dak.duty.repository.specification.PersonSpecs;
 import com.dak.duty.service.IntervalService.EventTypeDetailNode;
 import com.dak.duty.service.container.EventCalendarNode;
 import com.dak.duty.service.container.comparable.EventCalendarNodeSortByDate;
@@ -370,7 +375,8 @@ public class EventService {
       if(CollectionUtils.isEmpty(peopleWithDuties)){
          peopleNotServing = personRepos.findAll();
       } else {
-         peopleNotServing = personRepos.findByActiveTrueAndIdNotIn(getIds(peopleWithDuties));
+         //peopleNotServing = personRepos.findByActiveTrueAndIdNotIn(getIds(peopleWithDuties));
+         peopleNotServing = personRepos.findAll(where(isActive()).and(sameOrg()).and(PersonSpecs.idNotIn(getIds(peopleWithDuties)))); //TO DO -- TEST THIS!!!
       }
 
       if(!CollectionUtils.isEmpty(peopleNotServing)){

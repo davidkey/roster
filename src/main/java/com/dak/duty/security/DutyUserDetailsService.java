@@ -34,8 +34,6 @@ public class DutyUserDetailsService implements UserDetailsService {
    
    // converts Person to org.springframework.security.core.userdetails.User
    private User buildUserForAuthentication(Person person, List<GrantedAuthority> authorities) {
-     //  return new User(person.getEmailAddress(), person.getPassword(), person.getActive(), 
-      //                 true, true, true, authorities);
       return new CustomUserDetails(person, authorities);
    }
    

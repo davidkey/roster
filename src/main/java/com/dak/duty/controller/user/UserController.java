@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.dak.duty.model.Person;
 import com.dak.duty.repository.PersonRepository;
+import com.dak.duty.service.PersonService;
 
 @Controller
 @RequestMapping("/user")
@@ -24,10 +25,13 @@ public class UserController {
    @Autowired
    PersonRepository personRepos;
    
+   @Autowired
+   PersonService personService;
+   
    @RequestMapping(method = RequestMethod.GET)
    public String getUserHome(Model model, Principal principal){
       logger.debug("getUserHome");
-      Person p = personRepos.findByEmailAddress(principal.getName());
+      final Person p = personService.getAuthenticatedPerson();
       
       model.addAttribute("personName", p.getNameFirst() + " " + p.getNameLast());
       return "user/user";

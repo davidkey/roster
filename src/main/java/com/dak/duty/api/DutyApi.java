@@ -33,6 +33,7 @@ public class DutyApi {
 
    @Autowired
    DutyService dutyService;
+   
 
    @PreAuthorize("hasRole('ROLE_ADMIN')")
    @RequestMapping(method = RequestMethod.DELETE)
