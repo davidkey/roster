@@ -29,5 +29,9 @@
 	<global-method-security pre-post-annotations="enabled" secured-annotations="enabled" />
 
 	<b:bean id="dutyUserDetailsService" class="com.dak.duty.security.DutyUserDetailsService" />
+	
+	
+	<b:bean class="com.dak.duty.security.SecurityEvaluationContextExtension" />
+	
 
 </b:beans>
