@@ -14,4 +14,4 @@ Generating and managing duty rosters. Primarily useful for churches.
 * Visit $WEB_ROOT/admin/ to configure
 * Database schema changes & definitions can be found at /src/main/resources/sql/generated for your dialect of choice.
 
-See a (probably not up-to-date) demo @ <https://dak.rocks/duty/admin/>.
+See a (probably not up-to-date) demo @ <https://dak.rocks/duty/admin/> or <https://roster.guru/>.
