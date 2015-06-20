@@ -13,10 +13,15 @@
 	<!-- Begin page content -->
 	<div class="container">
 		<div class="page-header">
-			<h1>Welcome to Duty Roster!</h1>
+			<h1>Welcome to Roster Guru!</h1>
 		</div>
 		<p class="lead">Just a couple of housekeeping items and then you can get started.</p>
 		<form:form commandName="setupForm">
+			<div class="form-group">
+				<label for="organisationName">Organisation Name</label> 
+				<form:input path="organisationName" class="form-control" placeholder="First Baptist" />
+				<form:errors path="organisationName" class="alert-danger" />
+			</div>
 			<div class="form-group">
 				<label for="emailAddress">Admin Email Address</label> 
 				<form:input path="emailAddress" class="form-control" placeholder="johndoe@gmail.com" />

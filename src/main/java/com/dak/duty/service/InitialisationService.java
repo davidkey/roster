@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.dak.duty.exception.InvalidPasswordException;
+import com.dak.duty.form.SetupForm;
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.Event;
 import com.dak.duty.model.EventType;
@@ -110,7 +111,7 @@ public class InitialisationService {
       logger.debug("defaultEvents: {}", defaultEvents);
       eventRepos.save(defaultEvents);
       
-      createDefaultAdminUser("davidkey@gmail.com", "password");
+      createDefaultAdminUser("davidkey@gmail.com", "password", defaultOrgs.get(0));
       
    }
    
@@ -126,7 +127,31 @@ public class InitialisationService {
       return orgs;
    }
    
-   public void createDefaultAdminUser(final String email, final String password, final String lastName, final String firstName){
+   public void createOrganisationAndAdminUser(final SetupForm setupForm){
+      final Organisation org = createOrganisation(setupForm.getOrganisationName().trim());
+      createDefaultAdminUser(
+            setupForm.getEmailAddress().trim(), 
+            setupForm.getPassword(), 
+            setupForm.getNameLast().trim(), 
+            setupForm.getNameFirst().trim(), 
+            org);
+   }
+   
+   public Organisation createOrganisation(@NonNull final String name){
+      Organisation org = new Organisation();
+      org.setName(name.trim());
+      
+      final String nameSquashed = name.trim().toUpperCase().replace(" ", "");
+      if(nameSquashed.length() > 5){
+         org.setRegistrationCode(nameSquashed.substring(0, 5) + "001"); //FIXME: needs to poll database to make sure this is unique
+      } else{
+         org.setRegistrationCode(nameSquashed + "001");
+      }
+      
+      return orgRepos.save(org);
+   }
+   
+   public void createDefaultAdminUser(final String email, final String password, final String lastName, final String firstName, final Organisation org){
       logger.info("createDefaultAdminUser({})", email);
       
       if(!personService.isPasswordValid(password)){
@@ -139,7 +164,7 @@ public class InitialisationService {
       person.setNameFirst(firstName);
       person.setNameLast(lastName);
       person.setActive(true);
-      person.setOrganisation(orgRepos.findAll().get(0)); //FIXME: hack!
+      person.setOrganisation(org);
       
       final PersonRole adminRole = new PersonRole();
       adminRole.setRole(Role.ROLE_ADMIN);
@@ -153,8 +178,8 @@ public class InitialisationService {
       personService.save(person);
    }
    
-   public void createDefaultAdminUser(final String email, final String password){
-      createDefaultAdminUser(email, password, "USER", "ADMIN");
+   public void createDefaultAdminUser(final String email, final String password, final Organisation org){
+      createDefaultAdminUser(email, password, "USER", "ADMIN", org);
    }
    
    protected List<Event> getDefaultEvents(final List<EventType> eventTypes, final List<Organisation> orgs){
