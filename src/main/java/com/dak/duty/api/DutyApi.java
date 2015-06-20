@@ -1,7 +1,5 @@
 package com.dak.duty.api;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -17,114 +15,65 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dak.duty.api.util.JsonResponse;
 import com.dak.duty.api.util.JsonResponse.ResponseStatus;
-import com.dak.duty.api.util.SortOrder;
+import com.dak.duty.exception.SortOrderException;
 import com.dak.duty.model.Duty;
 import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.service.DutyService;
+import com.dak.duty.service.container.SortOrder;
 
 @Controller
 @RequestMapping("/api/duty")
 @PreAuthorize("hasRole('ROLE_USER')")
 public class DutyApi {
-   
+
    private static final Logger logger = LoggerFactory.getLogger(DutyApi.class);
-   
+
    @Autowired
    DutyRepository dutyRepos;
-   
+
    @Autowired
    DutyService dutyService;
-   
+
    @PreAuthorize("hasRole('ROLE_ADMIN')")
    @RequestMapping(method = RequestMethod.DELETE)
    public @ResponseBody JsonResponse delete(@RequestBody Duty duty){
       logger.debug("duty.delete({})", duty);
-      
-      duty = dutyRepos.findOne(duty.getId());
-      duty.setActive(false);
-      duty.setSortOrder(1);
-      duty = dutyService.saveOrUpdateDuty(duty);
-      
+      duty = dutyService.softDeleteDuty(duty);
       return new JsonResponse(ResponseStatus.OK, "Duty " + duty.getId() + " deleted");
    }
-   
+
    @RequestMapping(value="/{id}", method = RequestMethod.GET)
    public @ResponseBody Duty get(@PathVariable("id") Long id){
       logger.debug("duty.get({})", id);
-      
       return dutyRepos.findOne(id);
    }
-   
+
    @PreAuthorize("hasRole('ROLE_ADMIN')")
    @RequestMapping(method = RequestMethod.POST)
    public @ResponseBody JsonResponse save(@RequestBody Duty duty){
       logger.debug("duty.save({})", duty);
       duty = dutyService.saveOrUpdateDuty(duty);
-      
       return new JsonResponse(ResponseStatus.OK, "Duty saved with id " + duty.getId());
    }
-   
+
    @PreAuthorize("hasRole('ROLE_ADMIN')")
    @RequestMapping(value = "/sortOrder", method = RequestMethod.POST)
    public @ResponseBody JsonResponse saveSortOrder(@RequestBody List<SortOrder> params){
       logger.debug("duty.saveSortOrder({})", params);
-      
-      final HashMap<Long, Integer> sortOrderSet = SortOrder.getSortMap(params);
-      final List<Duty> allActiveDuties = dutyRepos.findByActiveTrue();
-      final List<Duty> dutiesToUpdate = new ArrayList<Duty>();
-      
-      int minSortOrder = Integer.MAX_VALUE;
-      int maxSortOrder = Integer.MIN_VALUE;
-      
-      for(Duty duty : allActiveDuties){
-         if(sortOrderSet.containsKey(duty.getId())){
-            final int newSortOrder = sortOrderSet.get(duty.getId());
-            final int oldSortOrder = duty.getSortOrder();
-            
-            if(newSortOrder != oldSortOrder){
-               duty.setSortOrder(newSortOrder);
-               dutiesToUpdate.add(duty);
-            }
-            
-            if(newSortOrder < minSortOrder){
-               minSortOrder = newSortOrder;
-            }
-            
-            if(newSortOrder > maxSortOrder){
-               maxSortOrder = newSortOrder;
-            }
-         } else {
-            return new JsonResponse(ResponseStatus.ERROR, "Duty " + duty.getId() + " was not included in sort. Action cancelled.");
-         }
+
+      try{
+         dutyService.updateSortOrder(params);
+      } catch (SortOrderException soe){
+         return new JsonResponse(ResponseStatus.ERROR, soe.getMessage());
       }
-      
-      if(minSortOrder != 1 || maxSortOrder != allActiveDuties.size()){
-         return new JsonResponse(ResponseStatus.ERROR, "Invalid sort order sequence");
-      }
-      
-      if(dutiesToUpdate.size() > 0){
-         dutyRepos.save(dutiesToUpdate);
-      }
-      
+
       return new JsonResponse(ResponseStatus.OK, "Sort orders updated");
    }
-   
+
    @RequestMapping(value = "/sortOrder", method = RequestMethod.GET)
    public @ResponseBody List<SortOrder> getSortOrder(){
       logger.debug("duty.getSortOrder({})");
-      
-      final List<SortOrder> sortOrders = new ArrayList<SortOrder>();
-      
-      List<Duty> activeDuties = dutyRepos.findByActiveTrue();
-      
-      for(Duty d : activeDuties){
-         SortOrder so = new SortOrder();
-         so.setId(d.getId());
-         so.setSortOrder(d.getSortOrder());
-         sortOrders.add(so);
-      }
-      
-      return sortOrders;
+      return dutyService.getSortOrders();
    }
-   
+
 }

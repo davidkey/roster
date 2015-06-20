@@ -14,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.dak.duty.exception.SortOrderException;
 import com.dak.duty.model.Duty;
 import com.dak.duty.repository.DutyRepository;
+import com.dak.duty.service.container.SortOrder;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:/servlet-context-test.xml"})
@@ -26,6 +28,23 @@ public class DutyServiceTest extends ServiceTest {
 
    @Autowired
    DutyRepository dutyRepos;
+   
+   @Test
+   public void sortOrderCountShouldMatchDutyCount(){
+      assertTrue("sort order count doesn't match duty count!", dutyService.getSortOrders().size() == dutyRepos.findAll().size());
+   }
+
+   @Test(expected = com.dak.duty.exception.SortOrderException.class)
+   public void updateSortOrderShouldNotAllowIncompleteInput() throws SortOrderException{
+      final List<SortOrder> sortOrders = dutyService.getSortOrders();
+
+      assertFalse("sortOrders shouldn't be null - data not staged correctly?", sortOrders == null);
+      assertFalse("sortOrders shoudn't be empty - data not staged correctly?", sortOrders.isEmpty());
+
+      sortOrders.remove(0);
+
+      dutyService.updateSortOrder(sortOrders);
+   }
 
    @Test
    public void testOverallSortOrder(){
@@ -51,7 +70,7 @@ public class DutyServiceTest extends ServiceTest {
 
       assertTrue("Sort order not updating correctly", maxDuty.getSortOrder() == originalMinSortOrder);
       assertTrue("Sort order not updating correctly", minDuty.getSortOrder() == originalMaxSortOrder);
-      
+
       Duty newDuty = new Duty();
       newDuty.setDescription("new duty");
       newDuty.setName("new duty");
@@ -60,86 +79,86 @@ public class DutyServiceTest extends ServiceTest {
 
       assertTrue("Sort order not incrementing correctly", dutyRepos.findOne(maxDuty.getId()).getSortOrder() == originalMinSortOrder + 1);
       assertTrue("Sort order not incrementing correctly", dutyRepos.findOne(minDuty.getId()).getSortOrder() == originalMaxSortOrder + 1);
-      
+
       newDuty.setSortOrder(2);
       dutyService.saveOrUpdateDuty(newDuty);
-      
+
       assertTrue("Sort order not decrementing correctly", dutyRepos.findOne(maxDuty.getId()).getSortOrder() == originalMinSortOrder);
       assertTrue("Sort order not decrementing correctly", dutyRepos.findOne(minDuty.getId()).getSortOrder() == originalMaxSortOrder + 1);
    }
-   
+
    @Test
    public void testSortOrderInSequence(){
       List<Duty> activeDuties = dutyRepos.findByActiveTrue();
-      
+
       assertNotNull(activeDuties);
       assertTrue("Not enough test data!", activeDuties.size() > 1);
       assertTrue("Sort orders not sequencing correctly!", areSortOrdersInSequence(activeDuties));
    }
-   
+
    @Test
    public void testBrokenSequenceVerification(){
       Duty duty = new Duty();
       duty.setName("testBrokenSequenceVerification");
       duty.setSortOrder(dutyRepos.findMaxSortOrder() + 2); // out of sequence
       duty = dutyService.saveOrUpdateDuty(duty);
-      
+
       assertFalse("Sort order sequence verification didn't detect out-of-sequence sort orders!", 
             areSortOrdersInSequence(dutyRepos.findByActiveTrue()));
    }
-   
+
    @Test
    public void testSortOrderAfterSoftDeleteOfFirstSortOrder(){
       Duty duty = new Duty();
       duty.setName("delete me please");
       duty.setSortOrder(1);
-      
+
       duty = dutyService.saveOrUpdateDuty(duty);
-            
+
       duty.setActive(false);
       duty = dutyService.saveOrUpdateDuty(duty);
-      
+
       assertTrue("Sort orders not sequencing correctly after soft delete!", areSortOrdersInSequence(dutyRepos.findByActiveTrue()));
    }
-   
+
    @Test
    public void testSortOrderAfterSoftDeleteOfLastSortOrder(){
       Duty duty = new Duty();
       duty.setName("delete me please");
       duty.setSortOrder(dutyRepos.findMaxSortOrder() + 1);
-      
+
       duty = dutyService.saveOrUpdateDuty(duty);
-   
+
       duty.setActive(false);
       duty = dutyService.saveOrUpdateDuty(duty);
-      
+
       assertTrue("Sort orders not sequencing correctly after soft delete!", areSortOrdersInSequence(dutyRepos.findByActiveTrue()));
    }
-   
+
    private boolean areSortOrdersInSequence(List<Duty> duties){
       Set<Integer> sortOrders = new HashSet<Integer>();
-      
+
       int min = Integer.MAX_VALUE;
       int max = Integer.MIN_VALUE;
-      
+
       for(Duty d : duties){
          final int sortOrder = d.getSortOrder();
-         
+
          if(sortOrders.contains(sortOrder)){
             return false;
          }
-         
+
          sortOrders.add(sortOrder);
-         
+
          if(sortOrder < min){
             min = sortOrder;
          }
-         
+
          if(sortOrder > max){
             max = sortOrder;
          }
       }
-      
+
       return duties.size() == 0 || min == 1 && max == sortOrders.size();
    }
 
@@ -156,10 +175,10 @@ public class DutyServiceTest extends ServiceTest {
             }
          }
       }
-      
+
       return duty;
    }
-   
+
    private Duty getDutyWithMaxSortOrder(){
       List<Duty> duties = dutyRepos.findAll();
 
@@ -173,7 +192,8 @@ public class DutyServiceTest extends ServiceTest {
             }
          }
       }
-      
+
       return duty;
    }
+
 }
