@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.RepositoryDefinition;
@@ -33,16 +34,23 @@ public interface EventRepository extends JpaRepository<Event, Long>{
    @Query("update Event e set e.approved = ?1 where e.approved != ?1 and e.organisation = ?#{principal.person.organisation}")
    public Integer setApprovedStatusOnAllEvents(boolean approved);
    
-   public List<Event> findByApproved(boolean approved);
+   @Query("select e from Event e where e.approved != ?1 and e.organisation = ?#{principal.person.organisation}")
+   public List<Event> findByApproved(Boolean approved);
+   
+   @Query("select e from Event e where e.organisation = ?#{principal.person.organisation} order by e.dateEvent desc")
    public List<Event> findAllByOrderByDateEventDesc();
-   public Page<Event> findAllByOrderByDateEventDescIdDesc(Pageable pageable);
    
    @Query("select e from Event e where e.organisation = ?#{principal.person.organisation} and e.dateEvent >= ?1 and e.dateEvent <= ?2")
    public List<Event> findEventsByDateBetween(final Date startDate, final Date endDate);
    
+   @Query("select e from Event e where e.organisation = ?#{principal.person.organisation} and e.dateEvent >= ?1")
    public List<Event> findAllByDateEventGreaterThanEqual(final Date d);
    
+ //  @Query("select e from Event e where e.organisation = ?#{principal.person.organisation} and e.roster.person = ?1 and e.dateEvent >= ?2")
    public List<Event> findAllByRoster_PersonAndDateEventGreaterThanEqual(Person person, Date d);
+   
+   //@Query("select e from Event e where e.organisation = ?#{principal.person.organisation} and e.roster.person = ?1 and e.dateEvent >= ?2 "
+ //        + "order by e.dateEvent asc")
    public List<Event> findAllByRoster_PersonAndDateEventGreaterThanEqualOrderByDateEventAsc(Person person, Date d);
    
    @Query("select e from Event e where e.organisation = ?#{principal.person.organisation}")
