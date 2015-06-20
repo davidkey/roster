@@ -14,7 +14,9 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -52,6 +54,10 @@ public class EventType implements Serializable {
    @GeneratedValue(strategy = GenerationType.AUTO, generator = "eventtype_id_seq")
    @Column(nullable = false)
    private long id;
+   
+   @ManyToOne
+   @JoinColumn(name="org_id", nullable=false)
+   private Organisation organisation;
    
    @Column(nullable = false, unique = true)
    @NotEmpty

@@ -12,6 +12,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PreUpdate;
 import javax.persistence.SequenceGenerator;
@@ -53,6 +55,10 @@ public class Person  implements Serializable {
    @GeneratedValue(strategy = GenerationType.AUTO, generator = "person_id_seq")
    @Column(nullable = false)
    private long id;
+   
+   @ManyToOne
+   @JoinColumn(name="org_id", nullable=false)
+   private Organisation organisation;
 
    @Column(nullable = false)
    @NotEmpty

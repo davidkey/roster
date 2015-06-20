@@ -48,6 +48,10 @@ public class Event implements Serializable {
    @GeneratedValue(strategy = GenerationType.AUTO, generator = "event_id_seq")
    @Column(nullable = false)
    private long id;
+   
+   @ManyToOne
+   @JoinColumn(name="org_id", nullable=false)
+   private Organisation organisation;
 
    @Temporal(TemporalType.DATE)
    @Column(nullable = false)

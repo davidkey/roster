@@ -18,6 +18,7 @@ import com.dak.duty.exception.InvalidPasswordException;
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.Event;
 import com.dak.duty.model.EventType;
+import com.dak.duty.model.Organisation;
 import com.dak.duty.model.Person;
 import com.dak.duty.model.PersonRole;
 import com.dak.duty.model.enums.EventTypeInterval;
@@ -26,6 +27,7 @@ import com.dak.duty.model.enums.Role;
 import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.EventTypeRepository;
+import com.dak.duty.repository.OrganisationRepository;
 import com.dak.duty.repository.PersonRepository;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
@@ -61,6 +63,9 @@ public class InitialisationService {
    @Autowired
    PersonService personService;
    
+   @Autowired
+   OrganisationRepository orgRepos;
+   
    protected void clearAllData(){
       logger.info("clearAllData");
       
@@ -85,24 +90,40 @@ public class InitialisationService {
       logger.info("populateDefaultData");
       clearAllData();
       
-      final List<Duty> defaultDuties = getDefaultDuties();
+      final List<Organisation> defaultOrgs = getDefaultOrganisations();
+      logger.debug("defaultOrganisations: {}", defaultOrgs);
+      orgRepos.save(defaultOrgs);
+      
+      final List<Duty> defaultDuties = getDefaultDuties(defaultOrgs);
       logger.debug("defaultDuties: {}", defaultDuties);
       dutyRepos.save(defaultDuties);
       
-      final List<EventType> defaultEventTypes = getDefaultEventTypes(defaultDuties);
+      final List<EventType> defaultEventTypes = getDefaultEventTypes(defaultDuties, defaultOrgs);
       logger.debug("defaultEventTypes: {}", defaultEventTypes);
       eventTypeRepos.save(defaultEventTypes);
       
-      final List<Person> defaultPeople = getDefaultPeople(defaultDuties); 
+      final List<Person> defaultPeople = getDefaultPeople(defaultDuties, defaultOrgs); 
       logger.debug("defaultPeople: {}", defaultPeople);
       personService.save(defaultPeople);
       
-      final List<Event> defaultEvents = getDefaultEvents(defaultEventTypes);
+      final List<Event> defaultEvents = getDefaultEvents(defaultEventTypes, defaultOrgs);
       logger.debug("defaultEvents: {}", defaultEvents);
       eventRepos.save(defaultEvents);
       
       createDefaultAdminUser("davidkey@gmail.com", "password");
       
+   }
+   
+   protected List<Organisation> getDefaultOrganisations(){
+      final List<Organisation> orgs = new ArrayList<Organisation>();
+      
+      Organisation org = new Organisation();
+      org.setName("My First Org");
+      org.setRegistrationCode("MYFIRST001");
+      
+      orgs.add(org);
+      
+      return orgs;
    }
    
    public void createDefaultAdminUser(final String email, final String password, final String lastName, final String firstName){
@@ -118,6 +139,7 @@ public class InitialisationService {
       person.setNameFirst(firstName);
       person.setNameLast(lastName);
       person.setActive(true);
+      person.setOrganisation(orgRepos.findAll().get(0)); //FIXME: hack!
       
       final PersonRole adminRole = new PersonRole();
       adminRole.setRole(Role.ROLE_ADMIN);
@@ -135,7 +157,7 @@ public class InitialisationService {
       createDefaultAdminUser(email, password, "USER", "ADMIN");
    }
    
-   protected List<Event> getDefaultEvents(final List<EventType> eventTypes){
+   protected List<Event> getDefaultEvents(final List<EventType> eventTypes, final List<Organisation> orgs){
       final List<Event> events = new ArrayList<Event>(eventTypes.size());
       
       for(EventType et : eventTypes){
@@ -153,6 +175,7 @@ public class InitialisationService {
          }
          
          e.setEventType(et);
+         e.setOrganisation(orgs.get(0));
         
          events.add(e);
       }
@@ -160,7 +183,7 @@ public class InitialisationService {
       return events;
    }
    
-   protected List<Person> getDefaultPeople(final List<Duty> duties){
+   protected List<Person> getDefaultPeople(final List<Duty> duties, final List<Organisation> orgs){
       final List<Person> people = new ArrayList<Person>();
       DataFactory df = new DataFactory();
       RandomDataGenerator randomData = new RandomDataGenerator();
@@ -172,6 +195,7 @@ public class InitialisationService {
          p.setEmailAddress(df.getEmailAddress());
          p.setNameFirst(df.getFirstName());
          p.setNameLast(df.getLastName());
+         p.setOrganisation(orgs.get(0));
          
          final PersonRole personRole = new PersonRole();
          personRole.setRole(Role.ROLE_USER);
@@ -190,7 +214,7 @@ public class InitialisationService {
       return people;
    }
    
-   protected List<Duty> getDefaultDuties(){
+   protected List<Duty> getDefaultDuties(final List<Organisation> orgs){
       final List<Duty> duties = new ArrayList<Duty>();
       
       Duty duty = null;
@@ -200,54 +224,62 @@ public class InitialisationService {
       duty.setName("Song Leading");
       duty.setDescription(duty.getName());
       duty.setSortOrder(count++);
+      duty.setOrganisation(orgs.get(0));
       duties.add(duty);
 
       duty = new Duty();
       duty.setName("Opening Prayer");
       duty.setDescription(duty.getName());
       duty.setSortOrder(count++);
+      duty.setOrganisation(orgs.get(0));
       duties.add(duty);
 
       duty = new Duty();
       duty.setName("Closing Prayer");
       duty.setDescription(duty.getName());
       duty.setSortOrder(count++);
+      duty.setOrganisation(orgs.get(0));
       duties.add(duty);
 
       duty = new Duty();
       duty.setName("Announcements");
       duty.setDescription(duty.getName());
       duty.setSortOrder(count++);
+      duty.setOrganisation(orgs.get(0));
       duties.add(duty);
 
       duty = new Duty();
       duty.setName("Scripture Reading");
       duty.setDescription(duty.getName());
       duty.setSortOrder(count++);
+      duty.setOrganisation(orgs.get(0));
       duties.add(duty);
 
       duty = new Duty();
       duty.setName("Preaching");
       duty.setDescription(duty.getName());
       duty.setSortOrder(count++);
+      duty.setOrganisation(orgs.get(0));
       duties.add(duty);
 
       duty = new Duty();
       duty.setName("Table");
       duty.setDescription(duty.getName());
       duty.setSortOrder(count++);
+      duty.setOrganisation(orgs.get(0));
       duties.add(duty);
 
       duty = new Duty();
       duty.setName("Invitation");
       duty.setDescription(duty.getName());
       duty.setSortOrder(count++);
+      duty.setOrganisation(orgs.get(0));
       duties.add(duty);
       
       return duties;
    }
    
-   protected List<EventType> getDefaultEventTypes(@NonNull final List<Duty> duties){
+   protected List<EventType> getDefaultEventTypes(@NonNull final List<Duty> duties, @NonNull final List<Organisation> orgs){
       final List<Duty> sundayAmDuties = new ArrayList<Duty>();
       final List<Duty> sundayPmDuties  = new ArrayList<Duty>();
       final List<Duty> wednesdayDuties = new ArrayList<Duty>();
@@ -291,6 +323,7 @@ public class InitialisationService {
       sundayAm.setIntervalDetail(IntervalWeekly.SUNDAY.toString());
       sundayAm.setStartTime(intervalService.getTimeWithoutDate(9, 30));
       sundayAm.setEndTime(intervalService.getTimeWithoutDate(11, 30));
+      sundayAm.setOrganisation(orgs.get(0));
       
       final EventType sundayPm = new EventType();
       sundayPm.setName("Sunday PM");
@@ -300,6 +333,7 @@ public class InitialisationService {
       sundayPm.setIntervalDetail(IntervalWeekly.SUNDAY.toString());
       sundayPm.setStartTime(intervalService.getTimeWithoutDate(18, 30));
       sundayPm.setEndTime(intervalService.getTimeWithoutDate(20, 0));
+      sundayPm.setOrganisation(orgs.get(0));
       
       final EventType wednesday = new EventType();
       wednesday.setName("Wednesday PM");
@@ -309,6 +343,7 @@ public class InitialisationService {
       wednesday.setIntervalDetail(IntervalWeekly.WEDNESDAY.toString());
       wednesday.setStartTime(intervalService.getTimeWithoutDate(19, 30));
       wednesday.setEndTime(intervalService.getTimeWithoutDate(21, 0));
+      wednesday.setOrganisation(orgs.get(0));
       
       final List<EventType> eventTypes = new ArrayList<EventType>();
       eventTypes.add(sundayAm);
