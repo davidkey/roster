@@ -3,8 +3,6 @@ package com.dak.duty.repository;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,7 +16,7 @@ import com.dak.duty.model.Person;
 
 @Repository
 @RepositoryDefinition(domainClass = Event.class, idClass = Long.class)
-public interface EventRepository extends JpaRepository<Event, Long>{
+public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecificationExecutor<Event>{
    
    // commenting out because this *only* returns rows of the same event type. 
    // @Query("select e from Event e where e.eventType = ?1 and e.dateEvent = (select max(e.dateEvent) from Event e where e.eventType = ?1)")
