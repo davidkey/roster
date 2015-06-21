@@ -58,70 +58,70 @@ import com.dak.duty.service.facade.IPasswordResetTokenFacade;
 @Service
 //@Transactional
 public class PersonService {
-   
+
    private static final Logger logger = LoggerFactory.getLogger(PersonService.class);
 
    @Autowired
    PersonRepository personRepos;
-   
+
    @Autowired
    EventRepository eventRepos;
-   
+
    @Autowired
    IntervalService intervalService;
-   
+
    @Autowired
    IAuthenticationFacade authenticationFacade;
 
    @Autowired
    Random rand;
-   
+
    @Autowired
    BCryptPasswordEncoder encoder;
-   
+
    @Autowired
    @Qualifier("authenticationManager")
    AuthenticationManager authenticationManager;
-   
+
    @Autowired
    IPasswordResetTokenFacade passwordResetTokenGenerator;
-   
+
    @Autowired
    EmailService<MailgunMailMessage> emailService;
-   
+
    @Autowired
    private VelocityEngine velocityEngine;
-   
+
    public List<PersonRole> getDefaultRoles(){
       final List<PersonRole> personRoles = new ArrayList<PersonRole>();
       PersonRole userRole = new PersonRole();
       userRole.setRole(Role.ROLE_USER);
       personRoles.add(userRole);
-      
+
       return personRoles;
    }
-   
+
    public void initiatePasswordReset(final String emailAddress, final String resetBaseUrl){
       Person person = personRepos.findByEmailAddress(emailAddress);
-      
+
       if(person == null){
          throw new InvalidIdException("person with that email address not found");
       }
-      
+
       initiatePasswordReset(person, resetBaseUrl);
    }
-   
+
    @SuppressWarnings("unchecked")
    @Transactional
    public void initiatePasswordReset(final Person person, final String resetBaseUrl){
       final int EXPIRE_MIN = 90;
       final String resetToken = passwordResetTokenGenerator.getNextPasswordResetToken();
-      
+
       person.setResetToken(resetToken);
       person.setResetTokenExpires(getMinutesInFuture(new Date(), EXPIRE_MIN));
-      
+
       personRepos.save(person);
-      
+
       @SuppressWarnings("rawtypes")
       Map model = new HashMap();                 
       model.put("name", person.getNameFirst() + " " + person.getNameLast());
@@ -129,7 +129,7 @@ public class PersonService {
       model.put("resetAddress", resetBaseUrl + resetToken);
       model.put("expireMinutes", EXPIRE_MIN);
       model.put("imageUrl", "https://roster.guru/resources/images/rosterGuruEmailHeader.png");
-            
+
       emailService.send(
             new Email(
                   "admin@roster.guru", 
@@ -137,9 +137,9 @@ public class PersonService {
                   "Password Reset Initiated", 
                   VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, "velocity/passwordReset.vm", "UTF-8", model)
                   ));
-      
+
    }
-   
+
 
    private Date getMinutesInFuture(final Date d, final int minutes){
       Calendar calendar = Calendar.getInstance();
@@ -147,7 +147,7 @@ public class PersonService {
       calendar.add(Calendar.MINUTE, minutes);
       return calendar.getTime();
    }
-   
+
    public boolean loginAsPerson(final String username, final String password, final HttpServletRequest request){
       logger.debug("loginAsPerson({}, {})", username, password);
       try {
@@ -164,15 +164,15 @@ public class PersonService {
          return false;
       }
    }
-   
+
    @Transactional
    public Person clearResetToken(final Person person){
       person.setResetToken(null);
       person.setResetTokenExpires(null);
-      
+
       return personRepos.save(person);
    }
-   
+
    @Transactional
    public Person setPassword(Person person, final String plaintextPassword){
       person.setPassword(encoder.encode(plaintextPassword));
@@ -180,15 +180,15 @@ public class PersonService {
       personRepos.flush();
       return person;
    }
-   
+
    public boolean isPasswordValid(final String password){
       return password != null && password.length() >= 6;
    }
-   
+
    public String getPasswordRequirements(){
       return "Password must be at least 6 digits";
    }
-   
+
    public List<DutyNode> getUpcomingDuties (final Person person){
       List<DutyNode> myDuties = new ArrayList<DutyNode>();
 
@@ -221,10 +221,10 @@ public class PersonService {
             }
          }
       }
-      
+
       return personRepos.save(people);
    }
-   
+
    @Transactional
    public Person save(Person person, Boolean force){
       // business logic to prevent duplicate email addresses
@@ -236,7 +236,7 @@ public class PersonService {
             throw new UsernameAlreadyExists(personWithThisEmailAddress.getEmailAddress());
          }
       }
-      
+
       if(!force && person.getOrganisation() != null && !person.getOrganisation().getId().equals(authenticationFacade.getOrganisation().getId())){
          throw new RosterSecurityException("can't do that");
       }
@@ -248,12 +248,24 @@ public class PersonService {
    public Person save(Person person){
       return save(person, false);
    }
-   
+
    public Person getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster){
       return getPersonForDuty(duty, currentEventRoster, new HashSet<Person>());
    }
-
+   
    public Person getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster, @NonNull final Set<Person> peopleExcluded){
+      Set<Long> ids = new HashSet<Long>();
+      
+      if(peopleExcluded != null){
+         for(Person p : peopleExcluded){
+            ids.add(p.getId());
+         }
+      }
+      
+      return getPersonForDutyExcludedById(duty, currentEventRoster, ids);
+   }
+
+   public Person getPersonForDutyExcludedById(@NonNull final Duty duty, final EventRoster currentEventRoster, @NonNull final Set<Long> peopleIdsExcluded){
       final List<Person> people =  personRepos.findAll(where(isActive()).and(sameOrg()).and(hasDuty(duty)));
       if(CollectionUtils.isEmpty(people)){
          return null;
@@ -263,8 +275,10 @@ public class PersonService {
 
       final Map<Person, Integer> personPreferenceRanking = new HashMap<Person, Integer>();
       for(Person person : people){
-         if(!CollectionUtils.isEmpty(peopleAlreadyServing) && peopleAlreadyServing.contains(person)){
-            if(getPeopleServingDuty(duty, currentEventRoster).contains(person) || peopleExcluded.contains(person)){  
+         if(peopleIdsExcluded != null && peopleIdsExcluded.contains(person.getId())){
+            personPreferenceRanking.put(person, -1);
+         } else if(!CollectionUtils.isEmpty(peopleAlreadyServing) && peopleAlreadyServing.contains(person)){
+            if(getPeopleServingDuty(duty, currentEventRoster).contains(person)){  
                // if this person is already doing THIS exact duty today, don't let them do it again!
                personPreferenceRanking.put(person, -1);
             } else { 
@@ -293,7 +307,7 @@ public class PersonService {
          for (Map.Entry<Person, Integer> entry : personPreferenceRanking.entrySet()) {
             Person key = entry.getKey();
             Integer value = entry.getValue();
-            if(value == 0){
+            if(value.equals(0)){
                listOfPeopleTimesPreferenceRanking.add(key);
             }
          }
@@ -342,5 +356,5 @@ public class PersonService {
 
       return -1;
    }
-   
+
 }

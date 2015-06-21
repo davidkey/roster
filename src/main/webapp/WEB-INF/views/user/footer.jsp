@@ -12,13 +12,12 @@
 <script type="text/javascript" src="<c:url value="/resources/app/setActiveNav.js"/>"></script>
 <script type="text/javascript" src="<c:url value="/resources/app/logout.js"/>"></script>
 <script>
+function updateDutyCount(){
+	$.get(WEB_ROOT() + "/user/upcomingDuties/count", function( data ) {
+		$( "#upcomingDutiesCount" ).html( data );
+	});
+}
 $(document).ready(function() {
-	function updateDutyCount(){
-		$.get(WEB_ROOT() + "/user/upcomingDuties/count", function( data ) {
-			$( "#upcomingDutiesCount" ).html( data );
-		});
-	}
-
 	updateDutyCount();
 });
 </script>

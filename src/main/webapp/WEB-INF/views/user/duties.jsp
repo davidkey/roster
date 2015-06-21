@@ -58,7 +58,7 @@ $(document).ready(function() {
 		return metadata;
 	}
 	
-	function optOut(metadata){
+	function optOut(metadata, row){
 		var headers = getCsrfHeaders();
 		
 		$.ajax({
@@ -67,7 +67,9 @@ $(document).ready(function() {
 			headers: getCsrfHeaders(),
 			data: metadata,
 			success: function(data){
-				bootbox.alert('great success');
+				bootbox.alert('Successfully opted out of duty');
+				$(row).hide();
+				updateDutyCount();
 			},
 			error: function(xhr, textStatus, errorThrown){
 				bootbox.alert("Error: " + xhr.status + ' ' + textStatus);
@@ -81,7 +83,7 @@ $(document).ready(function() {
 		
 		console.log('metadata: ' + metadata);
 		
-		optOut(metadata);
+		optOut(metadata, row);
 	});
 });
 	</script>

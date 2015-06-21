@@ -199,8 +199,8 @@ public class EventService {
             
             // try to repopulate hole in roster 
             // SHOULD THIS HAPPEN AUTOMATICALLY OR BE A MANUAL STEP? Maybe this should be a setting somewhere ...
-            boolean slotFilled = this.fillEmptySlots(event, person) == 1;
-            logger.debug("optPersonAndDutyOutOfEvent() - was slot replaced successfully ? {}", slotFilled);
+            final int slotsFilled = this.fillEmptySlots(event, person);
+            logger.debug("optPersonAndDutyOutOfEvent() - was slot replaced successfully ? Slots filled: {}", slotsFilled);
             
             return true;
          }
