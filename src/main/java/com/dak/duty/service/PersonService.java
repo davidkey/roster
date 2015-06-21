@@ -22,6 +22,7 @@ import javax.transaction.Transactional;
 import lombok.NonNull;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.velocity.app.VelocityEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.velocity.VelocityEngineUtils;
 
 import com.dak.duty.api.util.DutyNode;
 import com.dak.duty.exception.InvalidIdException;
@@ -87,6 +89,9 @@ public class PersonService {
    @Autowired
    EmailService<MailgunMailMessage> emailService;
    
+   @Autowired
+   private VelocityEngine velocityEngine;
+   
    public List<PersonRole> getDefaultRoles(){
       final List<PersonRole> personRoles = new ArrayList<PersonRole>();
       PersonRole userRole = new PersonRole();
@@ -96,18 +101,19 @@ public class PersonService {
       return personRoles;
    }
    
-   public void initiatePasswordReset(final String emailAddress){
+   public void initiatePasswordReset(final String emailAddress, final String resetBaseUrl){
       Person person = personRepos.findByEmailAddress(emailAddress);
       
       if(person == null){
          throw new InvalidIdException("person with that email address not found");
       }
       
-      initiatePasswordReset(person);
+      initiatePasswordReset(person, resetBaseUrl);
    }
    
+   @SuppressWarnings("unchecked")
    @Transactional
-   public void initiatePasswordReset(final Person person){
+   public void initiatePasswordReset(final Person person, final String resetBaseUrl){
       final int EXPIRE_MIN = 90;
       final String resetToken = passwordResetTokenGenerator.getNextPasswordResetToken();
       
@@ -116,13 +122,25 @@ public class PersonService {
       
       personRepos.save(person);
       
+      @SuppressWarnings("rawtypes")
+      Map model = new HashMap();                 
+      model.put("name", person.getNameFirst() + " " + person.getNameLast());
+      model.put("email", person.getEmailAddress());
+      model.put("resetAddress", resetBaseUrl + resetToken);
+      model.put("expireMinutes", EXPIRE_MIN);
+      model.put("imageUrl", "https://roster.guru/resources/images/rosterGuruEmailHeader.png");
+            
       emailService.send(
-            new Email("admin@duty.dak.rocks", person.getEmailAddress(), 
+            new Email(
+                  "admin@duty.dak.rocks", 
+                  person.getEmailAddress(), 
                   "Password Reset Initiated", 
-                  "Please click here to reset password: " + person.getResetToken() + ". This token expires in " + EXPIRE_MIN + " minutes."));
+                  VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, "velocity/passwordReset.vm", "UTF-8", model)
+                  ));
       
    }
    
+
    private Date getMinutesInFuture(final Date d, final int minutes){
       Calendar calendar = Calendar.getInstance();
       calendar.setTime(d);
@@ -145,6 +163,13 @@ public class PersonService {
          logger.error("Failure in autoLogin", e);
          return false;
       }
+   }
+   
+   public Person clearResetToken(final Person person){
+      person.setResetToken(null);
+      person.setResetTokenExpires(null);
+      
+      return personRepos.save(person);
    }
    
    @Transactional

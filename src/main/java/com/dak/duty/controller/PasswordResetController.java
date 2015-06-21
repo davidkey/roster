@@ -43,16 +43,17 @@ public class PasswordResetController {
    }
    
    @RequestMapping(value = "/", method = RequestMethod.POST)
-   public String forgotPassword(Model model, HttpServletRequest request, 
-         @Valid PasswordForgotForm form, BindingResult bindingResult){
+   public String forgotPassword(Model model, HttpServletRequest request, @Valid PasswordForgotForm form, BindingResult bindingResult){
       logger.debug("forgotPassword({})", request.getRemoteAddr());
+      
       if (bindingResult.hasErrors()) {
          model.addAttribute("passwordForgotForm", form);
          return "passwordForgot";
       }
       
       try{
-         personService.initiatePasswordReset(form.getEmailAddress());
+         final String requestUrl = request.getRequestURL().toString();
+         personService.initiatePasswordReset(form.getEmailAddress(), requestUrl);
          model.addAttribute("success", "You should be receiving an email shortly detailing with a link to reset your password.");
       } catch (InvalidIdException e){
          model.addAttribute("passwordForgotForm", form);
@@ -60,6 +61,7 @@ public class PasswordResetController {
       } catch (Exception e){
          model.addAttribute("passwordForgotForm", form);
          model.addAttribute("error", "An unknown error occured");
+         logger.error("exception during password reset: {}", e);
       }
       
       return "passwordForgot";
@@ -111,7 +113,9 @@ public class PasswordResetController {
       }
       
       personService.setPassword(person, form.getPassword());
-      personService.loginAsPerson(person.getEmailAddress(), form.getPassword(), request);
+      if(personService.loginAsPerson(person.getEmailAddress(), form.getPassword(), request)){
+         personService.clearResetToken(person);
+      }
       
       return "redirect:/user";
    }

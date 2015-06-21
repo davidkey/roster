@@ -145,6 +145,8 @@
         nameFirst varchar(255) not null,
         nameLast varchar(255) not null,
         password varchar(60) not null,
+        resetToken varchar(255),
+        resetTokenExpires datetime,
         org_id bigint not null,
         primary key (id)
     );
