@@ -22,6 +22,7 @@ import com.dak.duty.model.EventType;
 import com.dak.duty.model.enums.EventTypeInterval;
 import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.EventTypeRepository;
+import com.dak.duty.security.IAuthenticationFacade;
 import com.dak.duty.service.EventService;
 import com.dak.duty.service.PersonService;
 
@@ -42,6 +43,9 @@ public class EventTypeAdminController {
    
    @Autowired
    PersonService personService;
+   
+   @Autowired
+   IAuthenticationFacade authenticationFacade;
 
    
    @RequestMapping(method = RequestMethod.GET)
@@ -71,8 +75,12 @@ public class EventTypeAdminController {
          }
       }
       
-      eventType.setOrganisation(personService.getAuthenticatedPerson().getOrganisation());
-
+      if(alreadyExisted && !eventTypeRepos.findOne(eventType.getId()).getOrganisation().equals(authenticationFacade.getOrganisation())){
+         throw new SecurityException("can't do that");
+      } else { 
+         eventType.setOrganisation(authenticationFacade.getOrganisation());
+      }
+      
       eventService.saveEventType(eventType);
       redirectAttributes.addFlashAttribute("msg_success", alreadyExisted ? "Event Type updated!" : "Event Type added!");
       return "redirect:/admin/eventTypes";

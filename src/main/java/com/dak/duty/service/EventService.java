@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dak.duty.exception.InvalidIdException;
+import com.dak.duty.exception.RosterSecurityException;
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.Event;
 import com.dak.duty.model.EventRoster;
@@ -38,6 +39,7 @@ import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.EventTypeRepository;
 import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.repository.specification.PersonSpecs;
+import com.dak.duty.security.IAuthenticationFacade;
 import com.dak.duty.service.IntervalService.EventTypeDetailNode;
 import com.dak.duty.service.container.EventCalendarNode;
 import com.dak.duty.service.container.comparable.EventCalendarNodeSortByDate;
@@ -65,6 +67,9 @@ public class EventService {
 
    @Autowired
    DutyRepository dutyRepos;
+   
+   @Autowired
+   IAuthenticationFacade authenticationFacade;
 
    /**
     * Attempt to fill any empty slots in any current and future events.
@@ -150,7 +155,11 @@ public class EventService {
 
    public EventType saveEventType(final EventType eventType){
       
-      eventType.setOrganisation(personService.getAuthenticatedPerson().getOrganisation());
+      if(eventType.getOrganisation() != null && !eventType.getOrganisation().equals(authenticationFacade.getOrganisation())){
+         throw new RosterSecurityException("can't do that");
+      } else {
+         eventType.setOrganisation(authenticationFacade.getOrganisation());
+      }
 
       if(EventTypeInterval.DAILY.equals(eventType.getInterval())){
          eventType.setIntervalDetail(null); // clear out interval detail if this is now a daily event type

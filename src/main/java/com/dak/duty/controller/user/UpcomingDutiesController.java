@@ -21,6 +21,7 @@ import com.dak.duty.model.Person;
 import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.PersonRepository;
+import com.dak.duty.security.IAuthenticationFacade;
 import com.dak.duty.service.EventService;
 import com.dak.duty.service.PersonService;
 
@@ -46,17 +47,20 @@ public class UpcomingDutiesController {
    @Autowired
    EventService eventService;
    
+   @Autowired
+   IAuthenticationFacade authenticationFacade;
+   
    @RequestMapping(value = "/count", method = RequestMethod.GET)
    public @ResponseBody int getUpcomingDutiesCount(Principal principal){
       logger.debug("getUpcomingDutiesCount()");
       
-      return personService.getUpcomingDuties(personService.getAuthenticatedPerson()).size(); 
+      return personService.getUpcomingDuties(authenticationFacade.getPerson()).size(); 
    }
    
    @RequestMapping(method = RequestMethod.GET)
    public String getUpcomingDutiesAll(Principal principal, Model model){
       logger.debug("getUpcomingDutiesCount()");
-      model.addAttribute("upcomingDuties", personService.getUpcomingDuties(personService.getAuthenticatedPerson()));
+      model.addAttribute("upcomingDuties", personService.getUpcomingDuties(authenticationFacade.getPerson()));
       return "user/duties";
    }
    
@@ -64,7 +68,7 @@ public class UpcomingDutiesController {
    public @ResponseBody JsonResponse optOut(@ModelAttribute("dutyId") Duty duty, @ModelAttribute("eventId") Event event, Principal principal){
       logger.debug("optOut()");
       
-      final Person person = personService.getAuthenticatedPerson();
+      final Person person = authenticationFacade.getPerson();
       
       if(eventService.optPersonAndDutyOutOfEvent(person, duty, event)){
          return new JsonResponse(ResponseStatus.OK, "Opted out.");

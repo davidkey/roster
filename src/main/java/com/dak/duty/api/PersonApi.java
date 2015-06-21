@@ -22,6 +22,7 @@ import com.dak.duty.exception.RosterSecurityException;
 import com.dak.duty.model.Person;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.PersonRepository;
+import com.dak.duty.security.IAuthenticationFacade;
 import com.dak.duty.service.IntervalService;
 import com.dak.duty.service.PersonService;
 
@@ -46,6 +47,9 @@ public class PersonApi {
 
    @Autowired
    BCryptPasswordEncoder encoder;
+   
+   @Autowired
+   IAuthenticationFacade authenticationFacade;
 
    @PreAuthorize("hasRole('ROLE_ADMIN')")
    @RequestMapping(method = RequestMethod.DELETE)
@@ -96,7 +100,7 @@ public class PersonApi {
                   "Password does not meet requirements: " + personService.getPasswordRequirements());
          }
          
-         if(!personToUpdate.getOrganisation().getId().equals(personService.getAuthenticatedPerson().getOrganisation().getId())){
+         if(!personToUpdate.getOrganisation().getId().equals(authenticationFacade.getOrganisation().getId())){
             throw new RosterSecurityException("can't do that");
          }
          

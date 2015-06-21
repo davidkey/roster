@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.dak.duty.model.Person;
 import com.dak.duty.repository.PersonRepository;
+import com.dak.duty.security.IAuthenticationFacade;
 import com.dak.duty.service.PersonService;
 
 @Controller
@@ -28,10 +29,13 @@ public class UserController {
    @Autowired
    PersonService personService;
    
+   @Autowired
+   IAuthenticationFacade authenticationFacade;
+   
    @RequestMapping(method = RequestMethod.GET)
    public String getUserHome(Model model, Principal principal){
       logger.debug("getUserHome");
-      final Person p = personService.getAuthenticatedPerson();
+      final Person p = authenticationFacade.getPerson();
       
       model.addAttribute("personName", p.getNameFirst() + " " + p.getNameLast());
       return "user/user";

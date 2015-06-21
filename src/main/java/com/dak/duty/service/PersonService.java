@@ -20,7 +20,6 @@ import lombok.NonNull;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.dak.duty.api.util.DutyNode;
@@ -36,7 +35,7 @@ import com.dak.duty.model.PersonRole;
 import com.dak.duty.model.enums.Role;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.PersonRepository;
-import com.dak.duty.security.CustomUserDetails;
+import com.dak.duty.security.IAuthenticationFacade;
 
 @Service
 //@Transactional
@@ -50,6 +49,9 @@ public class PersonService {
    
    @Autowired
    IntervalService intervalService;
+   
+   @Autowired
+   IAuthenticationFacade authenticationFacade;
 
    @Autowired
    Random rand;
@@ -119,7 +121,7 @@ public class PersonService {
          }
       }
       
-      if(person.getOrganisation() != null && !person.getOrganisation().getId().equals(this.getAuthenticatedPerson().getOrganisation().getId())){
+      if(person.getOrganisation() != null && !person.getOrganisation().getId().equals(authenticationFacade.getOrganisation().getId())){
          throw new RosterSecurityException("can't do that");
       }
 
@@ -220,7 +222,4 @@ public class PersonService {
       return -1;
    }
    
-   public Person getAuthenticatedPerson(){
-      return ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson();
-   }
 }

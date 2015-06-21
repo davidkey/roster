@@ -15,6 +15,7 @@ import com.dak.duty.exception.RosterSecurityException;
 import com.dak.duty.exception.SortOrderException;
 import com.dak.duty.model.Duty;
 import com.dak.duty.repository.DutyRepository;
+import com.dak.duty.security.IAuthenticationFacade;
 import com.dak.duty.service.container.SortOrder;
 
 @Service
@@ -26,12 +27,15 @@ public class DutyService {
    
    @Autowired
    PersonService personService;
+   
+   @Autowired
+   IAuthenticationFacade authenticationFacade;
 
    public Duty saveOrUpdateDuty(Duty duty){
       
       if(duty.getOrganisation() == null){
-         duty.setOrganisation(personService.getAuthenticatedPerson().getOrganisation());
-      } else if(!duty.getOrganisation().getId().equals(personService.getAuthenticatedPerson().getOrganisation())){
+         duty.setOrganisation(authenticationFacade.getOrganisation());
+      } else if(!duty.getOrganisation().getId().equals(authenticationFacade.getOrganisation())){
          throw new RosterSecurityException("can't do that");
       }
 
