@@ -108,9 +108,9 @@ public class PersonService {
       
       return personRepos.save(people);
    }
-
+   
    @Transactional
-   public Person save(Person person){
+   public Person save(Person person, Boolean force){
       // business logic to prevent duplicate email addresses
       // we couldn't do this in a unique index because we allow nulls
       if(person.getEmailAddress() != null && person.getEmailAddress().length() > 0){
@@ -121,11 +121,16 @@ public class PersonService {
          }
       }
       
-      if(person.getOrganisation() != null && !person.getOrganisation().getId().equals(authenticationFacade.getOrganisation().getId())){
+      if(!force && person.getOrganisation() != null && !person.getOrganisation().getId().equals(authenticationFacade.getOrganisation().getId())){
          throw new RosterSecurityException("can't do that");
       }
 
       return personRepos.save(person);
+   }
+
+   @Transactional
+   public Person save(Person person){
+      return save(person, false);
    }
    
    public Person getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster){

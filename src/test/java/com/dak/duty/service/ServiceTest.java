@@ -7,14 +7,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:/servlet-context-test.xml"})
+@ContextConfiguration({"classpath:/servlet-context-test.xml", "classpath:/security-context-test.xml"})
 public abstract class ServiceTest {
 
    protected static boolean isInitialized = false;
    
    @Autowired
    InitialisationService initService;
-
    
    @Before
    public void runOnce(){

@@ -21,14 +21,15 @@
 		</authentication-provider>
 	</authentication-manager>
 
-<!-- 
+<!-- -->
 	<b:bean id="encoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
 		<b:constructor-arg name="strength" value="11" />
 	</b:bean>
 
 
 	<global-method-security pre-post-annotations="enabled" secured-annotations="enabled" />
--->
+
 	<b:bean id="dutyUserDetailsService" class="com.dak.duty.security.DutyUserDetailsService" />
 
+	<b:bean class="com.dak.duty.security.SecurityEvaluationContextExtension" />
 </b:beans>

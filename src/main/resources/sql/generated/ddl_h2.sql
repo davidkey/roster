@@ -136,7 +136,7 @@
         add constraint UK_dunk58vf3o8hxdjjspls1jrl  unique (name);
 
     alter table person 
-        add constraint UK_16j3oat1osvcnt3kgq1dwyrxp  unique (nameFirst, nameLast);
+        add constraint UK_7bo7u0h4h8brqsq637odohryf  unique (nameFirst, nameLast, org_id);
 
     alter table duty 
         add constraint FK_idy9l7mpe2wtbci3g9972920k 

@@ -1,6 +1,7 @@
 package com.dak.duty.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.List;
@@ -8,7 +9,6 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.dak.duty.model.EventType;
@@ -17,9 +17,10 @@ import com.dak.duty.model.enums.IntervalWeekly;
 import com.dak.duty.model.exception.IntervalValidationException;
 import com.dak.duty.repository.EventTypeRepository;
 import com.dak.duty.repository.OrganisationRepository;
+import com.dak.duty.security.mocking.WithMockCustomUserAdmin;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:/servlet-context-test.xml"})
+@WithMockCustomUserAdmin
 public class IntervalServiceTest extends ServiceTest {
 
    @Autowired

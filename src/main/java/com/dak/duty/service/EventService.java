@@ -155,7 +155,7 @@ public class EventService {
 
    public EventType saveEventType(final EventType eventType){
       
-      if(eventType.getOrganisation() != null && !eventType.getOrganisation().equals(authenticationFacade.getOrganisation())){
+      if(eventType.getOrganisation() != null && !eventType.getOrganisation().getId().equals(authenticationFacade.getOrganisation().getId())){
          throw new RosterSecurityException("can't do that");
       } else {
          eventType.setOrganisation(authenticationFacade.getOrganisation());

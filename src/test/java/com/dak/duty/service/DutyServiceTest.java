@@ -11,17 +11,17 @@ import java.util.Set;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.dak.duty.exception.SortOrderException;
 import com.dak.duty.model.Duty;
 import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.OrganisationRepository;
+import com.dak.duty.security.mocking.WithMockCustomUserAdmin;
 import com.dak.duty.service.container.SortOrder;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:/servlet-context-test.xml"})
+@WithMockCustomUserAdmin
 public class DutyServiceTest extends ServiceTest {
 
    @Autowired
@@ -41,7 +41,6 @@ public class DutyServiceTest extends ServiceTest {
    @Test(expected = com.dak.duty.exception.SortOrderException.class)
    public void updateSortOrderShouldNotAllowIncompleteInput() throws SortOrderException{
       final List<SortOrder> sortOrders = dutyService.getSortOrders();
-
       assertFalse("sortOrders shouldn't be null - data not staged correctly?", sortOrders == null);
       assertFalse("sortOrders shoudn't be empty - data not staged correctly?", sortOrders.isEmpty());
 
@@ -203,5 +202,5 @@ public class DutyServiceTest extends ServiceTest {
 
       return duty;
    }
-
+   
 }

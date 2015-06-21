@@ -115,18 +115,13 @@ public class InitialisationService {
       logger.debug("defaultEvents: {}", defaultEvents);
       eventRepos.save(defaultEvents);
       
-      createDefaultAdminUser("davidkey@gmail.com", "password", defaultOrgs.get(0));
+      createDefaultAdminUser(getDefaultAdminUser());
       
    }
    
    protected List<Organisation> getDefaultOrganisations(){
       final List<Organisation> orgs = new ArrayList<Organisation>();
-      
-      Organisation org = new Organisation();
-      org.setName("My First Org");
-      org.setRegistrationCode("MYFIRST001");
-      
-      orgs.add(org);
+      orgs.add(getDefaultOrg());
       
       return orgs;
    }
@@ -155,6 +150,17 @@ public class InitialisationService {
       return orgRepos.save(org);
    }
    
+   public void createDefaultAdminUser(final Person defaultAdminUser){
+      logger.info("createDefaultAdminUser({})", defaultAdminUser);
+      
+      createDefaultAdminUser(
+            defaultAdminUser.getEmailAddress(), 
+            defaultAdminUser.getPassword(), 
+            defaultAdminUser.getNameLast(), 
+            defaultAdminUser.getNameFirst(),
+            defaultAdminUser.getOrganisation());
+   }
+   
    public void createDefaultAdminUser(final String email, final String password, final String lastName, final String firstName, final Organisation org){
       logger.info("createDefaultAdminUser({})", email);
       
@@ -179,7 +185,36 @@ public class InitialisationService {
       person.addRole(adminRole);
       person.addRole(userRole);
       
-      personService.save(person);
+      personService.save(person, true);
+   }
+   
+   public Organisation getDefaultOrg(){
+      Organisation org = new Organisation();
+      org.setId(1L);
+      org.setName("My First Org");
+      org.setRegistrationCode("MYFIRST001");
+      return org;
+   }
+   
+   public Person getDefaultAdminUser(){
+      Person person = new Person();
+      person.setEmailAddress("davidkey@gmail.com");
+      person.setPassword(encoder.encode("password"));
+      person.setNameFirst("David");
+      person.setNameLast("Key");
+      person.setActive(true);
+      person.setOrganisation(getDefaultOrg());
+      
+      final PersonRole adminRole = new PersonRole();
+      adminRole.setRole(Role.ROLE_ADMIN);
+      
+      final PersonRole userRole = new PersonRole();
+      userRole.setRole(Role.ROLE_USER);
+      
+      person.addRole(adminRole);
+      person.addRole(userRole);
+      
+      return person;
    }
    
    public void createDefaultAdminUser(final String email, final String password, final Organisation org){

@@ -35,7 +35,7 @@ public class DutyService {
       
       if(duty.getOrganisation() == null){
          duty.setOrganisation(authenticationFacade.getOrganisation());
-      } else if(!duty.getOrganisation().getId().equals(authenticationFacade.getOrganisation())){
+      } else if(!duty.getOrganisation().getId().equals(authenticationFacade.getOrganisation().getId())){
          throw new RosterSecurityException("can't do that");
       }
 

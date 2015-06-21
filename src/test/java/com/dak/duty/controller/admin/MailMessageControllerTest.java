@@ -23,7 +23,7 @@ import com.dak.duty.repository.MailMessageRepository;
 import com.dak.duty.service.EmailService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:/servlet-context-test.xml"})
+@ContextConfiguration({"classpath:/servlet-context-test.xml", "classpath:/security-context-test.xml"})
 public class MailMessageControllerTest {
    
    @Mock
