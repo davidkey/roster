@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.dak.duty.api.util.DutyNode;
 import com.dak.duty.api.util.JsonResponse;
 import com.dak.duty.api.util.JsonResponse.ResponseStatus;
+import com.dak.duty.exception.RosterSecurityException;
 import com.dak.duty.model.Person;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.PersonRepository;
-
 import com.dak.duty.service.IntervalService;
 import com.dak.duty.service.PersonService;
 
@@ -60,7 +60,7 @@ public class PersonApi {
    }
 
    @RequestMapping(value="/{id}", method = RequestMethod.GET)
-   @PreAuthorize("#p.emailAddress == authentication.name or hasRole('ROLE_ADMIN')")
+   @PreAuthorize("#p.emailAddress == authentication.name or (hasRole('ROLE_ADMIN') and #p.organisation.id == principal.person.organisation.id)")
    public @ResponseBody Person get(@PathVariable("id") @P("p") Person person){
       logger.debug("person.get({})", person.getId());
 
@@ -68,7 +68,7 @@ public class PersonApi {
    }
 
    @RequestMapping(value="/{id}/upcomingDuties", method = RequestMethod.GET)
-   @PreAuthorize("#p.emailAddress == authentication.name or hasRole('ROLE_ADMIN')")
+   @PreAuthorize("#p.emailAddress == authentication.name or (hasRole('ROLE_ADMIN') and #p.organisation.id == principal.person.organisation.id)")
    public @ResponseBody List<DutyNode> getUpcomingDuties(@PathVariable("id") @P("p") Person person){
       return personService.getUpcomingDuties(person);
    }
@@ -94,6 +94,10 @@ public class PersonApi {
          if(!personService.isPasswordValid(person.getPassword())){
             return new JsonResponse(ResponseStatus.ERROR, 
                   "Password does not meet requirements: " + personService.getPasswordRequirements());
+         }
+         
+         if(!personToUpdate.getOrganisation().getId().equals(personService.getAuthenticatedPerson().getOrganisation().getId())){
+            throw new RosterSecurityException("can't do that");
          }
          
          personToUpdate.setPassword(encoder.encode(person.getPassword()));

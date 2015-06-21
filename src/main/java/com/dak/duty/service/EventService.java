@@ -149,6 +149,8 @@ public class EventService {
    }
 
    public EventType saveEventType(final EventType eventType){
+      
+      eventType.setOrganisation(personService.getAuthenticatedPerson().getOrganisation());
 
       if(EventTypeInterval.DAILY.equals(eventType.getInterval())){
          eventType.setIntervalDetail(null); // clear out interval detail if this is now a daily event type

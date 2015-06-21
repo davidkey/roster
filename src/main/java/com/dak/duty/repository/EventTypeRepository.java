@@ -13,6 +13,9 @@ import com.dak.duty.model.enums.EventTypeInterval;
 @Repository
 public interface EventTypeRepository extends JpaRepository<EventType, Long>{
    
+   @Query("select e from EventType e where e.organisation = ?#{principal.person.organisation} and e.id = ?1")
+   public EventType findOne(final Long id);
+   
    @Query("select e from EventType e where e.organisation = ?#{principal.person.organisation} and e.name = ?1")
    public EventType findByName(final String name);
    
