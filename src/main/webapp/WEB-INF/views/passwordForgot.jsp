@@ -12,7 +12,7 @@
 </head>
 <body>
  <div class="container">
-	<form:form commandName="passwordForgotForm">  
+	<form:form commandName="passwordForgotForm" class="form-signin">  
 		<c:if test="${error != null}">
 			<div class="alert alert-danger" role="alert">
 			  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>

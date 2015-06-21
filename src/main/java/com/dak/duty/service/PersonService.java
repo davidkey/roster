@@ -132,7 +132,7 @@ public class PersonService {
             
       emailService.send(
             new Email(
-                  "admin@duty.dak.rocks", 
+                  "admin@roster.guru", 
                   person.getEmailAddress(), 
                   "Password Reset Initiated", 
                   VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, "velocity/passwordReset.vm", "UTF-8", model)
@@ -165,6 +165,7 @@ public class PersonService {
       }
    }
    
+   @Transactional
    public Person clearResetToken(final Person person){
       person.setResetToken(null);
       person.setResetTokenExpires(null);

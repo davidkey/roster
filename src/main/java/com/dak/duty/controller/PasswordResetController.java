@@ -79,8 +79,6 @@ public class PasswordResetController {
          model.addAttribute("error", "Invalid reset token - may be expired.");
       }
       
-      
-      
       model.addAttribute("passwordResetForm", new PasswordResetForm());
       return "passwordReset";
    }

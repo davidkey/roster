@@ -71,7 +71,7 @@ public class SetupController {
       
       // send welcome email
       try {
-         emailService.send(new Email("admin@duty.dak.rocks", form.getEmailAddress().trim(), "Welcome to Duty Roster!", "We hope you like it!"));
+         emailService.send(new Email("admin@roster.guru", form.getEmailAddress().trim(), "Welcome to Duty Roster!", "We hope you like it!"));
       } catch (Exception e){
          logger.error("error: {}", e);
       }
