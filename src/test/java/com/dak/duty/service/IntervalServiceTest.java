@@ -62,7 +62,7 @@ public class IntervalServiceTest extends ServiceTest {
       et.setDescription(et.getName());
       et.setInterval(EventTypeInterval.DAILY);
       et.setOrganisation(orgRepos.findAll().get(0));
-      et = eventService.saveEventType(et);
+      //et = eventService.saveEventType(et);
 
       List<Date> dates = intervalService.getDaysOfMonthForInterval(intervalService.getCurrentSystemDate(), et.getInterval(), et.getIntervalDetail());
 
@@ -78,7 +78,7 @@ public class IntervalServiceTest extends ServiceTest {
       et.setDescription(et.getName());
       et.setInterval(EventTypeInterval.WEEKLY);
       et.setOrganisation(orgRepos.findAll().get(0));
-      et = eventService.saveEventType(et);
+      //et = eventService.saveEventType(et);
       
       intervalService.getDaysOfMonthForInterval(intervalService.getCurrentSystemDate(), et.getInterval(), et.getIntervalDetail());
    }
@@ -91,7 +91,7 @@ public class IntervalServiceTest extends ServiceTest {
       et.setDescription(et.getName());
       et.setInterval(EventTypeInterval.ONCE);
       et.setOrganisation(orgRepos.findAll().get(0));
-      et = eventService.saveEventType(et);
+      //et = eventService.saveEventType(et);
       
       intervalService.getDaysOfMonthForInterval(intervalService.getCurrentSystemDate(), et.getInterval(), et.getIntervalDetail());
    }
@@ -104,7 +104,7 @@ public class IntervalServiceTest extends ServiceTest {
       et.setDescription(et.getName());
       et.setInterval(EventTypeInterval.MONTHLY);
       et.setOrganisation(orgRepos.findAll().get(0));
-      et = eventService.saveEventType(et);
+      //et = eventService.saveEventType(et);
       
       intervalService.getDaysOfMonthForInterval(intervalService.getCurrentSystemDate(), et.getInterval(), et.getIntervalDetail());
    }
