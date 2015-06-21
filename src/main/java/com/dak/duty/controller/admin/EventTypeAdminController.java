@@ -7,6 +7,8 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.method.P;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,6 +23,7 @@ import com.dak.duty.model.enums.EventTypeInterval;
 import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.EventTypeRepository;
 import com.dak.duty.service.EventService;
+import com.dak.duty.service.PersonService;
 
 @Controller
 @RequestMapping("/admin/eventTypes")
@@ -36,6 +39,9 @@ public class EventTypeAdminController {
    
    @Autowired
    DutyRepository dutyRepos;
+   
+   @Autowired
+   PersonService personService;
 
    
    @RequestMapping(method = RequestMethod.GET)
@@ -64,18 +70,21 @@ public class EventTypeAdminController {
             return "redirect:/admin/eventTypes/new";
          }
       }
+      
+      eventType.setOrganisation(personService.getAuthenticatedPerson().getOrganisation());
 
       eventService.saveEventType(eventType);
       redirectAttributes.addFlashAttribute("msg_success", alreadyExisted ? "Event Type updated!" : "Event Type added!");
       return "redirect:/admin/eventTypes";
    }
 
+   @PreAuthorize("#e.organisation.id == principal.person.organisation.id")
    @RequestMapping(value = "/{eventTypeId}", method = RequestMethod.GET)
-   public String getEventTypeById(@PathVariable long eventTypeId, Model model){
-      logger.debug("getEventTypeById({})", eventTypeId);
+   public String getEventTypeById(@PathVariable("eventTypeId") @P("e") EventType eventType, Model model){
+      logger.debug("getEventTypeById({})", eventType.getId());
 
       if(!model.containsAttribute("eventType")){
-         model.addAttribute("eventType", eventTypeRepos.findOne(eventTypeId));
+         model.addAttribute("eventType", eventType);
       }
       model.addAttribute("eventTypeIntervals", EventTypeInterval.values());
       model.addAttribute("allPossibleDuties", dutyRepos.findByActiveTrue());

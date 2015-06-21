@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -34,7 +35,9 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.dak.duty.security.CustomUserDetails;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -95,9 +98,18 @@ public class Person  implements Serializable {
    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
    private Set<PersonRole> roles;
    
+   @PrePersist
+   protected void onPersist() {
+      if(organisation == null){ // hack?
+         organisation = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson().getOrganisation();
+      }
+   }
+   
    @PreUpdate
    protected void onUpdate() {
-      lastUpdated = new Date();
+      if(organisation == null){ // hack?
+         organisation = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson().getOrganisation();
+      }
    }
    
    @JsonIgnore

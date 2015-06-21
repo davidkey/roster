@@ -17,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -76,6 +77,13 @@ public class Event implements Serializable {
    
    @PrePersist
    protected void onPersist() {
+      if(organisation == null){ // hack?
+         organisation = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson().getOrganisation();
+      }
+   }
+   
+   @PreUpdate
+   protected void onUpdate() {
       if(organisation == null){ // hack?
          organisation = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson().getOrganisation();
       }

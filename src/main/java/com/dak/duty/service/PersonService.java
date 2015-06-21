@@ -24,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.dak.duty.api.util.DutyNode;
+import com.dak.duty.exception.RosterSecurityException;
 import com.dak.duty.exception.UsernameAlreadyExists;
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.Event;
@@ -116,6 +117,10 @@ public class PersonService {
          if(personWithThisEmailAddress != null && personWithThisEmailAddress.getId() != person.getId()){
             throw new UsernameAlreadyExists(personWithThisEmailAddress.getEmailAddress());
          }
+      }
+      
+      if(person.getOrganisation() != null && !person.getOrganisation().getId().equals(this.getAuthenticatedPerson().getOrganisation().getId())){
+         throw new RosterSecurityException("can't do that");
       }
 
       return personRepos.save(person);

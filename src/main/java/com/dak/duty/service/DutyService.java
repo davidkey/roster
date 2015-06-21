@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dak.duty.exception.RosterSecurityException;
 import com.dak.duty.exception.SortOrderException;
 import com.dak.duty.model.Duty;
 import com.dak.duty.repository.DutyRepository;
@@ -22,8 +23,17 @@ public class DutyService {
 
    @Autowired
    DutyRepository dutyRepos;
+   
+   @Autowired
+   PersonService personService;
 
    public Duty saveOrUpdateDuty(Duty duty){
+      
+      if(duty.getOrganisation() == null){
+         duty.setOrganisation(personService.getAuthenticatedPerson().getOrganisation());
+      } else if(!duty.getOrganisation().getId().equals(personService.getAuthenticatedPerson().getOrganisation())){
+         throw new RosterSecurityException("can't do that");
+      }
 
       /**
        * If this is a soft delete:
@@ -61,7 +71,7 @@ public class DutyService {
 
       int minSortOrder = Integer.MAX_VALUE;
       int maxSortOrder = Integer.MIN_VALUE;
-
+      
       for(Duty duty : allActiveDuties){
          if(sortOrderSet.containsKey(duty.getId())){
             final int newSortOrder = sortOrderSet.get(duty.getId());

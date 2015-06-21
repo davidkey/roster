@@ -7,6 +7,8 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.method.P;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -78,12 +80,13 @@ public class DutyAdminController {
       return "admin/duty";
    }
 
+   @PreAuthorize("#d.organisation.id == principal.person.organisation.id")
    @RequestMapping(value = "/{dutyId}", method = RequestMethod.GET)
-   public String getEditDuty(@PathVariable Long dutyId, Model model){
+   public String getEditDuty(@PathVariable("dutyId") @P("d") Duty duty, Model model){
       logger.debug("getEditDuty()");
 
       if(!model.containsAttribute("duty")){
-         model.addAttribute("duty", dutyRepos.findOne(dutyId));
+         model.addAttribute("duty", duty);
       }
       
       model.addAttribute("maxSortOrder", dutyRepos.findMaxSortOrder());

@@ -49,7 +49,7 @@
 		Delete logic - todo: clean this up - hideous
 		**/
 		$("#deleteMe").click(function(e, btn){
-			bootbox.confirm("Are you sure you want to delete this event type?", function(result) {
+			bootbox.confirm("Are you sure you want to delete this Duty type?", function(result) {
 				if(result){
 					var csrfParameter = $("meta[name='_csrf_parameter']").attr("content");
 					var csrfHeader = $("meta[name='_csrf_header']").attr("content");

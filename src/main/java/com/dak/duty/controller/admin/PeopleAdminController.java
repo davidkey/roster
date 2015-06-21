@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.dak.duty.exception.RosterSecurityException;
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.Person;
 import com.dak.duty.repository.DutyRepository;
@@ -67,9 +68,8 @@ public class PeopleAdminController {
       final boolean personAlreadyExisted = person.getId() > 0;
       
       if(personAlreadyExisted){
-         // security check
-         if(person.getOrganisation().getId() != personService.getAuthenticatedPerson().getOrganisation().getId()){
-            throw new SecurityException("can't do that!");
+         if(!personRepos.findOne(person.getId()).getOrganisation().getId().equals(personService.getAuthenticatedPerson().getOrganisation().getId())){
+            throw new RosterSecurityException("can't do that!");
          }
       }
 

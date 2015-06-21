@@ -10,11 +10,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -31,7 +31,6 @@ import com.dak.duty.security.CustomUserDetails;
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Getter
 @Setter
-@EqualsAndHashCode
 @ToString
 public class Duty implements Serializable {
    private static final long serialVersionUID = 1L;
@@ -67,12 +66,69 @@ public class Duty implements Serializable {
       }
    }
    
+   @PreUpdate
+   protected void onUpdate() {
+      if(organisation == null){ // hack?
+         organisation = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson().getOrganisation();
+      }
+   }
+   
+   
    public void setName(String name){
       if(name != null){
          name = name.trim();
       }
       
       this.name = name;
+   }
+
+   /**
+    * hashcode and equals exclude organisation!
+    */
+   @Override
+   public boolean equals(Object obj) {
+      if (this == obj)
+         return true;
+      if (obj == null)
+         return false;
+      if (getClass() != obj.getClass())
+         return false;
+      Duty other = (Duty) obj;
+      if (active == null) {
+         if (other.active != null)
+            return false;
+      } else if (!active.equals(other.active))
+         return false;
+      if (description == null) {
+         if (other.description != null)
+            return false;
+      } else if (!description.equals(other.description))
+         return false;
+      if (id != other.id)
+         return false;
+      if (name == null) {
+         if (other.name != null)
+            return false;
+      } else if (!name.equals(other.name))
+         return false;
+      if (sortOrder == null) {
+         if (other.sortOrder != null)
+            return false;
+      } else if (!sortOrder.equals(other.sortOrder))
+         return false;
+      return true;
+   }
+
+   @Override
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((active == null) ? 0 : active.hashCode());
+      result = prime * result + ((description == null) ? 0 : description.hashCode());
+      result = prime * result + (int) (id ^ (id >>> 32));
+      result = prime * result + ((name == null) ? 0 : name.hashCode());
+      result = prime * result + ((sortOrder == null) ? 0 : sortOrder.hashCode());
+      return result;
    }
 
 }
