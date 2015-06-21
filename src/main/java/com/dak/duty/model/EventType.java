@@ -17,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -34,10 +35,12 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.dak.duty.model.enums.EventTypeInterval;
 import com.dak.duty.model.exception.IntervalValidationException;
 import com.dak.duty.model.validation.EventTypeIntervalValidation;
+import com.dak.duty.security.CustomUserDetails;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
@@ -92,6 +95,13 @@ public class EventType implements Serializable {
    
    @Column(nullable = false)
    private Boolean active = true;
+   
+   @PrePersist
+   protected void onPersist() {
+      if(organisation == null){ // hack?
+         organisation = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson().getOrganisation();
+      }
+   }
    
    @Transient
    private Date getBlankDate(){

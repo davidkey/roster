@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
@@ -21,6 +22,9 @@ import lombok.ToString;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import com.dak.duty.security.CustomUserDetails;
 
 @Entity
 @Table(name = "duty")
@@ -55,6 +59,13 @@ public class Duty implements Serializable {
    
    @Column(nullable = false)
    private Boolean active = true;
+   
+   @PrePersist
+   protected void onPersist() {
+      if(organisation == null){ // hack?
+         organisation = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson().getOrganisation();
+      }
+   }
    
    public void setName(String name){
       if(name != null){
