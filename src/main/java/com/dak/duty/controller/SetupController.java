@@ -8,10 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -24,6 +20,7 @@ import com.dak.duty.model.MailgunMailMessage;
 import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.service.EmailService;
 import com.dak.duty.service.InitialisationService;
+import com.dak.duty.service.PersonService;
 
 @Controller
 @RequestMapping("/setup")
@@ -39,6 +36,9 @@ public class SetupController {
    
    @Autowired
    PersonRepository personRepos;
+   
+   @Autowired
+   PersonService personService;
    
    @Autowired
    @Qualifier("authenticationManager")
@@ -67,11 +67,11 @@ public class SetupController {
       initService.createOrganisationAndAdminUser(form);
 
       // log in as newly created user
-      doAutoLogin(form.getEmailAddress().trim(), form.getPassword(), request);
+      personService.loginAsPerson(form.getEmailAddress().trim(), form.getPassword(), request);
       
       // send welcome email
       try {
-         emailService.send(new Email("admin@duty.dak.rocks", form.getEmailAddress().trim(), "Welcome to Duty Roster!", "We hope you like it!"));
+         emailService.send(new Email("admin@roster.guru", form.getEmailAddress().trim(), "Welcome to Duty Roster!", "We hope you like it!"));
       } catch (Exception e){
          logger.error("error: {}", e);
       }
@@ -79,17 +79,4 @@ public class SetupController {
       return "redirect:/admin";
    }
 
-   private void doAutoLogin(String username, String password, HttpServletRequest request) {
-      try {
-         // Must be called from request filtered by Spring Security, otherwise SecurityContextHolder is not updated
-         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
-         token.setDetails(new WebAuthenticationDetails(request));
-         Authentication authentication = authenticationManager.authenticate(token);
-         logger.debug("Logging in with [{}]", authentication.getPrincipal());
-         SecurityContextHolder.getContext().setAuthentication(authentication);
-      } catch (Exception e) {
-         SecurityContextHolder.getContext().setAuthentication(null);
-         logger.error("Failure in autoLogin", e);
-      }
-   }
 }

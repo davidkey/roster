@@ -1,5 +1,7 @@
 package com.dak.duty.repository;
 
+import java.util.Date;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -16,4 +18,6 @@ public interface PersonRepository extends JpaRepository<Person, Long>, JpaSpecif
    public Person findOne(final Long id);
    
    public Person findByEmailAddress(String emailAddress);
+   
+   public Person findByResetTokenAndResetTokenExpiresGreaterThan(String resetToken, Date expireDate);
 }

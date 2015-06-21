@@ -19,6 +19,7 @@ import lombok.ToString;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import com.dak.duty.model.interfaces.MailMessageInterface;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -30,7 +31,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Setter
 @EqualsAndHashCode
 @ToString
-public class MailgunMailMessage implements Serializable {
+public class MailgunMailMessage implements Serializable, MailMessageInterface {
    private static final long serialVersionUID = 1L;
 
    @Id

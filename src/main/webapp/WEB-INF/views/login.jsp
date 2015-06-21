@@ -30,8 +30,10 @@
 		  </label>
 		  </div>
 		  --%>
-	  
 	  <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+	  <br/>
+	  <br/>
+	  <a class="btn btn-warning btn-block" href="<c:url value="/passwordReset/"/>">Forgot Password?</a>
 	</form>
 
     </div> <!-- /container -->

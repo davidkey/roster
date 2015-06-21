@@ -13,7 +13,7 @@
 		<intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMIN')" />
 		<form-login login-page="/login" authentication-failure-url="/login?error=true"/>
 		<http-basic />
-		<logout invalidate-session="true" logout-success-url="/" delete-cookies="JSESSIONID" logout-url="/logout" />
+		<logout invalidate-session="true" logout-success-url="/user" delete-cookies="JSESSIONID" logout-url="/logout" />
 	</http>
 
 	<authentication-manager alias="authenticationManager">
