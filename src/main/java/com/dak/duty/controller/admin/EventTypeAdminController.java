@@ -75,7 +75,7 @@ public class EventTypeAdminController {
          }
       }
       
-      if(alreadyExisted && !eventTypeRepos.findOne(eventType.getId()).getOrganisation().equals(authenticationFacade.getOrganisation())){
+      if(alreadyExisted && !eventTypeRepos.findOne(eventType.getId()).getOrganisation().equals(authenticationFacade.getOrganisation().getId())){
          throw new SecurityException("can't do that");
       } else { 
          eventType.setOrganisation(authenticationFacade.getOrganisation());
