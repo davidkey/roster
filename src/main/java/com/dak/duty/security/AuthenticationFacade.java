@@ -17,12 +17,20 @@ public class AuthenticationFacade implements IAuthenticationFacade {
 
    @Override
    public Organisation getOrganisation() {
-      return getPerson().getOrganisation();
+      return getPerson().getOrganisation(); // this could be null - problem?
    }
 
    @Override
    public Person getPerson() {
-      return ((CustomUserDetails) getAuthentication().getPrincipal()).getPerson();
+      Person p = new Person();
+      
+      try{
+         p = ((CustomUserDetails) getAuthentication().getPrincipal()).getPerson();
+      } catch (ClassCastException cce){
+         // do nothing - give them a blank person
+      }
+      
+      return p;
    }
 
 }

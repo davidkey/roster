@@ -39,9 +39,9 @@
 							<ul class="nav masthead-nav">
 								<li class="active"><a href="#">Home</a></li>
 								<li><a href="#">Features</a></li>
-								<li><a href="#">Contact</a></li>
-								<li><a href="#">Sign Up</a></li>
-								<li><a href="#">Log In</a></li>
+								<li><a href="mailto:davidkey@gmail.com">Contact</a></li>
+								<li><a href="<c:url value="/setup"/>">Sign Up</a></li>
+								<li><a href="<c:url value="/login"/>">Log In</a></li>
 							</ul>
 						</nav>
 					</div>

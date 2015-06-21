@@ -1,7 +1,5 @@
 package com.dak.duty.controller;
 
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,27 +25,19 @@ public class HomeController {
 
    @RequestMapping(value = "/", method = RequestMethod.GET)
    public String home(Locale locale, Model model) {
-      if(!initService.initSetupComplete()){
-         return "redirect:/setup";
-      }
-
-      logger.info("Welcome home! The client locale is {}.", locale);
-
-      Date date = new Date();
-      DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
-
-      String formattedDate = dateFormat.format(date);
-
-      model.addAttribute("serverTime", formattedDate );
+      //if(!initService.initSetupComplete()){
+      //   return "redirect:/setup";
+      //}
 
       return "home";
    }
 
    @RequestMapping(value = "/login", method = RequestMethod.GET)
-   public String getLogin(
-         @RequestParam(value = "error", required = false) String error, 
+   public String getLogin(@RequestParam(value = "error", required = false) String error, 
          Model model, HttpServletRequest request){
 
+      logger.debug("getLogin() by ip {}", request.getRemoteAddr());
+      
       if (error != null) {
          model.addAttribute("error", "Invalid username and password!");
       }

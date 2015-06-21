@@ -6,10 +6,17 @@ import com.dak.duty.model.Person;
 import com.dak.duty.security.CustomUserDetails;
 
 public abstract class AbstractSpecs {
-
+   
    protected static Person getAuthorizedPerson(){
-      // TODO: should really be in try{} but i want to see the errors for now...
-      return ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson();
+      Person person = new Person();
+      
+      try{
+         person = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson();
+      } catch (ClassCastException cce){
+         // nothing
+      }
+      
+      return person;
    }
    
    protected static String getLikePattern(final String searchTerm) {
