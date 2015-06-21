@@ -51,7 +51,6 @@ public class SearchApi {
       final List<AutocompleteNode> nodes = new ArrayList<AutocompleteNode>();
       
       // find and add people
-      //final List<Person> people = personRepos.findByNameLastContainingIgnoreCaseOrNameFirstContainingIgnoreCase(searchString, searchString); // this shows disabled users
       final List<Person> people = personRepos.findAll(
             where(isActive())
             .and(sameOrg())

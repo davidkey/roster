@@ -5,7 +5,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import static org.springframework.data.jpa.domain.Specifications.*;
 import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,9 +21,6 @@ import com.dak.duty.api.util.JsonResponse.ResponseStatus;
 import com.dak.duty.model.Person;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.PersonRepository;
-
-import static com.dak.duty.repository.specification.PersonSpecs.isActive;
-import static com.dak.duty.repository.specification.PersonSpecs.sameOrg;
 
 import com.dak.duty.service.IntervalService;
 import com.dak.duty.service.PersonService;
@@ -50,13 +46,6 @@ public class PersonApi {
 
    @Autowired
    BCryptPasswordEncoder encoder;
-   
-   @PreAuthorize("hasRole('ROLE_ADMIN')")
-   @RequestMapping(value = "/all", method = RequestMethod.GET)
-   public @ResponseBody List<Person> getAll(){
-      logger.debug("person.getAll()");
-      return personRepos.findAll(where(isActive()).and(sameOrg()));
-   }
 
    @PreAuthorize("hasRole('ROLE_ADMIN')")
    @RequestMapping(method = RequestMethod.DELETE)

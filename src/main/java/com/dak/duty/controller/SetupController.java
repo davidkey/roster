@@ -63,11 +63,9 @@ public class SetupController {
          return "setup/setup";
       }
       
+      // create org and admin user
       initService.createOrganisationAndAdminUser(form);
-      
-      // create admin user
-      //initService.createDefaultAdminUser(form.getEmailAddress().trim(), form.getPassword(), form.getNameLast().trim(), form.getNameFirst().trim());
-      
+
       // log in as newly created user
       doAutoLogin(form.getEmailAddress().trim(), form.getPassword(), request);
       

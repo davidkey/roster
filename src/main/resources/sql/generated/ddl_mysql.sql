@@ -83,7 +83,7 @@
 
     create table event (
         id bigint not null auto_increment,
-        approved bit not null,
+        approved bit,
         dateEvent date not null,
         name varchar(255),
         event_type_id bigint not null,
