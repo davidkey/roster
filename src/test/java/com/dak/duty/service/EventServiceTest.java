@@ -3,7 +3,9 @@ package com.dak.duty.service;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Date;
 import java.util.List;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import com.dak.duty.api.util.DutyNode;
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.EventType;
 import com.dak.duty.model.Person;
+import com.dak.duty.model.enums.EventTypeInterval;
 import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.EventTypeRepository;
@@ -59,7 +62,16 @@ public class EventServiceTest extends ServiceTest {
       person.addDutyAndPreference(duty, 5);
       
       // grab a random event type and add our new duty to it
-      EventType eventType = eventTypeRepos.findAll().get(0);
+      //EventType eventType = eventTypeRepos.findAll().get(0);
+      
+      EventType eventType = new EventType();
+      eventType.setActive(true);
+      eventType.setInterval(EventTypeInterval.DAILY);
+      eventType.setOrganisation(person.getOrganisation());
+      eventType.setStartTime(new Date());
+      eventType.setEndTime(new Date());
+      eventType.setName("My New Event That Nobody Likes");
+      
       eventType.addDuty(duty);
       
       eventTypeRepos.save(eventType);
