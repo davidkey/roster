@@ -27,7 +27,7 @@ import com.dak.duty.service.PersonService;
 
 @Controller
 @RequestMapping("/api/person")
-@PreAuthorize("hasRole('ROLE_USER')")
+//@PreAuthorize("hasRole('ROLE_USER')") // set in security context xml
 public class PersonApi {
 
    private static final Logger logger = LoggerFactory.getLogger(PersonApi.class);

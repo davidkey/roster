@@ -6,6 +6,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.method.P;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +22,7 @@ import com.dak.duty.service.EventService;
 
 @Controller
 @RequestMapping("/admin/rosters")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class RosterAdminController {
    
    private static final Logger logger = LoggerFactory.getLogger(RosterAdminController.class);
@@ -40,12 +43,12 @@ public class RosterAdminController {
       model.addAttribute("events", events);
       return "admin/rosters";
    }
-
+   
+   @PreAuthorize("#e.organisation.id == principal.person.organisation.id AND hasRole('ROLE_ADMIN')")
    @RequestMapping(value = "/{eventId}", method = RequestMethod.GET)
-   public String getEventAndRoster(@PathVariable Long eventId, Model model){
-      logger.debug("getEventAndRoster({})", eventId);
+   public String getEventAndRoster(@PathVariable("eventId") @P("e") Event event, Model model){
+      logger.debug("getEventAndRoster({})", event);
 
-      final Event event = eventRepos.findOne(eventId);
       final List<EventRosterItem> sortedRoster = eventService.getSortedRosterIncludingEmptySlots(event);
 
       model.addAttribute("event", event);

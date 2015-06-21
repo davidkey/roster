@@ -15,6 +15,8 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.method.P;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
@@ -63,6 +65,13 @@ public class PeopleAdminController {
    public String savePerson(@ModelAttribute @Valid Person person, BindingResult result, final RedirectAttributes redirectAttributes){
       logger.debug("savePerson()");
       final boolean personAlreadyExisted = person.getId() > 0;
+      
+      if(personAlreadyExisted){
+         // security check
+         if(person.getOrganisation().getId() != personService.getAuthenticatedPerson().getOrganisation().getId()){
+            throw new SecurityException("can't do that!");
+         }
+      }
 
       if(result.hasErrors()){         
          redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.person", result);
@@ -77,6 +86,7 @@ public class PeopleAdminController {
       
       if(!personAlreadyExisted){
          person.addRoles(personService.getDefaultRoles());
+         person.setOrganisation(personService.getAuthenticatedPerson().getOrganisation());
       }
     
       
@@ -95,22 +105,22 @@ public class PeopleAdminController {
       return "admin/person";
    }
 
+   @PreAuthorize("#p.organisation.id == principal.person.organisation.id")
    @RequestMapping(value = "/{personId}", method = RequestMethod.GET)
-   public String getEditPerson(@PathVariable Long personId, Model model){
+   public String getEditPerson(final @PathVariable("personId") @P("p") Person person, Model model){
       logger.debug("getEditPerson()");
       
       if(!model.containsAttribute("person")){
-         model.addAttribute("person", personRepos.findOne(personId));
+         model.addAttribute("person", person);
       }
       
       return "admin/person";
    }
 
+   @PreAuthorize("#p.organisation.id == principal.person.organisation.id")
    @RequestMapping(value = "/{personId}/duties", method = RequestMethod.GET)
-   public String getManageDuties(@PathVariable Long personId, Model model){
+   public String getManageDuties(final @PathVariable("personId") @P("p") Person person, Model model){
       logger.debug("getManageDuties()");
-
-      final Person person = personRepos.findOne(personId);
 
       model.addAttribute("personName", person.getNameFirst() + " " + person.getNameLast());
       model.addAttribute("person", person);
@@ -118,11 +128,10 @@ public class PeopleAdminController {
       return "admin/personDuties";
    }
 
+   @PreAuthorize("#p.organisation.id == principal.person.organisation.id")
    @RequestMapping(value = "/{personId}/duties", method = RequestMethod.POST)
-   public String updateDuties(@PathVariable Long personId, Model model, @RequestParam MultiValueMap<String, String> parameters, final RedirectAttributes redirectAttributes){
+   public String updateDuties(final @PathVariable("personId") @P("p") Person person, Model model, @RequestParam MultiValueMap<String, String> parameters, final RedirectAttributes redirectAttributes){
       logger.debug("updateDuties()");
-
-      final Person person = personRepos.findOne(personId);
 
       final Map<Long, Integer> dutyPrefs = new HashMap<Long, Integer>();
 
