@@ -6,6 +6,8 @@ import static com.dak.duty.repository.specification.PersonSpecs.sameOrg;
 import static org.springframework.data.jpa.domain.Specifications.where;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,21 +16,34 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import lombok.NonNull;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Service;
 
 import com.dak.duty.api.util.DutyNode;
+import com.dak.duty.exception.InvalidIdException;
 import com.dak.duty.exception.RosterSecurityException;
 import com.dak.duty.exception.UsernameAlreadyExists;
 import com.dak.duty.model.Duty;
+import com.dak.duty.model.Email;
 import com.dak.duty.model.Event;
 import com.dak.duty.model.EventRoster;
 import com.dak.duty.model.EventRosterItem;
+import com.dak.duty.model.MailgunMailMessage;
 import com.dak.duty.model.Person;
 import com.dak.duty.model.PersonDuty;
 import com.dak.duty.model.PersonRole;
@@ -36,10 +51,13 @@ import com.dak.duty.model.enums.Role;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.security.IAuthenticationFacade;
+import com.dak.duty.service.facade.IPasswordResetTokenFacade;
 
 @Service
 //@Transactional
 public class PersonService {
+   
+   private static final Logger logger = LoggerFactory.getLogger(PersonService.class);
 
    @Autowired
    PersonRepository personRepos;
@@ -56,6 +74,19 @@ public class PersonService {
    @Autowired
    Random rand;
    
+   @Autowired
+   BCryptPasswordEncoder encoder;
+   
+   @Autowired
+   @Qualifier("authenticationManager")
+   AuthenticationManager authenticationManager;
+   
+   @Autowired
+   IPasswordResetTokenFacade passwordResetTokenGenerator;
+   
+   @Autowired
+   EmailService<MailgunMailMessage> emailService;
+   
    public List<PersonRole> getDefaultRoles(){
       final List<PersonRole> personRoles = new ArrayList<PersonRole>();
       PersonRole userRole = new PersonRole();
@@ -63,6 +94,65 @@ public class PersonService {
       personRoles.add(userRole);
       
       return personRoles;
+   }
+   
+   public void initiatePasswordReset(final String emailAddress){
+      Person person = personRepos.findByEmailAddress(emailAddress);
+      
+      if(person == null){
+         throw new InvalidIdException("person with that email address not found");
+      }
+      
+      initiatePasswordReset(person);
+   }
+   
+   @Transactional
+   public void initiatePasswordReset(final Person person){
+      final int EXPIRE_MIN = 90;
+      final String resetToken = passwordResetTokenGenerator.getNextPasswordResetToken();
+      
+      person.setResetToken(resetToken);
+      person.setResetTokenExpires(getMinutesInFuture(new Date(), EXPIRE_MIN));
+      
+      personRepos.save(person);
+      
+      emailService.send(
+            new Email("admin@duty.dak.rocks", person.getEmailAddress(), 
+                  "Password Reset Initiated", 
+                  "Please click here to reset password: " + person.getResetToken() + ". This token expires in " + EXPIRE_MIN + " minutes."));
+      
+   }
+   
+   private Date getMinutesInFuture(final Date d, final int minutes){
+      Calendar calendar = Calendar.getInstance();
+      calendar.setTime(d);
+      calendar.add(Calendar.MINUTE, minutes);
+      return calendar.getTime();
+   }
+   
+   public boolean loginAsPerson(final String username, final String password, final HttpServletRequest request){
+      logger.debug("loginAsPerson({}, {})", username, password);
+      try {
+         // Must be called from request filtered by Spring Security, otherwise SecurityContextHolder is not updated
+         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
+         token.setDetails(new WebAuthenticationDetails(request));
+         Authentication authentication = authenticationManager.authenticate(token);
+         logger.debug("Logging in with [{}]", authentication.getPrincipal());
+         SecurityContextHolder.getContext().setAuthentication(authentication);
+         return true;
+      } catch (Exception e) {
+         SecurityContextHolder.getContext().setAuthentication(null);
+         logger.error("Failure in autoLogin", e);
+         return false;
+      }
+   }
+   
+   @Transactional
+   public Person setPassword(Person person, final String plaintextPassword){
+      person.setPassword(encoder.encode(plaintextPassword));
+      person = personRepos.save(person);
+      personRepos.flush();
+      return person;
    }
    
    public boolean isPasswordValid(final String password){

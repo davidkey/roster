@@ -98,6 +98,12 @@ public class Person  implements Serializable {
    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
    private Set<PersonRole> roles;
    
+   @Column(nullable = true)
+   private String resetToken;
+   
+   @Column(nullable = true)
+   private Date resetTokenExpires;
+   
    @PrePersist
    protected void onPersist() {
       if(organisation == null){ // hack?
