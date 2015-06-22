@@ -16,12 +16,14 @@
 		">
 		
 	<beans:beans profile="dev">
+
 		<beans:bean class="org.springframework.data.web.config.SpringDataWebConfiguration" />
 		<beans:bean class="org.springframework.data.repository.support.DomainClassConverter">
 		    <beans:constructor-arg ref="conversionService"/>
 		</beans:bean>
 		 
 		<beans:bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean"/>
+		
 		<annotation-driven conversion-service="conversionService">
 			<path-matching registered-suffixes-only="true" />
 			<message-converters> 
@@ -36,15 +38,18 @@
 			    </beans:bean>
 			</message-converters>
 		</annotation-driven>
+		
 	</beans:beans>
 	
 	<beans:beans profile="prod">
+	
 		<beans:bean class="org.springframework.data.web.config.SpringDataWebConfiguration" />
 		<beans:bean class="org.springframework.data.repository.support.DomainClassConverter">
 		   	<beans:constructor-arg ref="conversionService"/>
 		</beans:bean>
 		 
 		<beans:bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean"/>
+		
 		<annotation-driven conversion-service="conversionService">
 			<path-matching registered-suffixes-only="true" />
 			<message-converters>
@@ -54,6 +59,7 @@
 			    </beans:bean>
 			</message-converters>
 		</annotation-driven>
+		
 	</beans:beans>
 
 
