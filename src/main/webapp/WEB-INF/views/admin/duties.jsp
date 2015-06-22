@@ -28,7 +28,7 @@
 						<th>#</th>
 						<th>Name</th>
 						<th>Description</th>
-						<th>Sort Order</th>
+						<th style="display:none;">Sort Order</th>
 						<th>Edit</th>
 					</tr>
 				</thead>
@@ -38,12 +38,14 @@
 							<td class="dutyId">${duty.id}</td>
 							<td><c:out value="${duty.name}"/></td>
 							<td><c:out value="${duty.description}"/></td>
-							<td class="sortOrder">${duty.sortOrder}</td>
+							<td style="display:none;" class="sortOrder">${duty.sortOrder}</td>
 							<td><a href="${pageContext.request.contextPath}/admin/duties/${duty.id}" class="btn btn-xs btn-primary">Edit</a></td>
 						</tr>
 					</c:forEach>
 				</tbody>
 			</table>
+			<hr/>
+			<small>*Hint: You can drag Duties around to change the order they appear on rosters.</small>
 		</div>
 	</div>
 

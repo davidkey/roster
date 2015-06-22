@@ -26,6 +26,8 @@
 				<form:errors path="description" class="alert-danger" />
 			</div>
 			
+			<form:hidden path="sortOrder"/>
+			<%-- 
 			<div class="form-group">
 				<label for="sortOrder">Sort Order</label>
 				<form:select path="sortOrder" class="form-control">
@@ -36,7 +38,7 @@
 				</form:select>
 				<form:errors path="sortOrder" class="alert-danger" />
 			</div>
-			
+			--%>
 			<c:if test="${not empty duty.id && duty.id gt 0}">
 				<button type="button" class="btn btn-warning" id="deleteMe">Delete Duty</button>
 			</c:if>

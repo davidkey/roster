@@ -72,11 +72,13 @@ public class DutyAdminController {
       logger.debug("getNewDuty()");
 
       if(!model.containsAttribute("duty")){
-         model.addAttribute("duty", new Duty());
+         final Duty duty = new Duty();
+         final Integer maxSortOrder = dutyRepos.findMaxSortOrder();
+         duty.setSortOrder((maxSortOrder == null ? 0 : maxSortOrder) + 1);
+         
+         model.addAttribute("duty", duty);
       }
       
-      final Integer maxSortOrder = dutyRepos.findMaxSortOrder();
-      model.addAttribute("maxSortOrder", (maxSortOrder == null ? 0 : maxSortOrder) + 1);
       return "admin/duty";
    }
 
