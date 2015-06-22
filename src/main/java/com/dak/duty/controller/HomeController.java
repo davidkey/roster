@@ -44,10 +44,4 @@ public class HomeController {
 
       return "login";
    }
-   
-   @RequestMapping(value = "/error", method = RequestMethod.GET)
-   public String throwAnError(){
-      
-      throw new RuntimeException("yup, this is an error");
-   }
 }
