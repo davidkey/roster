@@ -18,6 +18,7 @@
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<display_version>v${project.version} - build ${BUILD_NUMBER} @ ${timestamp} - git ${GIT_COMMIT}</display_version>
+		<git_commit>${GIT_COMMIT}</git_commit>
 	</properties>
 	<repositories>
 		<repository>

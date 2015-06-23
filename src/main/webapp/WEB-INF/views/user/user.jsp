@@ -5,12 +5,7 @@
 <html lang="en">
 <head>
 	<jsp:include page="header.jsp"/>
-	<title>Duty Roster - Home</title>
-	<style>
-	#calendar {
-		width: 900px;
-	}
-	</style>
+	<title>Roster.Guru - Home</title>
 </head>
 <body>
 
@@ -21,7 +16,7 @@
 		<div class="jumbotron">
 			<h1><c:out value="${personName}"/>,</h1>
 			<p>
-				Welcome to the Duty Roster.
+				Welcome to Roster Guru!
 			</p>
 			<p>
 				Take a look at the navigation bar above to see what your options are.

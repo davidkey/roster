@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,6 +36,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.velocity.VelocityEngineUtils;
+import org.springframework.util.MultiValueMap;
 
 import com.dak.duty.api.util.DutyNode;
 import com.dak.duty.exception.InvalidIdException;
@@ -50,6 +52,7 @@ import com.dak.duty.model.Person;
 import com.dak.duty.model.PersonDuty;
 import com.dak.duty.model.PersonRole;
 import com.dak.duty.model.enums.Role;
+import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.security.IAuthenticationFacade;
@@ -66,6 +69,9 @@ public class PersonService {
 
    @Autowired
    EventRepository eventRepos;
+
+   @Autowired
+   DutyRepository dutyRepos;
 
    @Autowired
    IntervalService intervalService;
@@ -252,16 +258,16 @@ public class PersonService {
    public Person getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster){
       return getPersonForDuty(duty, currentEventRoster, new HashSet<Person>());
    }
-   
+
    public Person getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster, @NonNull final Set<Person> peopleExcluded){
       Set<Long> ids = new HashSet<Long>();
-      
+
       if(peopleExcluded != null){
          for(Person p : peopleExcluded){
             ids.add(p.getId());
          }
       }
-      
+
       return getPersonForDutyExcludedById(duty, currentEventRoster, ids);
    }
 
@@ -355,6 +361,43 @@ public class PersonService {
       }
 
       return -1;
+   }
+
+   public void updateDutiesFromFormPost(@NonNull final Person person, @NonNull final MultiValueMap<String, String> parameters){
+      logger.debug("updateDutesForPersonFromFormPost({})", person.getId());
+
+      final Map<Long, Integer> dutyPrefs = new HashMap<Long, Integer>();
+
+      for (final Iterator<Entry<String, List<String>>> iter = parameters.entrySet().iterator(); iter.hasNext();) {
+         final Entry<String, List<String>> entry = iter.next();
+         final String key = entry.getKey();
+         final List<String> vals = entry.getValue();
+
+         if(key != null && vals != null && vals.size() > 0 && key.startsWith("duty_")){
+            final long dutyId = Long.parseLong(key.split("_")[1]);
+            final int prefRanking = Integer.parseInt(vals.get(0));
+            dutyPrefs.put(dutyId, prefRanking);
+         }
+      }
+
+      logger.info("Duty Prefs: {}", dutyPrefs);
+
+      boolean personUpdated = false;
+      for (Map.Entry<Long, Integer> entry : dutyPrefs.entrySet()) { 
+         final Long dutyId = entry.getKey();
+
+         if(dutyId != null && dutyId >= 0){
+            final Duty duty = dutyRepos.findOne(dutyId);
+            final int prefRanking = entry.getValue();
+
+            person.addOrUpdateDutyAndPreference(duty, prefRanking);
+            personUpdated = true;
+         }
+      }
+
+      if(personUpdated){
+         this.save(person);
+      }
    }
 
 }

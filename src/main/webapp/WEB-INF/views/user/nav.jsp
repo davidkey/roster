@@ -7,7 +7,7 @@
 			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
 				<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="#">Duty Roster</a>
+			<a class="navbar-brand" href="#">Roster.Guru</a>
 		</div>
 		<div id="navbar" class="navbar-collapse collapse">
 			<ul class="nav navbar-nav">
@@ -15,7 +15,7 @@
 				<li id="navUpcomingDuties">
 					<a href="<c:url value="/user/upcomingDuties"/>">Upcoming Duties <span id="upcomingDutiesCount" class="label label-primary"></span></a>
 				</li>
-				<li><a href="#about">My Settings</a></li>
+				<li id="navPreferences"><a href="<c:url value="/user/preferences"/>">Preferences</a></li>
 				<li><a href="#contact">Contact Admin</a></li>
 			</ul>
 
