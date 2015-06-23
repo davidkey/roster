@@ -14,7 +14,10 @@
 	<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 		<h1 class="page-header">About</h1>
 		<p>
-			Duty Roster, created 2015 by <a href="mailto:davidkey@gmail.com">David Key</a>.
+			Roster.Guru, created 2015 by <a href="mailto:davidkey@gmail.com">David Key</a>.
+		</p>
+		<p>
+			View source on GitHub: <a href="https://github.com/davidkey/roster/tree/${git_commit}">This build</a> -- <a href="https://github.com/davidkey/roster">Dev Branch</a>.
 		</p>
 		<p>
 			<small>${display_version}</small>

@@ -7,7 +7,7 @@
     <jsp:include page="../shared/header.jsp" />
     
     <link rel="stylesheet" type='text/css' href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.3.1/fullcalendar.min.css">
-    <title>Admin</title>
+    <title>Roster.Guru - Admin</title>
     <style> #calendar { width: 900px; } </style>
   </head>
   

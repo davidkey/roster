@@ -5,7 +5,7 @@
 <html lang="en">
 <head>
 <jsp:include page="header.jsp" />
-<title>Duty Roster - Duties</title>
+<title>Roster.Guru - Duties</title>
 <style>
 #calendar {
 	width: 900px;
