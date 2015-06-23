@@ -197,6 +197,9 @@
     alter table person 
         add constraint UK_7bo7u0h4h8brqsq637odohryf  unique (nameFirst, nameLast, org_id);
 
+    alter table person_duty 
+        add constraint UK_fa6hsugxhnk4xr5s0k8fqnl7x  unique (person_id, duty_id);
+
     alter table duty 
         add constraint FK_idy9l7mpe2wtbci3g9972920k 
         foreign key (org_id) 

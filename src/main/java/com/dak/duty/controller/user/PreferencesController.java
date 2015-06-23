@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.dak.duty.repository.DutyRepository;
+import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.security.IAuthenticationFacade;
 import com.dak.duty.service.PersonService;
 
@@ -28,13 +29,16 @@ public class PreferencesController {
    PersonService personService;
    
    @Autowired
+   PersonRepository personRepos;
+   
+   @Autowired
    IAuthenticationFacade authenciationFacade;
    
 
    @RequestMapping(method = RequestMethod.GET)
    public String getPreferences(Model model){
       
-      model.addAttribute("person", authenciationFacade.getPerson());
+      model.addAttribute("person", personRepos.findOne(authenciationFacade.getPerson().getId()));
       model.addAttribute("duties", dutyRepos.findAllByActiveTrueOrderByNameAsc());
       
       return "user/preferences";
@@ -44,7 +48,7 @@ public class PreferencesController {
    public String savePreferences(Model model, @RequestParam MultiValueMap<String, String> parameters, final RedirectAttributes redirectAttributes){
       logger.debug("savePreferences()");
       
-      personService.updateDutiesFromFormPost(authenciationFacade.getPerson(), parameters);
+      personService.updateDutiesFromFormPost(personRepos.findOne(authenciationFacade.getPerson().getId()), parameters);
       redirectAttributes.addFlashAttribute("msg_success", "Duties updated!");
       return "redirect:/user/preferences";
    }

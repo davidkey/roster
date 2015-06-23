@@ -363,7 +363,8 @@ public class PersonService {
       return -1;
    }
 
-   public void updateDutiesFromFormPost(@NonNull final Person person, @NonNull final MultiValueMap<String, String> parameters){
+   @Transactional
+   public void updateDutiesFromFormPost(@NonNull Person person, @NonNull final MultiValueMap<String, String> parameters){
       logger.debug("updateDutesForPersonFromFormPost({})", person.getId());
 
       final Map<Long, Integer> dutyPrefs = new HashMap<Long, Integer>();
