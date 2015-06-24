@@ -66,11 +66,11 @@ public class PeopleAdminController {
       final boolean personAlreadyExisted = person.getId() > 0;
       
       if(personAlreadyExisted){
-         final Person existingPersonRecord = personRepos.findOne(person.getId());
          if(!personRepos.findOne(person.getId()).getOrganisation().getId().equals(authenticationFacade.getOrganisation().getId())){
             throw new RosterSecurityException("can't do that!");
          }
          
+         final Person existingPersonRecord = personRepos.findOne(person.getId());
          person.setPassword(existingPersonRecord.getPassword());
       }
 
