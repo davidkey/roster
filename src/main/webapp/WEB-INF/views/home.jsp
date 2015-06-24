@@ -40,8 +40,13 @@
 								<li class="active"><a href="#">Home</a></li>
 								<li><a href="#">Features</a></li>
 								<li><a href="mailto:davidkey@gmail.com">Contact</a></li>
+							<sec:authorize access="isAuthenticated()">
+								<li><a href="<c:url value="/user"/>"><sec:authentication property="principal.person.nameFirst" /> &mdash; Control Panel</a></li>
+							</sec:authorize>
+							<sec:authorize access="isAnonymous()">
 								<li><a href="<c:url value="/setup"/>">Sign Up</a></li>
 								<li><a href="<c:url value="/login"/>">Log In</a></li>
+							</sec:authorize>
 							</ul>
 						</nav>
 					</div>
