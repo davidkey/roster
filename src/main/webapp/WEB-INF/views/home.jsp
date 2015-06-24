@@ -41,7 +41,7 @@
 								<li><a href="#">Features</a></li>
 								<li><a href="mailto:davidkey@gmail.com">Contact</a></li>
 							<sec:authorize access="isAuthenticated()">
-								<li><a href="<c:url value="/user"/>"><sec:authentication property="principal.person.nameFirst" /> &mdash; Control Panel</a></li>
+								<li><a href="<c:url value="/user"/>">Control Panel &mdash; <sec:authentication property="principal.person.nameFirst" /></a></li>
 							</sec:authorize>
 							<sec:authorize access="isAnonymous()">
 								<li><a href="<c:url value="/setup"/>">Sign Up</a></li>

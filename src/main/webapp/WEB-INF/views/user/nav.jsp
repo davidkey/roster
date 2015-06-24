@@ -12,19 +12,27 @@
 		<div id="navbar" class="navbar-collapse collapse">
 			<ul class="nav navbar-nav">
 				<li id="navUser" class="active"><a href="<c:url value="/user/"/>">Home</a></li>
-				<li id="navUpcomingDuties">
-					<a href="<c:url value="/user/upcomingDuties"/>">Upcoming Duties <span id="upcomingDutiesCount" class="label label-primary"></span></a>
-				</li>
-				<li id="navPreferences"><a href="<c:url value="/user/preferences"/>">Preferences</a></li>
+				<li id="navUpcomingDuties"><a href="<c:url value="/user/upcomingDuties"/>">Upcoming Duties <span id="upcomingDutiesCount" class="label label-primary"></span></a></li>
+				<li id="navPreferences"><a href="<c:url value="/user/preferences"/>">Duty Preferences</a></li>
 				<li><a href="#contact">Contact Admin</a></li>
 			</ul>
 
 			<ul class="nav navbar-nav navbar-right">
-				<li class="active"><a href="#"><sec:authentication property="principal.username" /></a></li>
+
 				<sec:authorize url="/admin">
-					<li><a href="<c:url value="/admin"/>">Admin</a></li>
+					<li class="list-group-item-warning"><a href="<c:url value="/admin"/>">Admin</a></li>
 				</sec:authorize>
-				<li><a id="logoutLink" href="#">Log Out</a>
+
+				<li><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><sec:authentication property="principal.person.nameFirst" /> <span
+						class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li role="presentation" class="disabled"><a href="#"><sec:authentication property="principal.username" /></a></li>
+						<li role="separator" class="divider"></li>
+						<li><a href="#">Change Password</a></li>
+						<li role="separator" class="divider"></li>
+						<li><a id="logoutLink" href="#">Log Out</a></li>
+					</ul></li>
+
 			</ul>
 		</div>
 		<!--/.nav-collapse -->
