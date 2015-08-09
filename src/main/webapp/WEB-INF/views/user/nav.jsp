@@ -28,7 +28,7 @@
 					<ul class="dropdown-menu">
 						<li role="presentation" class="disabled"><a href="#"><sec:authentication property="principal.username" /></a></li>
 						<li role="separator" class="divider"></li>
-						<li><a href="#">Change Password</a></li>
+						<li><a href="<c:url value='/user/changePassword' />">Change Password</a></li>
 						<li role="separator" class="divider"></li>
 						<li><a id="logoutLink" href="#">Log Out</a></li>
 					</ul></li>

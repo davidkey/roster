@@ -11,7 +11,7 @@
 
 	<jsp:include page="nav.jsp"/>
 	<div class="container">
-
+		<jsp:include page="../shared/flashMessages.jsp" />
 		<!-- Main component for a primary marketing message or call to action -->
 		<div class="jumbotron">
 			<h1><c:out value="${personName}"/>,</h1>

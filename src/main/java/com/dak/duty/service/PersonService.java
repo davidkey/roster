@@ -186,6 +186,20 @@ public class PersonService {
       personRepos.flush();
       return person;
    }
+   
+   public Boolean isCurrentPassword(final Person person, final String password){
+      return encoder.matches(password, getCurrentEncodedPassword(person));
+   }
+   
+   private String getCurrentEncodedPassword(@NonNull Person person){
+      person = personRepos.findOne(person.getId());
+      
+      if(person == null){
+         throw new InvalidIdException("person not found");
+      }
+      
+      return person.getPassword();
+   }
 
    public boolean isPasswordValid(final String password){
       return password != null && password.length() >= 6;
