@@ -76,8 +76,8 @@ public class EventServiceTest extends ServiceTest {
       
       eventTypeRepos.save(eventType);
       personService.save(person);
-      eventService.createAndSaveEventsForNextMonth();
-      
+      eventService.createAndSaveEventsForMonth(new Date());
+ 
       List<DutyNode> duties = personService.getUpcomingDuties(person);
       assertFalse("duties shouldn't be empty here!", duties.isEmpty());
       
