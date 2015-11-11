@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/davidkey/roster.svg?branch=master)](https://travis-ci.org/davidkey/roster)
 ### What is this repository for? ###
 
-Generating and managing duty rosters. Primarily useful for churches.
+Generating and managing duty rosters. A work in progress.
 
 ### How do I get set up? ###
 
@@ -14,4 +14,4 @@ Generating and managing duty rosters. Primarily useful for churches.
 * Visit $WEB_ROOT/admin/ to configure
 * Database schema changes & definitions can be found at /src/main/resources/sql/generated for your dialect of choice.
 
-See a (probably not up-to-date) demo @ <https://dak.rocks/duty/admin/> or <https://roster.guru/>.
+See a (probably not up-to-date) demo @ <https://dak.rocks/duty/> (dev) or <https://roster.guru/> (stable build).
