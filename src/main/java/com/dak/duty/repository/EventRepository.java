@@ -32,7 +32,7 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
    @Query("update Event e set e.approved = ?1 where e.approved != ?1 and e.organisation = ?#{principal.person.organisation}")
    public Integer setApprovedStatusOnAllEvents(boolean approved);
    
-   @Query("select e from Event e where e.approved != ?1 and e.organisation = ?#{principal.person.organisation}")
+   @Query("select e from Event e where e.approved = ?1 and e.organisation = ?#{principal.person.organisation}")
    public List<Event> findByApproved(Boolean approved);
    
    @Query("select e from Event e where e.organisation = ?#{principal.person.organisation} order by e.dateEvent desc")
