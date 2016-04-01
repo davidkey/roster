@@ -86,7 +86,7 @@ public class PersonService {
    BCryptPasswordEncoder encoder;
 
    @Autowired
-   @Qualifier("authenticationManager")
+   @Qualifier("authenticationManagerBean")
    AuthenticationManager authenticationManager;
 
    @Autowired

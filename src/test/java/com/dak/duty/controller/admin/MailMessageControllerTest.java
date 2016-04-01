@@ -1,9 +1,11 @@
 package com.dak.duty.controller.admin;
 
-import static org.mockito.Mockito.*;
 import static org.junit.Assert.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*; // <-- this is it
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Matchers.notNull;
+import static org.mockito.Mockito.verify;
+// <-- this is it
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,17 +16,18 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
 import com.dak.duty.model.MailgunMailMessage;
 import com.dak.duty.repository.MailMessageRepository;
 import com.dak.duty.service.EmailService;
+import com.dak.duty.service.ServiceTest;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:/servlet-context-test.xml", "classpath:/security-context-test.xml"})
-public class MailMessageControllerTest {
+//@SpringApplicationConfiguration(classes = {RosterApplication.class, SecurityConfig.class} )
+public class MailMessageControllerTest extends ServiceTest{
    
    @Mock
    MailMessageRepository mailMessageRepos;

@@ -41,7 +41,7 @@ public class SetupController {
    PersonService personService;
    
    @Autowired
-   @Qualifier("authenticationManager")
+   @Qualifier("authenticationManagerBean")
    AuthenticationManager authenticationManager;
 
    @RequestMapping(method = RequestMethod.GET)

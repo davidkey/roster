@@ -31,13 +31,13 @@ public class MailgunEmailServiceImpl implements EmailService<MailgunMailMessage>
    
    private static final Logger logger = LoggerFactory.getLogger(MailgunEmailServiceImpl.class);
 
-   @Value("${email.mailgun.apiKey}")
+   @Value("${email.mailgun.apiKey:NONE}")
    private String mailgunApiKey;
 
-   @Value("${email.mailgun.host}")
+   @Value("${email.mailgun.host:NONE}")
    private String mailgunHost;
 
-   @Value("${email.mailgun.to}")
+   @Value("${email.mailgun.to:NONE}")
    private String testEmailAddress;
    
    @Autowired
@@ -45,13 +45,13 @@ public class MailgunEmailServiceImpl implements EmailService<MailgunMailMessage>
 
    @Override
    public boolean send(Email email) {
-      if(mailgunApiKey == null || mailgunHost == null){
-         logger.error("no apikey and/or host defined for mailgun");
+      if(mailgunApiKey == null || mailgunHost == null || "NONE".equals(mailgunApiKey) || "NONE".equals(mailgunHost)){
+         logger.warn("no apikey and/or host defined for mailgun");
          return false;
       }
 
       if(email.getFrom() == null || email.getTo() == null || email.getSubject() == null || email.getMessage() == null){
-         logger.error("required email field is missing!");
+         logger.warn("required email field is missing!");
          return false;
       }
 
