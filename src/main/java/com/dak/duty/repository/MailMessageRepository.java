@@ -9,7 +9,8 @@ import org.springframework.stereotype.Repository;
 import com.dak.duty.model.MailgunMailMessage;
 
 @Repository
-public interface MailMessageRepository extends JpaRepository<MailgunMailMessage, Long>{
-   List<MailgunMailMessage> findAllByActiveTrue(Sort sort);
-   List<MailgunMailMessage> findAllBySignature(String signature);
+public interface MailMessageRepository extends JpaRepository<MailgunMailMessage, Long> {
+	List<MailgunMailMessage> findAllByActiveTrue(Sort sort);
+
+	List<MailgunMailMessage> findAllBySignature(String signature);
 }

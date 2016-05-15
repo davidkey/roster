@@ -18,8 +18,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.dak.duty.security.SecurityEvaluationContextExtension;
 
-//@Configuration
-//@EnableWebSecurity
+// @Configuration
+// @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -32,39 +32,30 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	BCryptPasswordEncoder encoder;
 
 	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		LOGGER.debug("configure(http)");
+	protected void configure(final HttpSecurity http) throws Exception {
+		SecurityConfig.LOGGER.debug("configure(http)");
 
-		http.authorizeRequests()
-		.antMatchers("/login", "/logout", "/console/**", "/info").permitAll()
-		.antMatchers("/admin/**").hasRole("ADMIN")
-		.antMatchers("/user/**").hasRole("USER")
-		//.anyRequest().fullyAuthenticated()
-		.and()
-		.formLogin().loginPage("/login").defaultSuccessUrl("/user")
-		.failureUrl("/login?error=true")
-		.and()
-		.logout()
-		.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-		.deleteCookies("JSESSIONID")
-		.invalidateHttpSession(true)
-		.and()
-		.exceptionHandling().accessDeniedPage("/error?error=accessdenied");
+		http.authorizeRequests().antMatchers("/login", "/logout", "/console/**", "/info").permitAll().antMatchers("/admin/**")
+				.hasRole("ADMIN").antMatchers("/user/**").hasRole("USER")
+				// .anyRequest().fullyAuthenticated()
+				.and().formLogin().loginPage("/login").defaultSuccessUrl("/user").failureUrl("/login?error=true").and().logout()
+				.logoutRequestMatcher(new AntPathRequestMatcher("/logout")).deleteCookies("JSESSIONID").invalidateHttpSession(true).and()
+				.exceptionHandling().accessDeniedPage("/error?error=accessdenied");
 	}
 
 	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		LOGGER.debug("configure(auth)");
-		//auth.userDetailsService(userDetailsService).passwordEncoder(encoder);
-		auth.authenticationProvider(authProvider());
+	protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
+		SecurityConfig.LOGGER.debug("configure(auth)");
+		// auth.userDetailsService(userDetailsService).passwordEncoder(encoder);
+		auth.authenticationProvider(this.authProvider());
 	}
 
 	@Bean
 	public DaoAuthenticationProvider authProvider() {
-		LOGGER.debug("DaoAuthenticationProvider authProvider()");
-		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-		authProvider.setUserDetailsService(userDetailsService);
-		authProvider.setPasswordEncoder(encoder);
+		SecurityConfig.LOGGER.debug("DaoAuthenticationProvider authProvider()");
+		final DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+		authProvider.setUserDetailsService(this.userDetailsService);
+		authProvider.setPasswordEncoder(this.encoder);
 		return authProvider;
 	}
 
@@ -75,7 +66,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	public SecurityEvaluationContextExtension getSecurityEvaluationContextExtension(){
+	public SecurityEvaluationContextExtension getSecurityEvaluationContextExtension() {
 		return new SecurityEvaluationContextExtension();
 	}
 

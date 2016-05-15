@@ -26,57 +26,59 @@ import com.dak.duty.service.PersonService;
 @RequestMapping("/setup")
 public class SetupController {
 
-   private static final Logger logger = LoggerFactory.getLogger(SetupController.class);
+	private static final Logger logger = LoggerFactory.getLogger(SetupController.class);
 
-   @Autowired
-   EmailService<MailgunMailMessage> emailService;
-   
-   @Autowired
-   InitialisationService initService;
-   
-   @Autowired
-   PersonRepository personRepos;
-   
-   @Autowired
-   PersonService personService;
-   
-   @Autowired
-   @Qualifier("authenticationManagerBean")
-   AuthenticationManager authenticationManager;
+	@Autowired
+	EmailService<MailgunMailMessage> emailService;
 
-   @RequestMapping(method = RequestMethod.GET)
-   public String getSetup(Model model){
+	@Autowired
+	InitialisationService initService;
 
-      model.addAttribute("setupForm", new SetupForm());
-      return "setup/setup";
-   }
+	@Autowired
+	PersonRepository personRepos;
 
-   @RequestMapping(method = RequestMethod.POST)
-   public String postSetup(@Valid SetupForm form, BindingResult bindingResult, Model model, HttpServletRequest request){
-      logger.info("postSetup({})", form);
-      
-      if (bindingResult.hasErrors() || !form.getPassword().equals(form.getConfirmPassword())) {
-         if(form.getPassword() == null || !form.getPassword().equals(form.getConfirmPassword())){
-            bindingResult.rejectValue("confirmPassword", null, "Passwords must match!");
-         }
-         model.addAttribute("setupForm", form);
-         return "setup/setup";
-      }
-      
-      // create org and admin user
-      initService.createOrganisationAndAdminUser(form);
+	@Autowired
+	PersonService personService;
 
-      // log in as newly created user
-      personService.loginAsPerson(form.getEmailAddress().trim(), form.getPassword(), request);
-      
-      // send welcome email
-      try {
-         emailService.send(new Email("admin@roster.guru", form.getEmailAddress().trim(), "Welcome to Duty Roster!", "We hope you like it!"));
-      } catch (Exception e){
-         logger.error("error: {}", e);
-      }
+	@Autowired
+	@Qualifier("authenticationManagerBean")
+	AuthenticationManager authenticationManager;
 
-      return "redirect:/admin";
-   }
+	@RequestMapping(method = RequestMethod.GET)
+	public String getSetup(final Model model) {
+
+		model.addAttribute("setupForm", new SetupForm());
+		return "setup/setup";
+	}
+
+	@RequestMapping(method = RequestMethod.POST)
+	public String postSetup(@Valid final SetupForm form, final BindingResult bindingResult, final Model model,
+			final HttpServletRequest request) {
+		SetupController.logger.info("postSetup({})", form);
+
+		if (bindingResult.hasErrors() || !form.getPassword().equals(form.getConfirmPassword())) {
+			if (form.getPassword() == null || !form.getPassword().equals(form.getConfirmPassword())) {
+				bindingResult.rejectValue("confirmPassword", null, "Passwords must match!");
+			}
+			model.addAttribute("setupForm", form);
+			return "setup/setup";
+		}
+
+		// create org and admin user
+		this.initService.createOrganisationAndAdminUser(form);
+
+		// log in as newly created user
+		this.personService.loginAsPerson(form.getEmailAddress().trim(), form.getPassword(), request);
+
+		// send welcome email
+		try {
+			this.emailService
+					.send(new Email("admin@roster.guru", form.getEmailAddress().trim(), "Welcome to Duty Roster!", "We hope you like it!"));
+		} catch (final Exception e) {
+			SetupController.logger.error("error: {}", e);
+		}
+
+		return "redirect:/admin";
+	}
 
 }

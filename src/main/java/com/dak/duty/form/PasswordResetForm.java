@@ -13,15 +13,15 @@ import lombok.ToString;
 @Setter
 @ToString
 public class PasswordResetForm {
-   @Email
-   @NotEmpty
-   private String emailAddress;
-   
-   @Size(min=6, max=64)
-   @NotEmpty
-   private String password;
-   
-   @Size(min=6, max=64)
-   @NotEmpty
-   private String confirmPassword;
+	@Email
+	@NotEmpty
+	private String emailAddress;
+
+	@Size(min = 6, max = 64)
+	@NotEmpty
+	private String password;
+
+	@Size(min = 6, max = 64)
+	@NotEmpty
+	private String confirmPassword;
 }

@@ -12,11 +12,11 @@ import javax.persistence.PreUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "organisation")
@@ -24,28 +24,28 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Getter
 @Setter
 public class Organisation implements Serializable {
-   private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-   @Id
-   @SequenceGenerator(name = "org_id_seq", sequenceName = "org_id_seq")
-   @GeneratedValue(strategy = GenerationType.AUTO, generator = "org_id_seq")
-   @Column(nullable = false)
-   private Long id;
-   
-   @Column(nullable = false)
-   private String name;
-   
-   @Column(nullable = false)
-   private String registrationCode;
-   
-   @Column(nullable = false)
-   private Date dateCreated = new Date();
-   
-   @Column(nullable = false)
-   private Date dateUpdated = new Date();
-   
-   @PreUpdate
-   protected void onUpdate() {
-      dateUpdated = new Date();
-   }
+	@Id
+	@SequenceGenerator(name = "org_id_seq", sequenceName = "org_id_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "org_id_seq")
+	@Column(nullable = false)
+	private Long id;
+
+	@Column(nullable = false)
+	private String name;
+
+	@Column(nullable = false)
+	private String registrationCode;
+
+	@Column(nullable = false)
+	private Date dateCreated = new Date();
+
+	@Column(nullable = false)
+	private Date dateUpdated = new Date();
+
+	@PreUpdate
+	protected void onUpdate() {
+		this.dateUpdated = new Date();
+	}
 }

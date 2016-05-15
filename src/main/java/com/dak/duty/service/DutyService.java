@@ -22,111 +22,113 @@ import com.dak.duty.service.container.SortOrder;
 @Transactional
 public class DutyService {
 
-   @Autowired
-   DutyRepository dutyRepos;
-   
-   @Autowired
-   PersonService personService;
-   
-   @Autowired
-   IAuthenticationFacade authenticationFacade;
+	@Autowired
+	DutyRepository dutyRepos;
 
-   public Duty saveOrUpdateDuty(Duty duty){
-      
-      if(duty.getOrganisation() == null){
-         duty.setOrganisation(authenticationFacade.getOrganisation());
-      } else if(!duty.getOrganisation().getId().equals(authenticationFacade.getOrganisation().getId())){
-         throw new RosterSecurityException("can't do that");
-      }
+	@Autowired
+	PersonService personService;
 
-      /**
-       * If this is a soft delete:
-       *  1) Update name accordingly, decrement sort order [>=] current duty.sortOrder
-       * 
-       * Otherwise (update or a new duty)
-       *  1) Decrement all sort orders [>] old sort order (if this is an update, not a new item)
-       *  2) Increment all sort orders [>=] new / updated duty sort order IF this isn't an inactive duty
-       *  3) Persist duty w/ new sort order
-       */
-      if(duty.getId() > 0){ // if this is an update, not a new entity
-         final Duty dutyBeforeChanges = dutyRepos.findOne(duty.getId());
+	@Autowired
+	IAuthenticationFacade authenticationFacade;
 
-         if(!duty.getActive() && dutyBeforeChanges.getActive()){ // if we're deactivating / soft deleting this duty ...
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+	public Duty saveOrUpdateDuty(final Duty duty) {
 
-            duty.setName(duty.getName() + " (deleted @ " + sdf.format(new Date()) + ")"); // change name to show soft delete and to prevent key errors if another with same name added later
-            dutyRepos.decrementSortOrderAboveAndIncludingExcludingDutyId(dutyBeforeChanges.getSortOrder(), duty.getId());
-         }
-         if(duty.getActive() && !duty.getSortOrder().equals(dutyBeforeChanges.getSortOrder())){
-            dutyRepos.decrementSortOrderAboveExcludingDutyId(dutyBeforeChanges.getSortOrder(), duty.getId());
-            dutyRepos.incrementSortOrderAboveAndIncludingExcludingDutyId(duty.getSortOrder(), duty.getId());
-         }
-      } else {
-         dutyRepos.incrementSortOrderAboveAndIncluding(duty.getSortOrder());
-      }
+		if (duty.getOrganisation() == null) {
+			duty.setOrganisation(this.authenticationFacade.getOrganisation());
+		} else if (!duty.getOrganisation().getId().equals(this.authenticationFacade.getOrganisation().getId())) {
+			throw new RosterSecurityException("can't do that");
+		}
 
-      return dutyRepos.save(duty);
-   }
+		/**
+		 * If this is a soft delete: 1) Update name accordingly, decrement sort order [>=] current duty.sortOrder
+		 *
+		 * Otherwise (update or a new duty) 1) Decrement all sort orders [>] old sort order (if this is an update, not a
+		 * new item) 2) Increment all sort orders [>=] new / updated duty sort order IF this isn't an inactive duty 3)
+		 * Persist duty w/ new sort order
+		 */
+		if (duty.getId() > 0) { // if this is an update, not a new entity
+			final Duty dutyBeforeChanges = this.dutyRepos.findOne(duty.getId());
 
-   public void updateSortOrder(final List<SortOrder> sortOrders) throws SortOrderException{
-      final HashMap<Long, Integer> sortOrderSet = SortOrder.getSortMap(sortOrders);
-      final List<Duty> allActiveDuties = dutyRepos.findByActiveTrue();
-      final List<Duty> dutiesToUpdate = new ArrayList<Duty>();
+			if (!duty.getActive() && dutyBeforeChanges.getActive()) { // if we're deactivating / soft deleting this duty
+																							// ...
+				final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
 
-      int minSortOrder = Integer.MAX_VALUE;
-      int maxSortOrder = Integer.MIN_VALUE;
-      
-      for(Duty duty : allActiveDuties){
-         if(sortOrderSet.containsKey(duty.getId())){
-            final int newSortOrder = sortOrderSet.get(duty.getId());
-            final int oldSortOrder = duty.getSortOrder();
+				duty.setName(duty.getName() + " (deleted @ " + sdf.format(new Date()) + ")"); // change name to show soft
+																														// delete and to prevent key
+																														// errors if another with same
+																														// name added later
+				this.dutyRepos.decrementSortOrderAboveAndIncludingExcludingDutyId(dutyBeforeChanges.getSortOrder(), duty.getId());
+			}
+			if (duty.getActive() && !duty.getSortOrder().equals(dutyBeforeChanges.getSortOrder())) {
+				this.dutyRepos.decrementSortOrderAboveExcludingDutyId(dutyBeforeChanges.getSortOrder(), duty.getId());
+				this.dutyRepos.incrementSortOrderAboveAndIncludingExcludingDutyId(duty.getSortOrder(), duty.getId());
+			}
+		} else {
+			this.dutyRepos.incrementSortOrderAboveAndIncluding(duty.getSortOrder());
+		}
 
-            if(newSortOrder != oldSortOrder){
-               duty.setSortOrder(newSortOrder);
-               dutiesToUpdate.add(duty);
-            }
+		return this.dutyRepos.save(duty);
+	}
 
-            if(newSortOrder < minSortOrder){
-               minSortOrder = newSortOrder;
-            }
+	public void updateSortOrder(final List<SortOrder> sortOrders) throws SortOrderException {
+		final HashMap<Long, Integer> sortOrderSet = SortOrder.getSortMap(sortOrders);
+		final List<Duty> allActiveDuties = this.dutyRepos.findByActiveTrue();
+		final List<Duty> dutiesToUpdate = new ArrayList<>();
 
-            if(newSortOrder > maxSortOrder){
-               maxSortOrder = newSortOrder;
-            }
-         } else {
-            throw new SortOrderException("Duty " + duty.getId() + " was not included in sort.");
-         }
-      }
+		int minSortOrder = Integer.MAX_VALUE;
+		int maxSortOrder = Integer.MIN_VALUE;
 
-      if(minSortOrder != 1 || maxSortOrder != allActiveDuties.size()){
-         throw new SortOrderException("Invalid sort order sequence");
-      }
+		for (final Duty duty : allActiveDuties) {
+			if (sortOrderSet.containsKey(duty.getId())) {
+				final int newSortOrder = sortOrderSet.get(duty.getId());
+				final int oldSortOrder = duty.getSortOrder();
 
-      if(dutiesToUpdate.size() > 0){
-         dutyRepos.save(dutiesToUpdate);
-      }
-   }
-   
-   public List<SortOrder> getSortOrders(){
-      final List<SortOrder> sortOrders = new ArrayList<SortOrder>();
+				if (newSortOrder != oldSortOrder) {
+					duty.setSortOrder(newSortOrder);
+					dutiesToUpdate.add(duty);
+				}
 
-      List<Duty> activeDuties = dutyRepos.findByActiveTrue();
+				if (newSortOrder < minSortOrder) {
+					minSortOrder = newSortOrder;
+				}
 
-      for(Duty d : activeDuties){
-         SortOrder so = new SortOrder();
-         so.setId(d.getId());
-         so.setSortOrder(d.getSortOrder());
-         sortOrders.add(so);
-      }
-      
-      return sortOrders;
-   }
-   
-   public Duty softDeleteDuty(Duty duty){
-      duty = dutyRepos.findOne(duty.getId());
-      duty.setActive(false);
-      duty.setSortOrder(1);
-      duty = this.saveOrUpdateDuty(duty);
-      return duty;
-   }
+				if (newSortOrder > maxSortOrder) {
+					maxSortOrder = newSortOrder;
+				}
+			} else {
+				throw new SortOrderException("Duty " + duty.getId() + " was not included in sort.");
+			}
+		}
+
+		if (minSortOrder != 1 || maxSortOrder != allActiveDuties.size()) {
+			throw new SortOrderException("Invalid sort order sequence");
+		}
+
+		if (dutiesToUpdate.size() > 0) {
+			this.dutyRepos.save(dutiesToUpdate);
+		}
+	}
+
+	public List<SortOrder> getSortOrders() {
+		final List<SortOrder> sortOrders = new ArrayList<>();
+
+		final List<Duty> activeDuties = this.dutyRepos.findByActiveTrue();
+
+		for (final Duty d : activeDuties) {
+			final SortOrder so = new SortOrder();
+			so.setId(d.getId());
+			so.setSortOrder(d.getSortOrder());
+			sortOrders.add(so);
+		}
+
+		return sortOrders;
+	}
+
+	public Duty softDeleteDuty(Duty duty) {
+		duty = this.dutyRepos.findOne(duty.getId());
+		duty.setActive(false);
+		duty.setSortOrder(1);
+		duty = this.saveOrUpdateDuty(duty);
+		return duty;
+	}
 }

@@ -1,13 +1,10 @@
 package com.dak.duty.service;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,183 +21,190 @@ import com.dak.duty.service.container.SortOrder;
 @WithMockCustomUserAdmin
 public class DutyServiceTest extends ServiceTest {
 
-   @Autowired
-   DutyService dutyService;
+	@Autowired
+	DutyService dutyService;
 
-   @Autowired
-   DutyRepository dutyRepos;
-   
-   @Autowired
-   OrganisationRepository orgRepos;
-   
-   @Test
-   public void sortOrderCountShouldMatchDutyCount(){
-      assertTrue("sort order count doesn't match duty count!", dutyService.getSortOrders().size() == dutyRepos.findAll().size());
-   }
+	@Autowired
+	DutyRepository dutyRepos;
 
-   @Test(expected = com.dak.duty.exception.SortOrderException.class)
-   public void updateSortOrderShouldNotAllowIncompleteInput() throws SortOrderException{
-      final List<SortOrder> sortOrders = dutyService.getSortOrders();
-      assertFalse("sortOrders shouldn't be null - data not staged correctly?", sortOrders == null);
-      assertFalse("sortOrders shoudn't be empty - data not staged correctly?", sortOrders.isEmpty());
+	@Autowired
+	OrganisationRepository orgRepos;
 
-      sortOrders.remove(0);
+	@Test
+	public void sortOrderCountShouldMatchDutyCount() {
+		Assert.assertTrue("sort order count doesn't match duty count!",
+				this.dutyService.getSortOrders().size() == this.dutyRepos.findAll().size());
+	}
 
-      dutyService.updateSortOrder(sortOrders);
-   }
+	@Test(expected = com.dak.duty.exception.SortOrderException.class)
+	public void updateSortOrderShouldNotAllowIncompleteInput() throws SortOrderException {
+		final List<SortOrder> sortOrders = this.dutyService.getSortOrders();
+		Assert.assertFalse("sortOrders shouldn't be null - data not staged correctly?", sortOrders == null);
+		Assert.assertFalse("sortOrders shoudn't be empty - data not staged correctly?", sortOrders.isEmpty());
 
-   @Test
-   public void testOverallSortOrder(){
-      List<Duty> duties = dutyRepos.findByActiveTrue();
+		sortOrders.remove(0);
 
-      assertTrue("Not enough duties found for testing!", duties.size() >= 2);
+		this.dutyService.updateSortOrder(sortOrders);
+	}
 
-      Duty minDuty = getDutyWithMinSortOrder(), maxDuty = getDutyWithMaxSortOrder();
+	@Test
+	public void testOverallSortOrder() {
+		final List<Duty> duties = this.dutyRepos.findByActiveTrue();
 
-      assertNotNull(minDuty);
-      assertNotNull(maxDuty);
+		Assert.assertTrue("Not enough duties found for testing!", duties.size() >= 2);
 
-      assertTrue("Sort order not populating correctly!", minDuty.getSortOrder() < maxDuty.getSortOrder());
-      assertTrue("Sort order isn't sequential!", maxDuty.getSortOrder() == duties.size());
+		final Duty minDuty = this.getDutyWithMinSortOrder(), maxDuty = this.getDutyWithMaxSortOrder();
 
-      int originalMinSortOrder = minDuty.getSortOrder();
-      int originalMaxSortOrder = maxDuty.getSortOrder();
-      minDuty.setSortOrder(originalMaxSortOrder);
-      maxDuty.setSortOrder(originalMinSortOrder);
+		Assert.assertNotNull(minDuty);
+		Assert.assertNotNull(maxDuty);
 
-      dutyService.saveOrUpdateDuty(minDuty);
-      dutyService.saveOrUpdateDuty(maxDuty);
+		Assert.assertTrue("Sort order not populating correctly!", minDuty.getSortOrder() < maxDuty.getSortOrder());
+		Assert.assertTrue("Sort order isn't sequential!", maxDuty.getSortOrder() == duties.size());
 
-      assertTrue("Sort order not updating correctly", maxDuty.getSortOrder() == originalMinSortOrder);
-      assertTrue("Sort order not updating correctly", minDuty.getSortOrder() == originalMaxSortOrder);
+		final int originalMinSortOrder = minDuty.getSortOrder();
+		final int originalMaxSortOrder = maxDuty.getSortOrder();
+		minDuty.setSortOrder(originalMaxSortOrder);
+		maxDuty.setSortOrder(originalMinSortOrder);
 
-      Duty newDuty = new Duty();
-      newDuty.setDescription("new duty");
-      newDuty.setName("new duty");
-      newDuty.setSortOrder(1);
-      newDuty.setOrganisation(orgRepos.findAll().get(0));
-      dutyService.saveOrUpdateDuty(newDuty);
+		this.dutyService.saveOrUpdateDuty(minDuty);
+		this.dutyService.saveOrUpdateDuty(maxDuty);
 
-      assertTrue("Sort order not incrementing correctly", dutyRepos.findOne(maxDuty.getId()).getSortOrder() == originalMinSortOrder + 1);
-      assertTrue("Sort order not incrementing correctly", dutyRepos.findOne(minDuty.getId()).getSortOrder() == originalMaxSortOrder + 1);
+		Assert.assertTrue("Sort order not updating correctly", maxDuty.getSortOrder() == originalMinSortOrder);
+		Assert.assertTrue("Sort order not updating correctly", minDuty.getSortOrder() == originalMaxSortOrder);
 
-      newDuty.setSortOrder(2);
-      dutyService.saveOrUpdateDuty(newDuty);
+		final Duty newDuty = new Duty();
+		newDuty.setDescription("new duty");
+		newDuty.setName("new duty");
+		newDuty.setSortOrder(1);
+		newDuty.setOrganisation(this.orgRepos.findAll().get(0));
+		this.dutyService.saveOrUpdateDuty(newDuty);
 
-      assertTrue("Sort order not decrementing correctly", dutyRepos.findOne(maxDuty.getId()).getSortOrder() == originalMinSortOrder);
-      assertTrue("Sort order not decrementing correctly", dutyRepos.findOne(minDuty.getId()).getSortOrder() == originalMaxSortOrder + 1);
-   }
+		Assert.assertTrue("Sort order not incrementing correctly",
+				this.dutyRepos.findOne(maxDuty.getId()).getSortOrder() == originalMinSortOrder + 1);
+		Assert.assertTrue("Sort order not incrementing correctly",
+				this.dutyRepos.findOne(minDuty.getId()).getSortOrder() == originalMaxSortOrder + 1);
 
-   @Test
-   public void testSortOrderInSequence(){
-      List<Duty> activeDuties = dutyRepos.findByActiveTrue();
+		newDuty.setSortOrder(2);
+		this.dutyService.saveOrUpdateDuty(newDuty);
 
-      assertNotNull(activeDuties);
-      assertTrue("Not enough test data!", activeDuties.size() > 1);
-      assertTrue("Sort orders not sequencing correctly!", areSortOrdersInSequence(activeDuties));
-   }
+		Assert.assertTrue("Sort order not decrementing correctly",
+				this.dutyRepos.findOne(maxDuty.getId()).getSortOrder() == originalMinSortOrder);
+		Assert.assertTrue("Sort order not decrementing correctly",
+				this.dutyRepos.findOne(minDuty.getId()).getSortOrder() == originalMaxSortOrder + 1);
+	}
 
-   @Test
-   public void testBrokenSequenceVerification(){
-      Duty duty = new Duty();
-      duty.setName("testBrokenSequenceVerification");
-      duty.setOrganisation(orgRepos.findAll().get(0));
-      duty.setSortOrder(dutyRepos.findMaxSortOrder() + 2); // out of sequence
-      duty = dutyService.saveOrUpdateDuty(duty);
+	@Test
+	public void testSortOrderInSequence() {
+		final List<Duty> activeDuties = this.dutyRepos.findByActiveTrue();
 
-      assertFalse("Sort order sequence verification didn't detect out-of-sequence sort orders!", 
-            areSortOrdersInSequence(dutyRepos.findByActiveTrue()));
-   }
+		Assert.assertNotNull(activeDuties);
+		Assert.assertTrue("Not enough test data!", activeDuties.size() > 1);
+		Assert.assertTrue("Sort orders not sequencing correctly!", this.areSortOrdersInSequence(activeDuties));
+	}
 
-   @Test
-   public void testSortOrderAfterSoftDeleteOfFirstSortOrder(){
-      Duty duty = new Duty();
-      duty.setName("delete me please");
-      duty.setOrganisation(orgRepos.findAll().get(0));
-      duty.setSortOrder(1);
+	@Test
+	public void testBrokenSequenceVerification() {
+		Duty duty = new Duty();
+		duty.setName("testBrokenSequenceVerification");
+		duty.setOrganisation(this.orgRepos.findAll().get(0));
+		duty.setSortOrder(this.dutyRepos.findMaxSortOrder() + 2); // out of sequence
+		duty = this.dutyService.saveOrUpdateDuty(duty);
 
-      duty = dutyService.saveOrUpdateDuty(duty);
+		Assert.assertFalse("Sort order sequence verification didn't detect out-of-sequence sort orders!",
+				this.areSortOrdersInSequence(this.dutyRepos.findByActiveTrue()));
+	}
 
-      duty.setActive(false);
-      duty = dutyService.saveOrUpdateDuty(duty);
+	@Test
+	public void testSortOrderAfterSoftDeleteOfFirstSortOrder() {
+		Duty duty = new Duty();
+		duty.setName("delete me please");
+		duty.setOrganisation(this.orgRepos.findAll().get(0));
+		duty.setSortOrder(1);
 
-      assertTrue("Sort orders not sequencing correctly after soft delete!", areSortOrdersInSequence(dutyRepos.findByActiveTrue()));
-   }
+		duty = this.dutyService.saveOrUpdateDuty(duty);
 
-   @Test
-   public void testSortOrderAfterSoftDeleteOfLastSortOrder(){
-      Duty duty = new Duty();
-      duty.setName("delete me please");
-      duty.setOrganisation(orgRepos.findAll().get(0));
-      duty.setSortOrder(dutyRepos.findMaxSortOrder() + 1);
+		duty.setActive(false);
+		duty = this.dutyService.saveOrUpdateDuty(duty);
 
-      duty = dutyService.saveOrUpdateDuty(duty);
+		Assert.assertTrue("Sort orders not sequencing correctly after soft delete!",
+				this.areSortOrdersInSequence(this.dutyRepos.findByActiveTrue()));
+	}
 
-      duty.setActive(false);
-      duty = dutyService.saveOrUpdateDuty(duty);
+	@Test
+	public void testSortOrderAfterSoftDeleteOfLastSortOrder() {
+		Duty duty = new Duty();
+		duty.setName("delete me please");
+		duty.setOrganisation(this.orgRepos.findAll().get(0));
+		duty.setSortOrder(this.dutyRepos.findMaxSortOrder() + 1);
 
-      assertTrue("Sort orders not sequencing correctly after soft delete!", areSortOrdersInSequence(dutyRepos.findByActiveTrue()));
-   }
+		duty = this.dutyService.saveOrUpdateDuty(duty);
 
-   private boolean areSortOrdersInSequence(List<Duty> duties){
-      Set<Integer> sortOrders = new HashSet<Integer>();
+		duty.setActive(false);
+		duty = this.dutyService.saveOrUpdateDuty(duty);
 
-      int min = Integer.MAX_VALUE;
-      int max = Integer.MIN_VALUE;
+		Assert.assertTrue("Sort orders not sequencing correctly after soft delete!",
+				this.areSortOrdersInSequence(this.dutyRepos.findByActiveTrue()));
+	}
 
-      for(Duty d : duties){
-         final int sortOrder = d.getSortOrder();
+	private boolean areSortOrdersInSequence(final List<Duty> duties) {
+		final Set<Integer> sortOrders = new HashSet<>();
 
-         if(sortOrders.contains(sortOrder)){
-            return false;
-         }
+		int min = Integer.MAX_VALUE;
+		int max = Integer.MIN_VALUE;
 
-         sortOrders.add(sortOrder);
+		for (final Duty d : duties) {
+			final int sortOrder = d.getSortOrder();
 
-         if(sortOrder < min){
-            min = sortOrder;
-         }
+			if (sortOrders.contains(sortOrder)) {
+				return false;
+			}
 
-         if(sortOrder > max){
-            max = sortOrder;
-         }
-      }
+			sortOrders.add(sortOrder);
 
-      return duties.isEmpty() || (min == 1 && max == sortOrders.size());
-   }
+			if (sortOrder < min) {
+				min = sortOrder;
+			}
 
-   private Duty getDutyWithMinSortOrder(){
-      List<Duty> duties = dutyRepos.findAll();
+			if (sortOrder > max) {
+				max = sortOrder;
+			}
+		}
 
-      Duty duty = null;
-      for(Duty d : duties){
-         if(duty == null){
-            duty = d;
-         } else {
-            if(duty.getSortOrder() > d.getSortOrder()){
-               duty = d;
-            }
-         }
-      }
+		return duties.isEmpty() || (min == 1 && max == sortOrders.size());
+	}
 
-      return duty;
-   }
+	private Duty getDutyWithMinSortOrder() {
+		final List<Duty> duties = this.dutyRepos.findAll();
 
-   private Duty getDutyWithMaxSortOrder(){
-      List<Duty> duties = dutyRepos.findAll();
+		Duty duty = null;
+		for (final Duty d : duties) {
+			if (duty == null) {
+				duty = d;
+			} else {
+				if (duty.getSortOrder() > d.getSortOrder()) {
+					duty = d;
+				}
+			}
+		}
 
-      Duty duty = null;
-      for(Duty d : duties){
-         if(duty == null){
-            duty = d;
-         } else {
-            if(duty.getSortOrder() < d.getSortOrder()){
-               duty = d;
-            }
-         }
-      }
+		return duty;
+	}
 
-      return duty;
-   }
-   
+	private Duty getDutyWithMaxSortOrder() {
+		final List<Duty> duties = this.dutyRepos.findAll();
+
+		Duty duty = null;
+		for (final Duty d : duties) {
+			if (duty == null) {
+				duty = d;
+			} else {
+				if (duty.getSortOrder() < d.getSortOrder()) {
+					duty = d;
+				}
+			}
+		}
+
+		return duty;
+	}
+
 }

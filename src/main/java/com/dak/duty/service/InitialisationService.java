@@ -1,17 +1,10 @@
 package com.dak.duty.service;
 
-import static com.dak.duty.repository.specification.PersonSpecs.hasRole;
-import static com.dak.duty.repository.specification.PersonSpecs.isActive;
-import static com.dak.duty.repository.specification.PersonSpecs.sameOrg;
-import static org.springframework.data.jpa.domain.Specifications.where;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import javax.transaction.Transactional;
-
-import lombok.NonNull;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.fluttercode.datafactory.impl.DataFactory;
@@ -20,6 +13,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -39,381 +33,380 @@ import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.EventTypeRepository;
 import com.dak.duty.repository.OrganisationRepository;
 import com.dak.duty.repository.PersonRepository;
+import com.dak.duty.repository.specification.PersonSpecs;
+
+import lombok.NonNull;
 
 @Service
 @Transactional
 public class InitialisationService {
 
-   private static final Logger logger = LoggerFactory.getLogger(InitialisationService.class);
-   public static final DateTimeFormatter fmt = DateTimeFormat.forPattern("MM/dd/yyyy");
-   
-   @Autowired
-   BCryptPasswordEncoder encoder;
-   
-   @Autowired
-   EventTypeRepository eventTypeRepos;
-   
-   @Autowired
-   DutyRepository dutyRepos;
-   
-   @Autowired
-   PersonRepository personRepos;
-   
-   @Autowired
-   EventRepository eventRepos;
-   
-   @Autowired
-   IntervalService intervalService;
-   
-   @Autowired
-   PersonService personService;
-   
-   @Autowired
-   OrganisationRepository orgRepos;
-   
-   protected void clearAllData(){
-      logger.info("clearAllData");
-      
-      eventRepos.deleteAll();
-      eventRepos.flush();
-      
-      personRepos.deleteAll();
-      personRepos.flush();
-      
-      eventTypeRepos.deleteAll();
-      eventTypeRepos.flush();
-      
-      dutyRepos.deleteAll();
-      dutyRepos.flush();
-   }
-   
-   public boolean initSetupComplete(){
-      return !personRepos.findAll(where(isActive()).and(sameOrg()).and(hasRole(Role.ROLE_ADMIN))).isEmpty();
-   }
-   
-   public void populateDefaultData(){
-      logger.info("populateDefaultData");
-      clearAllData();
-      
-      final List<Organisation> defaultOrgs = getDefaultOrganisations();
-      logger.debug("defaultOrganisations: {}", defaultOrgs);
-      orgRepos.save(defaultOrgs);
-      
-      final List<Duty> defaultDuties = getDefaultDuties(defaultOrgs);
-      logger.debug("defaultDuties: {}", defaultDuties);
-      dutyRepos.save(defaultDuties);
-      
-      final List<EventType> defaultEventTypes = getDefaultEventTypes(defaultDuties, defaultOrgs);
-      logger.debug("defaultEventTypes: {}", defaultEventTypes);
-      eventTypeRepos.save(defaultEventTypes);
-      
-      final List<Person> defaultPeople = getDefaultPeople(defaultDuties, defaultOrgs); 
-      logger.debug("defaultPeople: {}", defaultPeople);
-      personService.save(defaultPeople);
-      
-      final List<Event> defaultEvents = getDefaultEvents(defaultEventTypes, defaultOrgs);
-      logger.debug("defaultEvents: {}", defaultEvents);
-      eventRepos.save(defaultEvents);
-      
-      createDefaultAdminUser(getDefaultAdminUser());
-      
-   }
-   
-   protected List<Organisation> getDefaultOrganisations(){
-      final List<Organisation> orgs = new ArrayList<Organisation>();
-      orgs.add(getDefaultOrg());
-      
-      return orgs;
-   }
-   
-   public void createOrganisationAndAdminUser(final SetupForm setupForm){
-      final Organisation org = createOrganisation(setupForm.getOrganisationName().trim());
-      createDefaultAdminUser(
-            setupForm.getEmailAddress().trim(), 
-            setupForm.getPassword(), 
-            setupForm.getNameLast().trim(), 
-            setupForm.getNameFirst().trim(), 
-            org);
-   }
-   
-   public Organisation createOrganisation(@NonNull final String name){
-      Organisation org = new Organisation();
-      org.setName(name.trim());
-      
-      final String nameSquashed = name.trim().toUpperCase().replace(" ", "");
-      if(nameSquashed.length() > 5){
-         org.setRegistrationCode(nameSquashed.substring(0, 5) + "001"); //FIXME: needs to poll database to make sure this is unique
-      } else{
-         org.setRegistrationCode(nameSquashed + "001");
-      }
-      
-      return orgRepos.save(org);
-   }
-   
-   public void createDefaultAdminUser(final Person defaultAdminUser){
-      logger.info("createDefaultAdminUser({})", defaultAdminUser);
-      
-      createDefaultAdminUser(
-            defaultAdminUser.getEmailAddress(), 
-            defaultAdminUser.getPassword(), 
-            defaultAdminUser.getNameLast(), 
-            defaultAdminUser.getNameFirst(),
-            defaultAdminUser.getOrganisation());
-   }
-   
-   public void createDefaultAdminUser(final String email, final String password, final String lastName, final String firstName, final Organisation org){
-      logger.info("createDefaultAdminUser({})", email);
-      
-      if(!personService.isPasswordValid(password)){
-         throw new InvalidPasswordException(personService.getPasswordRequirements());
-      }
-      
-      Person person = new Person();
-      person.setEmailAddress(email);
-      person.setPassword(encoder.encode(password));
-      person.setNameFirst(firstName);
-      person.setNameLast(lastName);
-      person.setActive(true);
-      person.setOrganisation(org);
-      
-      final PersonRole adminRole = new PersonRole();
-      adminRole.setRole(Role.ROLE_ADMIN);
-      
-      final PersonRole userRole = new PersonRole();
-      userRole.setRole(Role.ROLE_USER);
-      
-      person.addRole(adminRole);
-      person.addRole(userRole);
-      
-      personService.save(person, true);
-   }
-   
-   public Organisation getDefaultOrg(){
-      Organisation org = new Organisation();
-      org.setId(1L);
-      org.setName("My First Org");
-      org.setRegistrationCode("MYFIRST001");
-      return org;
-   }
-   
-   public Person getDefaultAdminUser(){
-      Person person = new Person();
-      person.setEmailAddress("davidkey@gmail.com");
-      person.setPassword(encoder.encode("password"));
-      person.setNameFirst("David");
-      person.setNameLast("Key");
-      person.setActive(true);
-      person.setOrganisation(getDefaultOrg());
-      
-      final PersonRole adminRole = new PersonRole();
-      adminRole.setRole(Role.ROLE_ADMIN);
-      
-      final PersonRole userRole = new PersonRole();
-      userRole.setRole(Role.ROLE_USER);
-      
-      person.addRole(adminRole);
-      person.addRole(userRole);
-      
-      return person;
-   }
-   
-   public void createDefaultAdminUser(final String email, final String password, final Organisation org){
-      createDefaultAdminUser(email, password, "USER", "ADMIN", org);
-   }
-   
-   protected List<Event> getDefaultEvents(final List<EventType> eventTypes, final List<Organisation> orgs){
-      final List<Event> events = new ArrayList<Event>(eventTypes.size());
-      
-      for(EventType et : eventTypes){
-         final Event e = new Event();
-        
-         e.setName(et.getName());
-         try{
-            if(e.getName().contains("Sunday")){
-               e.setDateEvent(fmt.parseDateTime("05/24/2015").toDate()); // sunday
-            } else {
-               e.setDateEvent(fmt.parseDateTime("05/27/2015").toDate()); // wednesday
-            }
-         } catch (IllegalArgumentException iae){
-            // do nothing
-         }
-         
-         e.setEventType(et);
-         e.setOrganisation(orgs.get(0));
-        
-         events.add(e);
-      }
-      
-      return events;
-   }
-   
-   protected List<Person> getDefaultPeople(final List<Duty> duties, final List<Organisation> orgs){
-      final List<Person> people = new ArrayList<Person>();
-      DataFactory df = new DataFactory();
-      RandomDataGenerator randomData = new RandomDataGenerator();
-      
-      final List<Duty> scrambledDuties = new ArrayList<Duty>(duties);
-      for(int i = 0; i < 25; i++){
-         Person p = new Person();
-         p.setActive(true);
-         p.setEmailAddress(df.getEmailAddress());
-         p.setNameFirst(df.getFirstName());
-         p.setNameLast(df.getLastName());
-         p.setOrganisation(orgs.get(0));
-         
-         final PersonRole personRole = new PersonRole();
-         personRole.setRole(Role.ROLE_USER);
+	private static final Logger logger = LoggerFactory.getLogger(InitialisationService.class);
+	public static final DateTimeFormatter fmt = DateTimeFormat.forPattern("MM/dd/yyyy");
 
-         p.addRole(personRole);
-         
-         Collections.shuffle(scrambledDuties);
-         final int numDuties = randomData.nextInt(2, scrambledDuties.size()-1);
-         for(int x = 0; x < numDuties; x++){
-            p.addDutyAndPreference(scrambledDuties.get(x), randomData.nextInt(1, 9));
-         }
-         
-         people.add(p);
-      }
-      
-      return people;
-   }
-   
-   protected List<Duty> getDefaultDuties(final List<Organisation> orgs){
-      final List<Duty> duties = new ArrayList<Duty>();
-      
-      Duty duty = null;
-      int count = 1;
-      
-      duty = new Duty();
-      duty.setName("Song Leading");
-      duty.setDescription(duty.getName());
-      duty.setSortOrder(count++);
-      duty.setOrganisation(orgs.get(0));
-      duties.add(duty);
+	@Autowired
+	BCryptPasswordEncoder encoder;
 
-      duty = new Duty();
-      duty.setName("Opening Prayer");
-      duty.setDescription(duty.getName());
-      duty.setSortOrder(count++);
-      duty.setOrganisation(orgs.get(0));
-      duties.add(duty);
+	@Autowired
+	EventTypeRepository eventTypeRepos;
 
-      duty = new Duty();
-      duty.setName("Closing Prayer");
-      duty.setDescription(duty.getName());
-      duty.setSortOrder(count++);
-      duty.setOrganisation(orgs.get(0));
-      duties.add(duty);
+	@Autowired
+	DutyRepository dutyRepos;
 
-      duty = new Duty();
-      duty.setName("Announcements");
-      duty.setDescription(duty.getName());
-      duty.setSortOrder(count++);
-      duty.setOrganisation(orgs.get(0));
-      duties.add(duty);
+	@Autowired
+	PersonRepository personRepos;
 
-      duty = new Duty();
-      duty.setName("Scripture Reading");
-      duty.setDescription(duty.getName());
-      duty.setSortOrder(count++);
-      duty.setOrganisation(orgs.get(0));
-      duties.add(duty);
+	@Autowired
+	EventRepository eventRepos;
 
-      duty = new Duty();
-      duty.setName("Preaching");
-      duty.setDescription(duty.getName());
-      duty.setSortOrder(count++);
-      duty.setOrganisation(orgs.get(0));
-      duties.add(duty);
+	@Autowired
+	IntervalService intervalService;
 
-      duty = new Duty();
-      duty.setName("Table");
-      duty.setDescription(duty.getName());
-      duty.setSortOrder(count++);
-      duty.setOrganisation(orgs.get(0));
-      duties.add(duty);
+	@Autowired
+	PersonService personService;
 
-      duty = new Duty();
-      duty.setName("Invitation");
-      duty.setDescription(duty.getName());
-      duty.setSortOrder(count++);
-      duty.setOrganisation(orgs.get(0));
-      duties.add(duty);
-      
-      return duties;
-   }
-   
-   protected List<EventType> getDefaultEventTypes(@NonNull final List<Duty> duties, @NonNull final List<Organisation> orgs){
-      final List<Duty> sundayAmDuties = new ArrayList<Duty>();
-      final List<Duty> sundayPmDuties  = new ArrayList<Duty>();
-      final List<Duty> wednesdayDuties = new ArrayList<Duty>();
-      
-      for(Duty d : duties){
-         switch(d.getName()){
-            case "Song Leading":
-            case "Opening Prayer":
-            case "Closing Prayer":
-            case "Announcements":
-               sundayAmDuties.add(d);
-               sundayPmDuties.add(d);
-               wednesdayDuties.add(d);
-               break;
-            case "Scripture Reading":
-            case "Preaching":
-               sundayAmDuties.add(d);
-               sundayPmDuties.add(d);
-               break;
-            case "Table":
-               sundayAmDuties.add(d);
-               sundayAmDuties.add(d);
-               sundayAmDuties.add(d);
-               sundayAmDuties.add(d);
-               sundayPmDuties.add(d);
-               break;
-            case "Invitation":
-               wednesdayDuties.add(d);
-               break;               
-            default:
-               logger.warn("possible problem - we've got a default duty ({}) without an associated event.", d);
-               break;
-         }
-      }
-      
-      final EventType sundayAm = new EventType();
-      sundayAm.setName("Sunday AM");
-      sundayAm.setDescription(sundayAm.getName());
-      sundayAm.setDuties(sundayAmDuties);
-      sundayAm.setInterval(EventTypeInterval.WEEKLY);
-      sundayAm.setIntervalDetail(IntervalWeekly.SUNDAY.toString());
-      sundayAm.setStartTime(intervalService.getTimeWithoutDate(9, 30));
-      sundayAm.setEndTime(intervalService.getTimeWithoutDate(11, 30));
-      sundayAm.setOrganisation(orgs.get(0));
-      
-      final EventType sundayPm = new EventType();
-      sundayPm.setName("Sunday PM");
-      sundayPm.setDescription(sundayPm.getName());
-      sundayPm.setDuties(sundayPmDuties);
-      sundayPm.setInterval(EventTypeInterval.WEEKLY);
-      sundayPm.setIntervalDetail(IntervalWeekly.SUNDAY.toString());
-      sundayPm.setStartTime(intervalService.getTimeWithoutDate(18, 30));
-      sundayPm.setEndTime(intervalService.getTimeWithoutDate(20, 0));
-      sundayPm.setOrganisation(orgs.get(0));
-      
-      final EventType wednesday = new EventType();
-      wednesday.setName("Wednesday PM");
-      wednesday.setDescription(wednesday.getName());
-      wednesday.setDuties(wednesdayDuties);
-      wednesday.setInterval(EventTypeInterval.WEEKLY);
-      wednesday.setIntervalDetail(IntervalWeekly.WEDNESDAY.toString());
-      wednesday.setStartTime(intervalService.getTimeWithoutDate(19, 30));
-      wednesday.setEndTime(intervalService.getTimeWithoutDate(21, 0));
-      wednesday.setOrganisation(orgs.get(0));
-      
-      final List<EventType> eventTypes = new ArrayList<EventType>();
-      eventTypes.add(sundayAm);
-      eventTypes.add(sundayPm);
-      eventTypes.add(wednesday);
-      
-      return eventTypes;
-   }
+	@Autowired
+	OrganisationRepository orgRepos;
+
+	protected void clearAllData() {
+		InitialisationService.logger.info("clearAllData");
+
+		this.eventRepos.deleteAll();
+		this.eventRepos.flush();
+
+		this.personRepos.deleteAll();
+		this.personRepos.flush();
+
+		this.eventTypeRepos.deleteAll();
+		this.eventTypeRepos.flush();
+
+		this.dutyRepos.deleteAll();
+		this.dutyRepos.flush();
+	}
+
+	public boolean initSetupComplete() {
+		return !this.personRepos
+				.findAll(Specifications.where(PersonSpecs.isActive()).and(PersonSpecs.sameOrg()).and(PersonSpecs.hasRole(Role.ROLE_ADMIN)))
+				.isEmpty();
+	}
+
+	public void populateDefaultData() {
+		InitialisationService.logger.info("populateDefaultData");
+		this.clearAllData();
+
+		final List<Organisation> defaultOrgs = this.getDefaultOrganisations();
+		InitialisationService.logger.debug("defaultOrganisations: {}", defaultOrgs);
+		this.orgRepos.save(defaultOrgs);
+
+		final List<Duty> defaultDuties = this.getDefaultDuties(defaultOrgs);
+		InitialisationService.logger.debug("defaultDuties: {}", defaultDuties);
+		this.dutyRepos.save(defaultDuties);
+
+		final List<EventType> defaultEventTypes = this.getDefaultEventTypes(defaultDuties, defaultOrgs);
+		InitialisationService.logger.debug("defaultEventTypes: {}", defaultEventTypes);
+		this.eventTypeRepos.save(defaultEventTypes);
+
+		final List<Person> defaultPeople = this.getDefaultPeople(defaultDuties, defaultOrgs);
+		InitialisationService.logger.debug("defaultPeople: {}", defaultPeople);
+		this.personService.save(defaultPeople);
+
+		final List<Event> defaultEvents = this.getDefaultEvents(defaultEventTypes, defaultOrgs);
+		InitialisationService.logger.debug("defaultEvents: {}", defaultEvents);
+		this.eventRepos.save(defaultEvents);
+
+		this.createDefaultAdminUser(this.getDefaultAdminUser());
+
+	}
+
+	protected List<Organisation> getDefaultOrganisations() {
+		final List<Organisation> orgs = new ArrayList<>();
+		orgs.add(this.getDefaultOrg());
+
+		return orgs;
+	}
+
+	public void createOrganisationAndAdminUser(final SetupForm setupForm) {
+		final Organisation org = this.createOrganisation(setupForm.getOrganisationName().trim());
+		this.createDefaultAdminUser(setupForm.getEmailAddress().trim(), setupForm.getPassword(), setupForm.getNameLast().trim(),
+				setupForm.getNameFirst().trim(), org);
+	}
+
+	public Organisation createOrganisation(@NonNull final String name) {
+		final Organisation org = new Organisation();
+		org.setName(name.trim());
+
+		final String nameSquashed = name.trim().toUpperCase().replace(" ", "");
+		if (nameSquashed.length() > 5) {
+			org.setRegistrationCode(nameSquashed.substring(0, 5) + "001"); // FIXME: needs to poll database to make sure
+																								// this is unique
+		} else {
+			org.setRegistrationCode(nameSquashed + "001");
+		}
+
+		return this.orgRepos.save(org);
+	}
+
+	public void createDefaultAdminUser(final Person defaultAdminUser) {
+		InitialisationService.logger.info("createDefaultAdminUser({})", defaultAdminUser);
+
+		this.createDefaultAdminUser(defaultAdminUser.getEmailAddress(), defaultAdminUser.getPassword(), defaultAdminUser.getNameLast(),
+				defaultAdminUser.getNameFirst(), defaultAdminUser.getOrganisation());
+	}
+
+	public void createDefaultAdminUser(final String email, final String password, final String lastName, final String firstName,
+			final Organisation org) {
+		InitialisationService.logger.info("createDefaultAdminUser({})", email);
+
+		if (!this.personService.isPasswordValid(password)) {
+			throw new InvalidPasswordException(this.personService.getPasswordRequirements());
+		}
+
+		final Person person = new Person();
+		person.setEmailAddress(email);
+		person.setPassword(this.encoder.encode(password));
+		person.setNameFirst(firstName);
+		person.setNameLast(lastName);
+		person.setActive(true);
+		person.setOrganisation(org);
+
+		final PersonRole adminRole = new PersonRole();
+		adminRole.setRole(Role.ROLE_ADMIN);
+
+		final PersonRole userRole = new PersonRole();
+		userRole.setRole(Role.ROLE_USER);
+
+		person.addRole(adminRole);
+		person.addRole(userRole);
+
+		this.personService.save(person, true);
+	}
+
+	public Organisation getDefaultOrg() {
+		final Organisation org = new Organisation();
+		org.setId(1L);
+		org.setName("My First Org");
+		org.setRegistrationCode("MYFIRST001");
+		return org;
+	}
+
+	public Person getDefaultAdminUser() {
+		final Person person = new Person();
+		person.setEmailAddress("davidkey@gmail.com");
+		person.setPassword(this.encoder.encode("password"));
+		person.setNameFirst("David");
+		person.setNameLast("Key");
+		person.setActive(true);
+		person.setOrganisation(this.getDefaultOrg());
+
+		final PersonRole adminRole = new PersonRole();
+		adminRole.setRole(Role.ROLE_ADMIN);
+
+		final PersonRole userRole = new PersonRole();
+		userRole.setRole(Role.ROLE_USER);
+
+		person.addRole(adminRole);
+		person.addRole(userRole);
+
+		return person;
+	}
+
+	public void createDefaultAdminUser(final String email, final String password, final Organisation org) {
+		this.createDefaultAdminUser(email, password, "USER", "ADMIN", org);
+	}
+
+	protected List<Event> getDefaultEvents(final List<EventType> eventTypes, final List<Organisation> orgs) {
+		final List<Event> events = new ArrayList<>(eventTypes.size());
+
+		for (final EventType et : eventTypes) {
+			final Event e = new Event();
+
+			e.setName(et.getName());
+			try {
+				if (e.getName().contains("Sunday")) {
+					e.setDateEvent(InitialisationService.fmt.parseDateTime("05/24/2015").toDate()); // sunday
+				} else {
+					e.setDateEvent(InitialisationService.fmt.parseDateTime("05/27/2015").toDate()); // wednesday
+				}
+			} catch (final IllegalArgumentException iae) {
+				// do nothing
+			}
+
+			e.setEventType(et);
+			e.setOrganisation(orgs.get(0));
+
+			events.add(e);
+		}
+
+		return events;
+	}
+
+	protected List<Person> getDefaultPeople(final List<Duty> duties, final List<Organisation> orgs) {
+		final List<Person> people = new ArrayList<>();
+		final DataFactory df = new DataFactory();
+		final RandomDataGenerator randomData = new RandomDataGenerator();
+
+		final List<Duty> scrambledDuties = new ArrayList<>(duties);
+		for (int i = 0; i < 25; i++) {
+			final Person p = new Person();
+			p.setActive(true);
+			p.setEmailAddress(df.getEmailAddress());
+			p.setNameFirst(df.getFirstName());
+			p.setNameLast(df.getLastName());
+			p.setOrganisation(orgs.get(0));
+
+			final PersonRole personRole = new PersonRole();
+			personRole.setRole(Role.ROLE_USER);
+
+			p.addRole(personRole);
+
+			Collections.shuffle(scrambledDuties);
+			final int numDuties = randomData.nextInt(2, scrambledDuties.size() - 1);
+			for (int x = 0; x < numDuties; x++) {
+				p.addDutyAndPreference(scrambledDuties.get(x), randomData.nextInt(1, 9));
+			}
+
+			people.add(p);
+		}
+
+		return people;
+	}
+
+	protected List<Duty> getDefaultDuties(final List<Organisation> orgs) {
+		final List<Duty> duties = new ArrayList<>();
+
+		Duty duty = null;
+		int count = 1;
+
+		duty = new Duty();
+		duty.setName("Song Leading");
+		duty.setDescription(duty.getName());
+		duty.setSortOrder(count++);
+		duty.setOrganisation(orgs.get(0));
+		duties.add(duty);
+
+		duty = new Duty();
+		duty.setName("Opening Prayer");
+		duty.setDescription(duty.getName());
+		duty.setSortOrder(count++);
+		duty.setOrganisation(orgs.get(0));
+		duties.add(duty);
+
+		duty = new Duty();
+		duty.setName("Closing Prayer");
+		duty.setDescription(duty.getName());
+		duty.setSortOrder(count++);
+		duty.setOrganisation(orgs.get(0));
+		duties.add(duty);
+
+		duty = new Duty();
+		duty.setName("Announcements");
+		duty.setDescription(duty.getName());
+		duty.setSortOrder(count++);
+		duty.setOrganisation(orgs.get(0));
+		duties.add(duty);
+
+		duty = new Duty();
+		duty.setName("Scripture Reading");
+		duty.setDescription(duty.getName());
+		duty.setSortOrder(count++);
+		duty.setOrganisation(orgs.get(0));
+		duties.add(duty);
+
+		duty = new Duty();
+		duty.setName("Preaching");
+		duty.setDescription(duty.getName());
+		duty.setSortOrder(count++);
+		duty.setOrganisation(orgs.get(0));
+		duties.add(duty);
+
+		duty = new Duty();
+		duty.setName("Table");
+		duty.setDescription(duty.getName());
+		duty.setSortOrder(count++);
+		duty.setOrganisation(orgs.get(0));
+		duties.add(duty);
+
+		duty = new Duty();
+		duty.setName("Invitation");
+		duty.setDescription(duty.getName());
+		duty.setSortOrder(count++);
+		duty.setOrganisation(orgs.get(0));
+		duties.add(duty);
+
+		return duties;
+	}
+
+	protected List<EventType> getDefaultEventTypes(@NonNull final List<Duty> duties, @NonNull final List<Organisation> orgs) {
+		final List<Duty> sundayAmDuties = new ArrayList<>();
+		final List<Duty> sundayPmDuties = new ArrayList<>();
+		final List<Duty> wednesdayDuties = new ArrayList<>();
+
+		for (final Duty d : duties) {
+			switch (d.getName()) {
+			case "Song Leading":
+			case "Opening Prayer":
+			case "Closing Prayer":
+			case "Announcements":
+				sundayAmDuties.add(d);
+				sundayPmDuties.add(d);
+				wednesdayDuties.add(d);
+				break;
+			case "Scripture Reading":
+			case "Preaching":
+				sundayAmDuties.add(d);
+				sundayPmDuties.add(d);
+				break;
+			case "Table":
+				sundayAmDuties.add(d);
+				sundayAmDuties.add(d);
+				sundayAmDuties.add(d);
+				sundayAmDuties.add(d);
+				sundayPmDuties.add(d);
+				break;
+			case "Invitation":
+				wednesdayDuties.add(d);
+				break;
+			default:
+				InitialisationService.logger.warn("possible problem - we've got a default duty ({}) without an associated event.", d);
+				break;
+			}
+		}
+
+		final EventType sundayAm = new EventType();
+		sundayAm.setName("Sunday AM");
+		sundayAm.setDescription(sundayAm.getName());
+		sundayAm.setDuties(sundayAmDuties);
+		sundayAm.setInterval(EventTypeInterval.WEEKLY);
+		sundayAm.setIntervalDetail(IntervalWeekly.SUNDAY.toString());
+		sundayAm.setStartTime(this.intervalService.getTimeWithoutDate(9, 30));
+		sundayAm.setEndTime(this.intervalService.getTimeWithoutDate(11, 30));
+		sundayAm.setOrganisation(orgs.get(0));
+
+		final EventType sundayPm = new EventType();
+		sundayPm.setName("Sunday PM");
+		sundayPm.setDescription(sundayPm.getName());
+		sundayPm.setDuties(sundayPmDuties);
+		sundayPm.setInterval(EventTypeInterval.WEEKLY);
+		sundayPm.setIntervalDetail(IntervalWeekly.SUNDAY.toString());
+		sundayPm.setStartTime(this.intervalService.getTimeWithoutDate(18, 30));
+		sundayPm.setEndTime(this.intervalService.getTimeWithoutDate(20, 0));
+		sundayPm.setOrganisation(orgs.get(0));
+
+		final EventType wednesday = new EventType();
+		wednesday.setName("Wednesday PM");
+		wednesday.setDescription(wednesday.getName());
+		wednesday.setDuties(wednesdayDuties);
+		wednesday.setInterval(EventTypeInterval.WEEKLY);
+		wednesday.setIntervalDetail(IntervalWeekly.WEDNESDAY.toString());
+		wednesday.setStartTime(this.intervalService.getTimeWithoutDate(19, 30));
+		wednesday.setEndTime(this.intervalService.getTimeWithoutDate(21, 0));
+		wednesday.setOrganisation(orgs.get(0));
+
+		final List<EventType> eventTypes = new ArrayList<>();
+		eventTypes.add(sundayAm);
+		eventTypes.add(sundayPm);
+		eventTypes.add(wednesday);
+
+		return eventTypes;
+	}
 }

@@ -11,23 +11,23 @@ import com.dak.duty.RosterApplication;
 import com.dak.duty.config.SecurityConfig;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {RosterApplication.class, SecurityConfig.class} )
+@SpringApplicationConfiguration(classes = { RosterApplication.class, SecurityConfig.class })
 @WebAppConfiguration
 public abstract class ServiceTest {
 
-   protected static boolean isInitialized = false;
-   
-   @Autowired
-   InitialisationService initService;
-   	
-   @Before
-   public void runOnce(){
-      if(isInitialized){
-         return;
-      }
-      
-      initService.clearAllData();
-      initService.populateDefaultData();
-      isInitialized = true;
-   }
+	protected static boolean isInitialized = false;
+
+	@Autowired
+	InitialisationService initService;
+
+	@Before
+	public void runOnce() {
+		if (ServiceTest.isInitialized) {
+			return;
+		}
+
+		this.initService.clearAllData();
+		this.initService.populateDefaultData();
+		ServiceTest.isInitialized = true;
+	}
 }

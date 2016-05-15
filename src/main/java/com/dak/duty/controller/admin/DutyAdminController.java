@@ -25,73 +25,72 @@ import com.dak.duty.service.DutyService;
 @Controller
 @RequestMapping("/admin/duties")
 public class DutyAdminController {
-   
-   private static final Logger logger = LoggerFactory.getLogger(DutyAdminController.class);
-   
-   @Autowired
-   DutyRepository dutyRepos;
 
-   @Autowired
-   DutyService dutyService;
-   
+	private static final Logger logger = LoggerFactory.getLogger(DutyAdminController.class);
 
-   @RequestMapping(method = RequestMethod.GET)
-   public String getDuties(Model model){
-      logger.debug("getDuties()");
+	@Autowired
+	DutyRepository dutyRepos;
 
-      final List<Duty> duties = dutyRepos.findByActiveTrueOrderBySortOrderAsc();
-      logger.debug("duties found: {}", duties.size());
+	@Autowired
+	DutyService dutyService;
 
-      model.addAttribute("duties", duties);
-      return "admin/duties";
-   }
+	@RequestMapping(method = RequestMethod.GET)
+	public String getDuties(final Model model) {
+		DutyAdminController.logger.debug("getDuties()");
 
-   @RequestMapping(method = RequestMethod.POST)
-   public String saveDuty(@ModelAttribute @Valid Duty duty, BindingResult result, final RedirectAttributes redirectAttributes){
-      logger.debug("saveDuty()");
-      final boolean alreadyExisted = duty.getId() > 0;
+		final List<Duty> duties = this.dutyRepos.findByActiveTrueOrderBySortOrderAsc();
+		DutyAdminController.logger.debug("duties found: {}", duties.size());
 
-      if(result.hasErrors()){
-         redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.duty", result);
-         redirectAttributes.addFlashAttribute("duty", duty);
-         
-         if(alreadyExisted){
-            return "redirect:/admin/duties/" + duty.getId();
-         } else {
-            return "redirect:/admin/duties/new";
-         }
-      }
+		model.addAttribute("duties", duties);
+		return "admin/duties";
+	}
 
-      dutyService.saveOrUpdateDuty(duty);
-      redirectAttributes.addFlashAttribute("msg_success", alreadyExisted ? "Duty updated!" : "Duty added!");
-      return "redirect:/admin/duties";
-   }
+	@RequestMapping(method = RequestMethod.POST)
+	public String saveDuty(@ModelAttribute @Valid final Duty duty, final BindingResult result, final RedirectAttributes redirectAttributes) {
+		DutyAdminController.logger.debug("saveDuty()");
+		final boolean alreadyExisted = duty.getId() > 0;
 
-   @RequestMapping(value = "/new", method = RequestMethod.GET)
-   public String getNewDuty(Model model){
-      logger.debug("getNewDuty()");
+		if (result.hasErrors()) {
+			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.duty", result);
+			redirectAttributes.addFlashAttribute("duty", duty);
 
-      if(!model.containsAttribute("duty")){
-         final Duty duty = new Duty();
-         final Integer maxSortOrder = dutyRepos.findMaxSortOrder();
-         duty.setSortOrder((maxSortOrder == null ? 0 : maxSortOrder) + 1);
-         
-         model.addAttribute("duty", duty);
-      }
-      
-      return "admin/duty";
-   }
+			if (alreadyExisted) {
+				return "redirect:/admin/duties/" + duty.getId();
+			} else {
+				return "redirect:/admin/duties/new";
+			}
+		}
 
-   @PreAuthorize("#d.organisation.id == principal.person.organisation.id")
-   @RequestMapping(value = "/{dutyId}", method = RequestMethod.GET)
-   public String getEditDuty(@PathVariable("dutyId") @P("d") Duty duty, Model model){
-      logger.debug("getEditDuty()");
+		this.dutyService.saveOrUpdateDuty(duty);
+		redirectAttributes.addFlashAttribute("msg_success", alreadyExisted ? "Duty updated!" : "Duty added!");
+		return "redirect:/admin/duties";
+	}
 
-      if(!model.containsAttribute("duty")){
-         model.addAttribute("duty", duty);
-      }
-      
-      model.addAttribute("maxSortOrder", dutyRepos.findMaxSortOrder());
-      return "admin/duty";
-   }
+	@RequestMapping(value = "/new", method = RequestMethod.GET)
+	public String getNewDuty(final Model model) {
+		DutyAdminController.logger.debug("getNewDuty()");
+
+		if (!model.containsAttribute("duty")) {
+			final Duty duty = new Duty();
+			final Integer maxSortOrder = this.dutyRepos.findMaxSortOrder();
+			duty.setSortOrder((maxSortOrder == null ? 0 : maxSortOrder) + 1);
+
+			model.addAttribute("duty", duty);
+		}
+
+		return "admin/duty";
+	}
+
+	@PreAuthorize("#d.organisation.id == principal.person.organisation.id")
+	@RequestMapping(value = "/{dutyId}", method = RequestMethod.GET)
+	public String getEditDuty(@PathVariable("dutyId") @P("d") final Duty duty, final Model model) {
+		DutyAdminController.logger.debug("getEditDuty()");
+
+		if (!model.containsAttribute("duty")) {
+			model.addAttribute("duty", duty);
+		}
+
+		model.addAttribute("maxSortOrder", this.dutyRepos.findMaxSortOrder());
+		return "admin/duty";
+	}
 }

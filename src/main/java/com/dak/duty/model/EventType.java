@@ -26,10 +26,6 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Fetch;
@@ -44,6 +40,10 @@ import com.dak.duty.model.validation.EventTypeIntervalValidation;
 import com.dak.duty.security.CustomUserDetails;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 @Entity
 @Table(name = "event_type")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -51,100 +51,104 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @Setter
 @ToString
 public class EventType implements Serializable {
-   private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-   @Id
-   @SequenceGenerator(name = "eventtype_id_seq", sequenceName = "eventtype_id_seq")
-   @GeneratedValue(strategy = GenerationType.AUTO, generator = "eventtype_id_seq")
-   @Column(nullable = false)
-   private long id;
-   
-   @ManyToOne
-   @JoinColumn(name="org_id", nullable=false)
-   private Organisation organisation;
-   
-   @Column(nullable = false, unique = true)
-   @NotEmpty
-   private String name;
-   
-   @Column(nullable = true)
-   private String description;
-   
-   @ManyToMany(fetch=FetchType.EAGER)
-   @Fetch(FetchMode.SELECT) // to prevent dupes... super annoying dupes - see https://stackoverflow.com/questions/17566304/multiple-fetches-with-eager-type-in-hibernate-with-jpa
-   private List<Duty> duties;
-   
-   @Enumerated(EnumType.STRING)
-   @Column(nullable = false)
-   @NotNull // see https://stackoverflow.com/questions/5982741/error-no-validator-could-be-found-for-type-java-lang-integer
-   private EventTypeInterval interval;
-   
-   @Column(nullable = true)
-   private String intervalDetail;
-   
-   @Temporal(TemporalType.TIME)
-   @Column(nullable = false)
-   @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="h:mm a")
-   @DateTimeFormat(pattern="h:mma") // 12:15am
-   private Date startTime = getBlankDate();
-   
-   @Temporal(TemporalType.TIME)
-   @Column(nullable = false)
-   @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="h:mm a")
-   @DateTimeFormat(pattern="h:mma")
-   private Date endTime = getBlankDate();
-   
-   @Column(nullable = false)
-   private Boolean active = true;
-   
-   @PrePersist
-   protected void onPersist() {
-      if(organisation == null){ // hack?
-         organisation = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson().getOrganisation();
-      }
-   }
-   
-   @PreUpdate
-   protected void onUpdate() {
-      if(organisation == null){ // hack?
-         organisation = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson().getOrganisation();
-      }
-   }
-   
-   @Transient
-   private Date getBlankDate(){
-      Calendar cal = Calendar.getInstance();
-      cal.setTime(new Date(0L));
-      cal.set(Calendar.HOUR_OF_DAY, 0);
-      cal.set(Calendar.MINUTE, 0);
-      cal.set(Calendar.SECOND, 0);
-      cal.set(Calendar.MILLISECOND, 0);
-      
-      return cal.getTime();
-   }
-   
-   public void setInterval(final EventTypeInterval interval){
-      if(intervalDetail != null && !EventTypeIntervalValidation.validate(interval, intervalDetail)){
-         throw new IntervalValidationException("IntervalDetail '" + intervalDetail + "' invalid for type " + interval.toString());
-      }
-      
-      this.interval = interval;
-   }
-   
-   public void setIntervalDetail(final String intervalDetail){
-      if(interval != null && !EventTypeIntervalValidation.validate(interval, intervalDetail)){
-         throw new IntervalValidationException("IntervalDetail '" + intervalDetail + "' invalid for type " + interval.toString());
-      }
-      
-      this.intervalDetail = intervalDetail;
-   }
-   
-   @Transient
-   public void addDuty(final Duty d){
-      if(duties == null){
-         duties = new ArrayList<Duty>();
-      }
-      
-      duties.add(d);
-   }
+	@Id
+	@SequenceGenerator(name = "eventtype_id_seq", sequenceName = "eventtype_id_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "eventtype_id_seq")
+	@Column(nullable = false)
+	private long id;
+
+	@ManyToOne
+	@JoinColumn(name = "org_id", nullable = false)
+	private Organisation organisation;
+
+	@Column(nullable = false, unique = true)
+	@NotEmpty
+	private String name;
+
+	@Column(nullable = true)
+	private String description;
+
+	@ManyToMany(fetch = FetchType.EAGER)
+	@Fetch(FetchMode.SELECT) // to prevent dupes... super annoying dupes - see
+										// https://stackoverflow.com/questions/17566304/multiple-fetches-with-eager-type-in-hibernate-with-jpa
+	private List<Duty> duties;
+
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	@NotNull // see
+				// https://stackoverflow.com/questions/5982741/error-no-validator-could-be-found-for-type-java-lang-integer
+	private EventTypeInterval interval;
+
+	@Column(nullable = true)
+	private String intervalDetail;
+
+	@Temporal(TemporalType.TIME)
+	@Column(nullable = false)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "h:mm a")
+	@DateTimeFormat(pattern = "h:mma") // 12:15am
+	private Date startTime = this.getBlankDate();
+
+	@Temporal(TemporalType.TIME)
+	@Column(nullable = false)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "h:mm a")
+	@DateTimeFormat(pattern = "h:mma")
+	private Date endTime = this.getBlankDate();
+
+	@Column(nullable = false)
+	private Boolean active = true;
+
+	@PrePersist
+	protected void onPersist() {
+		if (this.organisation == null) { // hack?
+			this.organisation = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson()
+					.getOrganisation();
+		}
+	}
+
+	@PreUpdate
+	protected void onUpdate() {
+		if (this.organisation == null) { // hack?
+			this.organisation = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson()
+					.getOrganisation();
+		}
+	}
+
+	@Transient
+	private Date getBlankDate() {
+		final Calendar cal = Calendar.getInstance();
+		cal.setTime(new Date(0L));
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+
+		return cal.getTime();
+	}
+
+	public void setInterval(final EventTypeInterval interval) {
+		if (this.intervalDetail != null && !EventTypeIntervalValidation.validate(interval, this.intervalDetail)) {
+			throw new IntervalValidationException("IntervalDetail '" + this.intervalDetail + "' invalid for type " + interval.toString());
+		}
+
+		this.interval = interval;
+	}
+
+	public void setIntervalDetail(final String intervalDetail) {
+		if (this.interval != null && !EventTypeIntervalValidation.validate(this.interval, intervalDetail)) {
+			throw new IntervalValidationException("IntervalDetail '" + intervalDetail + "' invalid for type " + this.interval.toString());
+		}
+
+		this.intervalDetail = intervalDetail;
+	}
+
+	@Transient
+	public void addDuty(final Duty d) {
+		if (this.duties == null) {
+			this.duties = new ArrayList<>();
+		}
+
+		this.duties.add(d);
+	}
 }

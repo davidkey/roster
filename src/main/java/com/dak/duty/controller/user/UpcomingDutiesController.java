@@ -29,51 +29,52 @@ import com.dak.duty.service.PersonService;
 @RequestMapping("/user/upcomingDuties")
 @PreAuthorize("hasRole('ROLE_USER')")
 public class UpcomingDutiesController {
-   
-   private static final Logger logger = LoggerFactory.getLogger(UpcomingDutiesController.class);
-   
-   @Autowired
-   PersonService personService;
-   
-   @Autowired
-   PersonRepository personRepos;
-   
-   @Autowired
-   EventRepository eventRepos;
-   
-   @Autowired
-   DutyRepository dutyRepos;
-   
-   @Autowired
-   EventService eventService;
-   
-   @Autowired
-   IAuthenticationFacade authenticationFacade;
-   
-   @RequestMapping(value = "/count", method = RequestMethod.GET)
-   public @ResponseBody int getUpcomingDutiesCount(Principal principal){
-      logger.debug("getUpcomingDutiesCount()");
-      
-      return personService.getUpcomingDuties(authenticationFacade.getPerson()).size(); 
-   }
-   
-   @RequestMapping(method = RequestMethod.GET)
-   public String getUpcomingDutiesAll(Principal principal, Model model){
-      logger.debug("getUpcomingDutiesCount()");
-      model.addAttribute("upcomingDuties", personService.getUpcomingDuties(authenticationFacade.getPerson()));
-      return "user/duties";
-   }
-   
-   @RequestMapping(value = "/optOut", method = RequestMethod.POST)
-   public @ResponseBody JsonResponse optOut(@ModelAttribute("dutyId") Duty duty, @ModelAttribute("eventId") Event event, Principal principal){
-      logger.debug("optOut()");
-      
-      final Person person = authenticationFacade.getPerson();
-      
-      if(eventService.optPersonAndDutyOutOfEvent(person, duty, event)){
-         return new JsonResponse(ResponseStatus.OK, "Opted out.");
-      } else {
-         return new JsonResponse(ResponseStatus.ERROR, "Opting out failed!");
-      }
-   }
+
+	private static final Logger logger = LoggerFactory.getLogger(UpcomingDutiesController.class);
+
+	@Autowired
+	PersonService personService;
+
+	@Autowired
+	PersonRepository personRepos;
+
+	@Autowired
+	EventRepository eventRepos;
+
+	@Autowired
+	DutyRepository dutyRepos;
+
+	@Autowired
+	EventService eventService;
+
+	@Autowired
+	IAuthenticationFacade authenticationFacade;
+
+	@RequestMapping(value = "/count", method = RequestMethod.GET)
+	public @ResponseBody int getUpcomingDutiesCount(final Principal principal) {
+		UpcomingDutiesController.logger.debug("getUpcomingDutiesCount()");
+
+		return this.personService.getUpcomingDuties(this.authenticationFacade.getPerson()).size();
+	}
+
+	@RequestMapping(method = RequestMethod.GET)
+	public String getUpcomingDutiesAll(final Principal principal, final Model model) {
+		UpcomingDutiesController.logger.debug("getUpcomingDutiesCount()");
+		model.addAttribute("upcomingDuties", this.personService.getUpcomingDuties(this.authenticationFacade.getPerson()));
+		return "user/duties";
+	}
+
+	@RequestMapping(value = "/optOut", method = RequestMethod.POST)
+	public @ResponseBody JsonResponse optOut(@ModelAttribute("dutyId") final Duty duty, @ModelAttribute("eventId") final Event event,
+			final Principal principal) {
+		UpcomingDutiesController.logger.debug("optOut()");
+
+		final Person person = this.authenticationFacade.getPerson();
+
+		if (this.eventService.optPersonAndDutyOutOfEvent(person, duty, event)) {
+			return new JsonResponse(ResponseStatus.OK, "Opted out.");
+		} else {
+			return new JsonResponse(ResponseStatus.ERROR, "Opting out failed!");
+		}
+	}
 }

@@ -19,39 +19,38 @@ import com.dak.duty.model.PersonRole;
 import com.dak.duty.security.CustomUserDetails;
 import com.dak.duty.service.InitialisationService;
 
-public class WithMockCustomUserSecurityContextFactory  implements WithSecurityContextFactory<WithMockCustomUserAdmin> {
-   
-   private InitialisationService initService;
-   
-   @Autowired
-   public WithMockCustomUserSecurityContextFactory(InitialisationService initService){
-      this.initService = initService;
-   }
+public class WithMockCustomUserSecurityContextFactory implements WithSecurityContextFactory<WithMockCustomUserAdmin> {
 
-   @Override
-   public SecurityContext createSecurityContext(WithMockCustomUserAdmin customUser) {
-      SecurityContext context = SecurityContextHolder.createEmptyContext();
+	private final InitialisationService initService;
 
-      final Person p = initService.getDefaultAdminUser();
-      
-      CustomUserDetails principal = new CustomUserDetails(p, buildUserAuthority(p.getRoles()));
-      Authentication auth = new UsernamePasswordAuthenticationToken(principal, "password", principal.getAuthorities());
-      context.setAuthentication(auth);
-      return context;
-   }
-   
-   
-   private List<GrantedAuthority> buildUserAuthority(Set<PersonRole> personRoles) {
-      
-      Set<GrantedAuthority> setAuths = new HashSet<GrantedAuthority>();
+	@Autowired
+	public WithMockCustomUserSecurityContextFactory(final InitialisationService initService) {
+		this.initService = initService;
+	}
 
-      for (PersonRole personRole : personRoles) {
-          setAuths.add(new SimpleGrantedAuthority(personRole.getRole().toString()));
-      }
+	@Override
+	public SecurityContext createSecurityContext(final WithMockCustomUserAdmin customUser) {
+		final SecurityContext context = SecurityContextHolder.createEmptyContext();
 
-      List<GrantedAuthority> result = new ArrayList<GrantedAuthority>(setAuths);
+		final Person p = this.initService.getDefaultAdminUser();
 
-      return result;
-  }
+		final CustomUserDetails principal = new CustomUserDetails(p, this.buildUserAuthority(p.getRoles()));
+		final Authentication auth = new UsernamePasswordAuthenticationToken(principal, "password", principal.getAuthorities());
+		context.setAuthentication(auth);
+		return context;
+	}
+
+	private List<GrantedAuthority> buildUserAuthority(final Set<PersonRole> personRoles) {
+
+		final Set<GrantedAuthority> setAuths = new HashSet<>();
+
+		for (final PersonRole personRole : personRoles) {
+			setAuths.add(new SimpleGrantedAuthority(personRole.getRole().toString()));
+		}
+
+		final List<GrantedAuthority> result = new ArrayList<>(setAuths);
+
+		return result;
+	}
 
 }

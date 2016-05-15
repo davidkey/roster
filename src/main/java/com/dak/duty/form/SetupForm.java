@@ -13,27 +13,27 @@ import lombok.ToString;
 @Setter
 @ToString
 public class SetupForm {
-   @Email
-   @NotEmpty
-   private String emailAddress;
-   
-   @Size(min=2, max=64)
-   @NotEmpty
-   private String nameFirst;
-   
-   @Size(min=2, max=64)
-   @NotEmpty
-   private String nameLast;
-   
-   @Size(min=6, max=64)
-   @NotEmpty
-   private String password;
-   
-   @Size(min=6, max=64)
-   @NotEmpty
-   private String confirmPassword;
-   
-   @Size(min=3, max=64)
-   @NotEmpty
-   private String organisationName;
+	@Email
+	@NotEmpty
+	private String emailAddress;
+
+	@Size(min = 2, max = 64)
+	@NotEmpty
+	private String nameFirst;
+
+	@Size(min = 2, max = 64)
+	@NotEmpty
+	private String nameLast;
+
+	@Size(min = 6, max = 64)
+	@NotEmpty
+	private String password;
+
+	@Size(min = 6, max = 64)
+	@NotEmpty
+	private String confirmPassword;
+
+	@Size(min = 3, max = 64)
+	@NotEmpty
+	private String organisationName;
 }

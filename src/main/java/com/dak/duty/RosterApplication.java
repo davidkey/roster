@@ -15,35 +15,34 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @SpringBootApplication
 @Configuration
 public class RosterApplication {
-	
+
 	@Value("${security.encoder.strength}")
 	private Integer ENCODER_STRENGTH;
 
-	public static void main(String[] args) {
-		SpringApplication springApplication = new SpringApplication(RosterApplication.class);
+	public static void main(final String[] args) {
+		final SpringApplication springApplication = new SpringApplication(RosterApplication.class);
 		springApplication.addListeners(new ApplicationPidFileWriter("./roster.pid"));
 		springApplication.run(args);
 	}
-	
-    /**
-     * For viewing h2 console (in-mem database / schema).
-     * Use this url: jdbc:h2:mem:testdb
-     * @return
-     */
-    @Bean
-    public ServletRegistrationBean h2servletRegistration() {
-        ServletRegistrationBean registration = new ServletRegistrationBean(new WebServlet());
-        registration.addUrlMappings("/console/*");
-        return registration;
-    }
-    
-    @Bean
-    public Random getRand(){
-    	return new Random();
-    }
-    
-    @Bean
-    public BCryptPasswordEncoder getEncoder(){
-    	return new BCryptPasswordEncoder(ENCODER_STRENGTH);
-    }
+
+	/**
+	 * For viewing h2 console (in-mem database / schema). Use this url: jdbc:h2:mem:testdb
+	 * @return
+	 */
+	@Bean
+	public ServletRegistrationBean h2servletRegistration() {
+		final ServletRegistrationBean registration = new ServletRegistrationBean(new WebServlet());
+		registration.addUrlMappings("/console/*");
+		return registration;
+	}
+
+	@Bean
+	public Random getRand() {
+		return new Random();
+	}
+
+	@Bean
+	public BCryptPasswordEncoder getEncoder() {
+		return new BCryptPasswordEncoder(this.ENCODER_STRENGTH);
+	}
 }

@@ -15,33 +15,33 @@ import com.dak.duty.service.InitialisationService;
 @RequestMapping("/admin")
 public class AdminController {
 
-   private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
+	private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
-   @Autowired
-   InitialisationService initService;
-   
-   @RequestMapping(method = RequestMethod.GET)
-   public String getAdminHome(Model model){
-      logger.debug("getAdminHome()");
-      return "admin/admin";
-   }
+	@Autowired
+	private InitialisationService initService;
 
-   @RequestMapping(value = "/settings", method = RequestMethod.GET)
-   public String getSettings(Model model){
-      logger.debug("getSettings()");
-      return "admin/settings";
-   }
+	@RequestMapping(method = RequestMethod.GET)
+	public String getAdminHome(final Model model) {
+		AdminController.logger.debug("getAdminHome()");
+		return "admin/admin";
+	}
 
-   @RequestMapping(value = "/about", method = RequestMethod.GET)
-   public String getAbout(Model model){
-      logger.debug("getAbout()");
-      return "admin/about";
-   }
-   
-   @RequestMapping("/init")
-   public @ResponseBody String initData(){
-      initService.populateDefaultData();
-      return "data init'd";
-   }
+	@RequestMapping(value = "/settings", method = RequestMethod.GET)
+	public String getSettings(final Model model) {
+		AdminController.logger.debug("getSettings()");
+		return "admin/settings";
+	}
+
+	@RequestMapping(value = "/about", method = RequestMethod.GET)
+	public String getAbout(final Model model) {
+		AdminController.logger.debug("getAbout()");
+		return "admin/about";
+	}
+
+	@RequestMapping("/init")
+	public @ResponseBody String initData() {
+		this.initService.populateDefaultData();
+		return "data init'd";
+	}
 
 }

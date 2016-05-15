@@ -13,14 +13,14 @@ import org.springframework.web.servlet.ModelAndView;
 @ControllerAdvice
 public class ExceptionController {
 
-   @ExceptionHandler(value = {Exception.class, RuntimeException.class})
-   public ModelAndView getDefaultErrorView(Exception ex, HttpServletRequest request, HttpServletResponse response){
-      
-      ModelAndView model = new ModelAndView("error");
-      model.addObject("now", new Date());
-      model.addObject("requestUrl", request.getRequestURL().toString());
-      model.addObject("exception", ex);
-      model.addObject("stackTrace", ExceptionUtils.getStackTrace(ex));
-      return model;
-   }
+	@ExceptionHandler(value = { Exception.class, RuntimeException.class })
+	public ModelAndView getDefaultErrorView(final Exception ex, final HttpServletRequest request, final HttpServletResponse response) {
+
+		final ModelAndView model = new ModelAndView("error");
+		model.addObject("now", new Date());
+		model.addObject("requestUrl", request.getRequestURL().toString());
+		model.addObject("exception", ex);
+		model.addObject("stackTrace", ExceptionUtils.getStackTrace(ex));
+		return model;
+	}
 }

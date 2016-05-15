@@ -30,85 +30,86 @@ import com.dak.duty.service.PersonService;
 @RequestMapping("/admin/eventTypes")
 public class EventTypeAdminController {
 
-   private static final Logger logger = LoggerFactory.getLogger(EventTypeAdminController.class);
-   
-   @Autowired
-   EventTypeRepository eventTypeRepos;
-   
-   @Autowired
-   EventService eventService;
-   
-   @Autowired
-   DutyRepository dutyRepos;
-   
-   @Autowired
-   PersonService personService;
-   
-   @Autowired
-   IAuthenticationFacade authenticationFacade;
+	private static final Logger logger = LoggerFactory.getLogger(EventTypeAdminController.class);
 
-   
-   @RequestMapping(method = RequestMethod.GET)
-   public String getEventTypes(Model model){
-      logger.debug("getEventTypes()");
+	@Autowired
+	EventTypeRepository eventTypeRepos;
 
-      final List<EventType> eventTypes = eventTypeRepos.findByActiveTrue();
-      logger.debug("event types found: {}", eventTypes.size());
+	@Autowired
+	EventService eventService;
 
-      model.addAttribute("eventTypes", eventTypes);
-      return "admin/eventTypes";
-   }
+	@Autowired
+	DutyRepository dutyRepos;
 
-   @RequestMapping(method = RequestMethod.POST)
-   public String saveEventType(@ModelAttribute @Valid EventType eventType, BindingResult result, final RedirectAttributes redirectAttributes){
-      logger.debug("saveEventType()");
-      final boolean alreadyExisted = eventType.getId() > 0;
+	@Autowired
+	PersonService personService;
 
-      if(result.hasErrors()){
-         redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.eventType", result);
-         redirectAttributes.addFlashAttribute("eventType", eventType);
-         
-         if(alreadyExisted){
-            return "redirect:/admin/eventTypes/" + eventType.getId();
-         } else {
-            return "redirect:/admin/eventTypes/new";
-         }
-      }
-      
-      if(alreadyExisted && !eventTypeRepos.findOne(eventType.getId()).getOrganisation().getId().equals(authenticationFacade.getOrganisation().getId())){
-         throw new SecurityException("can't do that");
-      } else { 
-         eventType.setOrganisation(authenticationFacade.getOrganisation());
-      }
-      
-      eventService.saveEventType(eventType);
-      redirectAttributes.addFlashAttribute("msg_success", alreadyExisted ? "Event Type updated!" : "Event Type added!");
-      return "redirect:/admin/eventTypes";
-   }
+	@Autowired
+	IAuthenticationFacade authenticationFacade;
 
-   @PreAuthorize("#e.organisation.id == principal.person.organisation.id")
-   @RequestMapping(value = "/{eventTypeId}", method = RequestMethod.GET)
-   public String getEventTypeById(@PathVariable("eventTypeId") @P("e") EventType eventType, Model model){
-      logger.debug("getEventTypeById({})", eventType.getId());
+	@RequestMapping(method = RequestMethod.GET)
+	public String getEventTypes(final Model model) {
+		EventTypeAdminController.logger.debug("getEventTypes()");
 
-      if(!model.containsAttribute("eventType")){
-         model.addAttribute("eventType", eventType);
-      }
-      model.addAttribute("eventTypeIntervals", EventTypeInterval.values());
-      model.addAttribute("allPossibleDuties", dutyRepos.findByActiveTrue());
-      return "admin/eventType";
-   }
+		final List<EventType> eventTypes = this.eventTypeRepos.findByActiveTrue();
+		EventTypeAdminController.logger.debug("event types found: {}", eventTypes.size());
 
-   @RequestMapping(value = "/new", method = RequestMethod.GET)
-   public String getAddEventType(Model model){
-      logger.debug("getAddEventType()");
+		model.addAttribute("eventTypes", eventTypes);
+		return "admin/eventTypes";
+	}
 
-      if(!model.containsAttribute("eventType")){
-         model.addAttribute("eventType", new EventType());
-      }
-      
-      model.addAttribute("eventTypeIntervals", EventTypeInterval.values());
-      model.addAttribute("allPossibleDuties", dutyRepos.findByActiveTrue());
-      return "admin/eventType";
-   }
+	@RequestMapping(method = RequestMethod.POST)
+	public String saveEventType(@ModelAttribute @Valid final EventType eventType, final BindingResult result,
+			final RedirectAttributes redirectAttributes) {
+		EventTypeAdminController.logger.debug("saveEventType()");
+		final boolean alreadyExisted = eventType.getId() > 0;
+
+		if (result.hasErrors()) {
+			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.eventType", result);
+			redirectAttributes.addFlashAttribute("eventType", eventType);
+
+			if (alreadyExisted) {
+				return "redirect:/admin/eventTypes/" + eventType.getId();
+			} else {
+				return "redirect:/admin/eventTypes/new";
+			}
+		}
+
+		if (alreadyExisted && !this.eventTypeRepos.findOne(eventType.getId()).getOrganisation().getId()
+				.equals(this.authenticationFacade.getOrganisation().getId())) {
+			throw new SecurityException("can't do that");
+		} else {
+			eventType.setOrganisation(this.authenticationFacade.getOrganisation());
+		}
+
+		this.eventService.saveEventType(eventType);
+		redirectAttributes.addFlashAttribute("msg_success", alreadyExisted ? "Event Type updated!" : "Event Type added!");
+		return "redirect:/admin/eventTypes";
+	}
+
+	@PreAuthorize("#e.organisation.id == principal.person.organisation.id")
+	@RequestMapping(value = "/{eventTypeId}", method = RequestMethod.GET)
+	public String getEventTypeById(@PathVariable("eventTypeId") @P("e") final EventType eventType, final Model model) {
+		EventTypeAdminController.logger.debug("getEventTypeById({})", eventType.getId());
+
+		if (!model.containsAttribute("eventType")) {
+			model.addAttribute("eventType", eventType);
+		}
+		model.addAttribute("eventTypeIntervals", EventTypeInterval.values());
+		model.addAttribute("allPossibleDuties", this.dutyRepos.findByActiveTrue());
+		return "admin/eventType";
+	}
+
+	@RequestMapping(value = "/new", method = RequestMethod.GET)
+	public String getAddEventType(final Model model) {
+		EventTypeAdminController.logger.debug("getAddEventType()");
+
+		if (!model.containsAttribute("eventType")) {
+			model.addAttribute("eventType", new EventType());
+		}
+
+		model.addAttribute("eventTypeIntervals", EventTypeInterval.values());
+		model.addAttribute("allPossibleDuties", this.dutyRepos.findByActiveTrue());
+		return "admin/eventType";
+	}
 }

@@ -6,8 +6,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
- * This class exists to tell Spring to use spel on jpa repositories.
- * See: http://docs.spring.io/autorepo/docs/spring-security/4.0.x/reference/html/data-configuration.html
+ * This class exists to tell Spring to use spel on jpa repositories. See:
+ * http://docs.spring.io/autorepo/docs/spring-security/4.0.x/reference/html/data-configuration.html
  * @author David
  *
  */
@@ -20,8 +20,9 @@ public class SecurityEvaluationContextExtension extends EvaluationContextExtensi
 
 	@Override
 	public SecurityExpressionRoot getRootObject() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		return new SecurityExpressionRoot(authentication) {};
+		final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		return new SecurityExpressionRoot(authentication) {
+		};
 	}
 
 }

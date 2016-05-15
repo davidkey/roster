@@ -8,6 +8,7 @@ import com.dak.duty.model.interfaces.MailMessageInterface;
 @Service
 public interface EmailService<Msg extends MailMessageInterface> {
 
-   public boolean send(Email email);
-   public boolean validateIncoming(Msg msg);
+	boolean send(Email email);
+
+	boolean validateIncoming(Msg msg);
 }

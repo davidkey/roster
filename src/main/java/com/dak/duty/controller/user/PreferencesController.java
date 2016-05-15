@@ -19,37 +19,37 @@ import com.dak.duty.service.PersonService;
 @Controller
 @RequestMapping("/user/preferences")
 public class PreferencesController {
-   
-   private static final Logger logger = LoggerFactory.getLogger(PreferencesController.class);
-   
-   @Autowired
-   DutyRepository dutyRepos;
-   
-   @Autowired
-   PersonService personService;
-   
-   @Autowired
-   PersonRepository personRepos;
-   
-   @Autowired
-   IAuthenticationFacade authenciationFacade;
-   
 
-   @RequestMapping(method = RequestMethod.GET)
-   public String getPreferences(Model model){
-      
-      model.addAttribute("person", personRepos.findOne(authenciationFacade.getPerson().getId()));
-      model.addAttribute("duties", dutyRepos.findAllByActiveTrueOrderByNameAsc());
-      
-      return "user/preferences";
-   }
-   
-   @RequestMapping(method = RequestMethod.POST)
-   public String savePreferences(Model model, @RequestParam MultiValueMap<String, String> parameters, final RedirectAttributes redirectAttributes){
-      logger.debug("savePreferences()");
-      
-      personService.updateDutiesFromFormPost(personRepos.findOne(authenciationFacade.getPerson().getId()), parameters);
-      redirectAttributes.addFlashAttribute("msg_success", "Duties updated!");
-      return "redirect:/user/preferences";
-   }
+	private static final Logger logger = LoggerFactory.getLogger(PreferencesController.class);
+
+	@Autowired
+	DutyRepository dutyRepos;
+
+	@Autowired
+	PersonService personService;
+
+	@Autowired
+	PersonRepository personRepos;
+
+	@Autowired
+	IAuthenticationFacade authenciationFacade;
+
+	@RequestMapping(method = RequestMethod.GET)
+	public String getPreferences(final Model model) {
+
+		model.addAttribute("person", this.personRepos.findOne(this.authenciationFacade.getPerson().getId()));
+		model.addAttribute("duties", this.dutyRepos.findAllByActiveTrueOrderByNameAsc());
+
+		return "user/preferences";
+	}
+
+	@RequestMapping(method = RequestMethod.POST)
+	public String savePreferences(final Model model, @RequestParam final MultiValueMap<String, String> parameters,
+			final RedirectAttributes redirectAttributes) {
+		PreferencesController.logger.debug("savePreferences()");
+
+		this.personService.updateDutiesFromFormPost(this.personRepos.findOne(this.authenciationFacade.getPerson().getId()), parameters);
+		redirectAttributes.addFlashAttribute("msg_success", "Duties updated!");
+		return "redirect:/user/preferences";
+	}
 }

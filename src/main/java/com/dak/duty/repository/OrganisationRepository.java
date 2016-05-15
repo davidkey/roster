@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.dak.duty.model.Organisation;
 
 @Repository
-public interface OrganisationRepository extends JpaRepository<Organisation, Long>{
+public interface OrganisationRepository extends JpaRepository<Organisation, Long> {
 
 }
