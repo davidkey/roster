@@ -34,7 +34,7 @@ public class EventCalendarNodeSortByDate implements Comparator<EventCalendarNode
 			}
 		}
 
-		return date1.compareTo(date2);
+		return date1 == null ? -1 : date1.compareTo(date2);
 	}
 
 }
