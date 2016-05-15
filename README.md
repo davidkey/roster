@@ -1,6 +1,7 @@
 # Duty #
 [![Build Status](https://travis-ci.org/davidkey/roster.svg?branch=master)](https://travis-ci.org/davidkey/roster)
 [![Sputnik](https://sputnik.ci/conf/badge)](https://sputnik.ci/app#/builds/davidkey/roster)
+[![Build Status](https://dak.rocks/jenkins/buildStatus/icon?job=BUILD_DUTY_ROSTER)](https://dak.rocks/jenkins/job/BUILD_DUTY_ROSTER)
 ### What is this repository for? ###
 
 Generating and managing duty rosters. A work in progress.
