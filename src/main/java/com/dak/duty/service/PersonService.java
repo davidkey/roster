@@ -146,18 +146,18 @@ public class PersonService {
 	}
 
 	public boolean loginAsPerson(final String username, final String password, final HttpServletRequest request) {
-		PersonService.logger.debug("loginAsPerson({}, {})", username, password);
+		logger.debug("loginAsPerson({}, {})", username, password);
 		try {
 			// Must be called from request filtered by Spring Security, otherwise SecurityContextHolder is not updated
 			final UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
 			token.setDetails(new WebAuthenticationDetails(request));
 			final Authentication authentication = this.authenticationManager.authenticate(token);
-			PersonService.logger.debug("Logging in with [{}]", authentication.getPrincipal());
+			logger.debug("Logging in with [{}]", authentication.getPrincipal());
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 			return true;
 		} catch (final Exception e) {
 			SecurityContextHolder.getContext().setAuthentication(null);
-			PersonService.logger.error("Failure in autoLogin", e);
+			logger.error("Failure in autoLogin", e);
 			return false;
 		}
 	}
@@ -376,7 +376,7 @@ public class PersonService {
 
 	@Transactional
 	public void updateDutiesFromFormPost(@NonNull final Person person, @NonNull final MultiValueMap<String, String> parameters) {
-		PersonService.logger.debug("updateDutesForPersonFromFormPost({})", person.getId());
+		logger.debug("updateDutesForPersonFromFormPost({})", person.getId());
 
 		final Map<Long, Integer> dutyPrefs = new HashMap<>();
 
@@ -392,7 +392,7 @@ public class PersonService {
 			}
 		}
 
-		PersonService.logger.info("Duty Prefs: {}", dutyPrefs);
+		logger.info("Duty Prefs: {}", dutyPrefs);
 
 		boolean personUpdated = false;
 		for (final Map.Entry<Long, Integer> entry : dutyPrefs.entrySet()) {

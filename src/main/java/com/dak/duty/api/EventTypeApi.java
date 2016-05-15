@@ -33,7 +33,7 @@ public class EventTypeApi {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(method = RequestMethod.DELETE)
 	public @ResponseBody JsonResponse delete(@RequestBody EventType eventType) {
-		EventTypeApi.logger.debug("eventType.delete({})", eventType);
+		logger.debug("eventType.delete({})", eventType);
 
 		eventType = this.eventTypeRepos.findOne(eventType.getId());
 		eventType.setActive(false);
@@ -44,7 +44,7 @@ public class EventTypeApi {
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public @ResponseBody EventType get(@PathVariable("id") final Long id) {
-		EventTypeApi.logger.debug("eventType.get({})", id);
+		logger.debug("eventType.get({})", id);
 
 		return this.eventTypeRepos.findOne(id);
 	}
@@ -52,7 +52,7 @@ public class EventTypeApi {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(method = RequestMethod.POST)
 	public @ResponseBody JsonResponse save(@RequestBody EventType eventType) {
-		EventTypeApi.logger.debug("eventType.save({})", eventType);
+		logger.debug("eventType.save({})", eventType);
 		eventType = this.eventService.saveEventType(eventType);
 
 		return new JsonResponse(ResponseStatus.OK, "Event saved with id " + eventType.getId());

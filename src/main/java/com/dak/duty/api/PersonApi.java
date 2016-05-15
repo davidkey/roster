@@ -54,7 +54,7 @@ public class PersonApi {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(method = RequestMethod.DELETE)
 	public @ResponseBody JsonResponse delete(@RequestBody Person person) {
-		PersonApi.logger.debug("person.delete({})", person);
+		logger.debug("person.delete({})", person);
 
 		person = this.personRepos.findOne(person.getId());
 		person.setActive(false);
@@ -66,7 +66,7 @@ public class PersonApi {
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	@PreAuthorize("#p.emailAddress == authentication.name or (hasRole('ROLE_ADMIN') and #p.organisation.id == principal.person.organisation.id)")
 	public @ResponseBody Person get(@PathVariable("id") @P("p") final Person person) {
-		PersonApi.logger.debug("person.get({})", person.getId());
+		logger.debug("person.get({})", person.getId());
 
 		return person;
 	}
@@ -80,7 +80,7 @@ public class PersonApi {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(method = RequestMethod.POST)
 	public @ResponseBody JsonResponse save(@RequestBody Person person) {
-		PersonApi.logger.debug("person.save({})", person.getEmailAddress());
+		logger.debug("person.save({})", person.getEmailAddress());
 
 		person = this.personService.save(person);
 
@@ -90,7 +90,7 @@ public class PersonApi {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(value = "/password", method = RequestMethod.POST)
 	public @ResponseBody JsonResponse setPassword(@RequestBody final Person person) {
-		PersonApi.logger.debug("setPassword.save({})", person.getId());
+		logger.debug("setPassword.save({})", person.getId());
 
 		Person personToUpdate = this.personRepos.findOne(person.getId());
 		if (personToUpdate != null) {

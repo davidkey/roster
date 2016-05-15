@@ -22,7 +22,7 @@ public class MessageController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getMessages(final Model model) {
-		MessageController.logger.debug("getMessages()");
+		logger.debug("getMessages()");
 
 		model.addAttribute("messages", this.mailMessageRepos.findAllByActiveTrue(new Sort(Sort.Direction.DESC, "timestamp")));
 		return "admin/messages";

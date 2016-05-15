@@ -40,7 +40,7 @@ public class MessageApi {
 
 	@RequestMapping(value = "/{id}/read", method = RequestMethod.POST)
 	public @ResponseBody JsonResponse markAsRead(@PathVariable("id") final MailgunMailMessage msg) {
-		MessageApi.logger.debug("markAsRead({})", msg.getId());
+		logger.debug("markAsRead({})", msg.getId());
 
 		msg.setRead(true);
 		this.messageRepos.save(msg);
@@ -49,7 +49,7 @@ public class MessageApi {
 
 	@RequestMapping(value = "/{id}/unread", method = RequestMethod.POST)
 	public @ResponseBody JsonResponse markAsUnread(@PathVariable("id") final MailgunMailMessage msg) {
-		MessageApi.logger.debug("markAsRead({})", msg.getId());
+		logger.debug("markAsRead({})", msg.getId());
 
 		msg.setRead(false);
 		this.messageRepos.save(msg);
@@ -58,7 +58,7 @@ public class MessageApi {
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public @ResponseBody JsonResponse delete(@PathVariable("id") final MailgunMailMessage msg) {
-		MessageApi.logger.debug("delete({})", msg.getId());
+		logger.debug("delete({})", msg.getId());
 
 		msg.setActive(false);
 		this.messageRepos.save(msg);

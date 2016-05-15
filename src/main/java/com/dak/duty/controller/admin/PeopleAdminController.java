@@ -49,12 +49,12 @@ public class PeopleAdminController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getPeople(final Model model) {
-		PeopleAdminController.logger.debug("getPeople()");
+		logger.debug("getPeople()");
 
 		final List<Person> people = this.personRepos
 				.findAll(Specifications.where(PersonSpecs.sameOrg()).and(PersonSpecs.orderByNameLastAscNameFirstAsc()));
 
-		PeopleAdminController.logger.debug("people found: {}", people.size());
+		logger.debug("people found: {}", people.size());
 
 		model.addAttribute("people", people);
 		return "admin/people";
@@ -63,7 +63,7 @@ public class PeopleAdminController {
 	@RequestMapping(method = RequestMethod.POST)
 	public String savePerson(@ModelAttribute @Valid final Person person, final BindingResult result,
 			final RedirectAttributes redirectAttributes) {
-		PeopleAdminController.logger.debug("savePerson()");
+		logger.debug("savePerson()");
 		final boolean personAlreadyExisted = person.getId() > 0;
 
 		if (personAlreadyExisted) {
@@ -99,7 +99,7 @@ public class PeopleAdminController {
 
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
 	public String getAddPerson(final Model model) {
-		PeopleAdminController.logger.debug("getAddPerson()");
+		logger.debug("getAddPerson()");
 		if (!model.containsAttribute("person")) {
 			model.addAttribute("person", new Person());
 		}
@@ -110,7 +110,7 @@ public class PeopleAdminController {
 	@PreAuthorize("#p.organisation.id == principal.person.organisation.id")
 	@RequestMapping(value = "/{personId}", method = RequestMethod.GET)
 	public String getEditPerson(final @PathVariable("personId") @P("p") Person person, final Model model) {
-		PeopleAdminController.logger.debug("getEditPerson()");
+		logger.debug("getEditPerson()");
 
 		if (!model.containsAttribute("person")) {
 			model.addAttribute("person", person);
@@ -122,7 +122,7 @@ public class PeopleAdminController {
 	@PreAuthorize("#p.organisation.id == principal.person.organisation.id")
 	@RequestMapping(value = "/{personId}/duties", method = RequestMethod.GET)
 	public String getManageDuties(final @PathVariable("personId") @P("p") Person person, final Model model) {
-		PeopleAdminController.logger.debug("getManageDuties()");
+		logger.debug("getManageDuties()");
 
 		model.addAttribute("personName", person.getNameFirst() + " " + person.getNameLast());
 		model.addAttribute("person", person);
@@ -134,7 +134,7 @@ public class PeopleAdminController {
 	@RequestMapping(value = "/{personId}/duties", method = RequestMethod.POST)
 	public String updateDuties(final @PathVariable("personId") @P("p") Person person, final Model model,
 			@RequestParam final MultiValueMap<String, String> parameters, final RedirectAttributes redirectAttributes) {
-		PeopleAdminController.logger.debug("updateDuties()");
+		logger.debug("updateDuties()");
 
 		this.personService.updateDutiesFromFormPost(person, parameters);
 

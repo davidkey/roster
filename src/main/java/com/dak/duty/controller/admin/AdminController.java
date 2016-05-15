@@ -22,19 +22,19 @@ public class AdminController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getAdminHome(final Model model) {
-		AdminController.logger.debug("getAdminHome()");
+		logger.debug("getAdminHome()");
 		return "admin/admin";
 	}
 
 	@RequestMapping(value = "/settings", method = RequestMethod.GET)
 	public String getSettings(final Model model) {
-		AdminController.logger.debug("getSettings()");
+		logger.debug("getSettings()");
 		return "admin/settings";
 	}
 
 	@RequestMapping(value = "/about", method = RequestMethod.GET)
 	public String getAbout(final Model model) {
-		AdminController.logger.debug("getAbout()");
+		logger.debug("getAbout()");
 		return "admin/about";
 	}
 

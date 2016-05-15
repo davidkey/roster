@@ -35,10 +35,10 @@ public class RosterAdminController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getRostersAndEvents(final Model model) {
-		RosterAdminController.logger.debug("getRostersAndEvents()");
+		logger.debug("getRostersAndEvents()");
 
 		final List<Event> events = this.eventRepos.findAll();
-		RosterAdminController.logger.debug("events found: {}", events.size());
+		logger.debug("events found: {}", events.size());
 
 		model.addAttribute("events", events);
 		return "admin/rosters";
@@ -47,7 +47,7 @@ public class RosterAdminController {
 	@PreAuthorize("#e.organisation.id == principal.person.organisation.id AND hasRole('ROLE_ADMIN')")
 	@RequestMapping(value = "/{eventId}", method = RequestMethod.GET)
 	public String getEventAndRoster(@PathVariable("eventId") @P("e") final Event event, final Model model) {
-		RosterAdminController.logger.debug("getEventAndRoster({})", event);
+		logger.debug("getEventAndRoster({})", event);
 
 		final List<EventRosterItem> sortedRoster = this.eventService.getSortedRosterIncludingEmptySlots(event);
 
@@ -58,7 +58,7 @@ public class RosterAdminController {
 
 	@RequestMapping(value = "/generate", method = RequestMethod.GET)
 	public String generateRosters(final Model model, final RedirectAttributes redirectAttributes) {
-		RosterAdminController.logger.debug("generateRosters()");
+		logger.debug("generateRosters()");
 
 		final int numGenerated = this.eventService.createAndSaveEventsForNextMonth();
 
@@ -68,7 +68,7 @@ public class RosterAdminController {
 
 	@RequestMapping(value = "/generateMissing", method = RequestMethod.GET)
 	public String generateMissingRosters(final Model model, final RedirectAttributes redirectAttributes) {
-		RosterAdminController.logger.debug("generateMissingRosters()");
+		logger.debug("generateMissingRosters()");
 
 		final int numGenerated = this.eventService.createAndSaveMissingEvents();
 
@@ -78,7 +78,7 @@ public class RosterAdminController {
 
 	@RequestMapping(value = "/approveAllFullyPopulated", method = RequestMethod.GET)
 	public String approveAllFullyPopulated(final Model model, final RedirectAttributes redirectAttributes) {
-		RosterAdminController.logger.debug("approveAllFullyPopulated()");
+		logger.debug("approveAllFullyPopulated()");
 
 		final List<Event> events = this.eventRepos.findByApproved(false);
 		final List<Event> eventsToApprove = new ArrayList<>();
@@ -98,7 +98,7 @@ public class RosterAdminController {
 
 	@RequestMapping(value = "/approveAll", method = RequestMethod.GET)
 	public String approveAll(final Model model, final RedirectAttributes redirectAttributes) {
-		RosterAdminController.logger.debug("approveAll()");
+		logger.debug("approveAll()");
 
 		final int numAffected = this.eventService.approveAllRosters();
 
@@ -108,7 +108,7 @@ public class RosterAdminController {
 
 	@RequestMapping(value = "/unapproveAll", method = RequestMethod.GET)
 	public String unapproveAll(final Model model, final RedirectAttributes redirectAttributes) {
-		RosterAdminController.logger.debug("unapproveAll()");
+		logger.debug("unapproveAll()");
 
 		final int numAffected = this.eventService.unApproveAllRosters();
 
@@ -118,7 +118,7 @@ public class RosterAdminController {
 
 	@RequestMapping(value = "/fillEmptySlots", method = RequestMethod.GET)
 	public String fillEmptySlots(final Model model, final RedirectAttributes redirectAttributes) {
-		RosterAdminController.logger.debug("fillEmptySlots()");
+		logger.debug("fillEmptySlots()");
 
 		final int numAffected = this.eventService.fillEmptySlots();
 

@@ -36,7 +36,7 @@ public class MailMessageController {
 
 	@RequestMapping(method = RequestMethod.POST)
 	public @ResponseBody Boolean postMessage(@ModelAttribute @Valid final MailgunMailMessage mailgunMailMessage) {
-		MailMessageController.logger.debug("postMessage({})", mailgunMailMessage);
+		logger.debug("postMessage({})", mailgunMailMessage);
 
 		if (!this.emailService.validateIncoming(mailgunMailMessage)) {
 			throw new MailValidationException("Email validation failed!");

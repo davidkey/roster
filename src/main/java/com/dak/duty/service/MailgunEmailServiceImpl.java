@@ -46,12 +46,12 @@ public class MailgunEmailServiceImpl implements EmailService<MailgunMailMessage>
 	@Override
 	public boolean send(final Email email) {
 		if (this.mailgunApiKey == null || this.mailgunHost == null || "NONE".equals(this.mailgunApiKey) || "NONE".equals(this.mailgunHost)) {
-			MailgunEmailServiceImpl.logger.warn("no apikey and/or host defined for mailgun");
+			logger.warn("no apikey and/or host defined for mailgun");
 			return false;
 		}
 
 		if (email.getFrom() == null || email.getTo() == null || email.getSubject() == null || email.getMessage() == null) {
-			MailgunEmailServiceImpl.logger.warn("required email field is missing!");
+			logger.warn("required email field is missing!");
 			return false;
 		}
 
@@ -89,7 +89,7 @@ public class MailgunEmailServiceImpl implements EmailService<MailgunMailMessage>
 		final ClientResponse clientResponse = webResource.type(MediaType.APPLICATION_FORM_URLENCODED).post(ClientResponse.class, formData);
 		final String output = clientResponse.getEntity(String.class);
 
-		MailgunEmailServiceImpl.logger.info("Email sent successfully : " + output);
+		logger.info("Email sent successfully : " + output);
 		return true;
 	}
 
@@ -112,13 +112,13 @@ public class MailgunEmailServiceImpl implements EmailService<MailgunMailMessage>
 		if (this.mailgunApiKey != null && this.mailgunApiKey.length() > 0) {
 			final String mySig = this.encode(this.mailgunApiKey, String.valueOf(msg.getTimestamp()) + msg.getToken());
 			if (mySig == null || !mySig.equals(msg.getSignature())) {
-				MailgunEmailServiceImpl.logger.debug("email validation failed: signature doesn't match expected value.");
+				logger.debug("email validation failed: signature doesn't match expected value.");
 				return false;
 			}
 
 			final List<MailgunMailMessage> msgsWithSameSignature = this.mailMessageRepos.findAllBySignature(mySig);
 			if (!CollectionUtils.isEmpty(msgsWithSameSignature)) {
-				MailgunEmailServiceImpl.logger.debug("email validation failed: email with this signature already received.");
+				logger.debug("email validation failed: email with this signature already received.");
 				return false;
 			}
 		}

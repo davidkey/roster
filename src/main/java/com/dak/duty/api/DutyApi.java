@@ -37,21 +37,21 @@ public class DutyApi {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(method = RequestMethod.DELETE)
 	public @ResponseBody JsonResponse delete(@RequestBody Duty duty) {
-		DutyApi.logger.debug("duty.delete({})", duty);
+		logger.debug("duty.delete({})", duty);
 		duty = this.dutyService.softDeleteDuty(duty);
 		return new JsonResponse(ResponseStatus.OK, "Duty " + duty.getId() + " deleted");
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public @ResponseBody Duty get(@PathVariable("id") final Long id) {
-		DutyApi.logger.debug("duty.get({})", id);
+		logger.debug("duty.get({})", id);
 		return this.dutyRepos.findOne(id);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(method = RequestMethod.POST)
 	public @ResponseBody JsonResponse save(@RequestBody Duty duty) {
-		DutyApi.logger.debug("duty.save({})", duty);
+		logger.debug("duty.save({})", duty);
 		duty = this.dutyService.saveOrUpdateDuty(duty);
 		return new JsonResponse(ResponseStatus.OK, "Duty saved with id " + duty.getId());
 	}
@@ -59,7 +59,7 @@ public class DutyApi {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(value = "/sortOrder", method = RequestMethod.POST)
 	public @ResponseBody JsonResponse saveSortOrder(@RequestBody final List<SortOrder> params) {
-		DutyApi.logger.debug("duty.saveSortOrder({})", params);
+		logger.debug("duty.saveSortOrder({})", params);
 
 		try {
 			this.dutyService.updateSortOrder(params);
@@ -72,7 +72,7 @@ public class DutyApi {
 
 	@RequestMapping(value = "/sortOrder", method = RequestMethod.GET)
 	public @ResponseBody List<SortOrder> getSortOrder() {
-		DutyApi.logger.debug("duty.getSortOrder({})");
+		logger.debug("duty.getSortOrder({})");
 		return this.dutyService.getSortOrders();
 	}
 

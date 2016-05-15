@@ -36,7 +36,7 @@ public class HomeController {
 	public String getLogin(@RequestParam(value = "error", required = false) final String error, final Model model,
 			final HttpServletRequest request) {
 
-		HomeController.logger.debug("getLogin() by ip {}", request.getRemoteAddr());
+		logger.debug("getLogin() by ip {}", request.getRemoteAddr());
 
 		if (error != null) {
 			model.addAttribute("error", "Invalid username and password!");

@@ -46,7 +46,7 @@ public class PreferencesController {
 	@RequestMapping(method = RequestMethod.POST)
 	public String savePreferences(final Model model, @RequestParam final MultiValueMap<String, String> parameters,
 			final RedirectAttributes redirectAttributes) {
-		PreferencesController.logger.debug("savePreferences()");
+		logger.debug("savePreferences()");
 
 		this.personService.updateDutiesFromFormPost(this.personRepos.findOne(this.authenciationFacade.getPerson().getId()), parameters);
 		redirectAttributes.addFlashAttribute("msg_success", "Duties updated!");

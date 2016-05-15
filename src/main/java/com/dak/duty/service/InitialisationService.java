@@ -69,7 +69,7 @@ public class InitialisationService {
 	OrganisationRepository orgRepos;
 
 	protected void clearAllData() {
-		InitialisationService.logger.info("clearAllData");
+		logger.info("clearAllData");
 
 		this.eventRepos.deleteAll();
 		this.eventRepos.flush();
@@ -91,27 +91,27 @@ public class InitialisationService {
 	}
 
 	public void populateDefaultData() {
-		InitialisationService.logger.info("populateDefaultData");
+		logger.info("populateDefaultData");
 		this.clearAllData();
 
 		final List<Organisation> defaultOrgs = this.getDefaultOrganisations();
-		InitialisationService.logger.debug("defaultOrganisations: {}", defaultOrgs);
+		logger.debug("defaultOrganisations: {}", defaultOrgs);
 		this.orgRepos.save(defaultOrgs);
 
 		final List<Duty> defaultDuties = this.getDefaultDuties(defaultOrgs);
-		InitialisationService.logger.debug("defaultDuties: {}", defaultDuties);
+		logger.debug("defaultDuties: {}", defaultDuties);
 		this.dutyRepos.save(defaultDuties);
 
 		final List<EventType> defaultEventTypes = this.getDefaultEventTypes(defaultDuties, defaultOrgs);
-		InitialisationService.logger.debug("defaultEventTypes: {}", defaultEventTypes);
+		logger.debug("defaultEventTypes: {}", defaultEventTypes);
 		this.eventTypeRepos.save(defaultEventTypes);
 
 		final List<Person> defaultPeople = this.getDefaultPeople(defaultDuties, defaultOrgs);
-		InitialisationService.logger.debug("defaultPeople: {}", defaultPeople);
+		logger.debug("defaultPeople: {}", defaultPeople);
 		this.personService.save(defaultPeople);
 
 		final List<Event> defaultEvents = this.getDefaultEvents(defaultEventTypes, defaultOrgs);
-		InitialisationService.logger.debug("defaultEvents: {}", defaultEvents);
+		logger.debug("defaultEvents: {}", defaultEvents);
 		this.eventRepos.save(defaultEvents);
 
 		this.createDefaultAdminUser(this.getDefaultAdminUser());
@@ -147,7 +147,7 @@ public class InitialisationService {
 	}
 
 	public void createDefaultAdminUser(final Person defaultAdminUser) {
-		InitialisationService.logger.info("createDefaultAdminUser({})", defaultAdminUser);
+		logger.info("createDefaultAdminUser({})", defaultAdminUser);
 
 		this.createDefaultAdminUser(defaultAdminUser.getEmailAddress(), defaultAdminUser.getPassword(), defaultAdminUser.getNameLast(),
 				defaultAdminUser.getNameFirst(), defaultAdminUser.getOrganisation());
@@ -155,7 +155,7 @@ public class InitialisationService {
 
 	public void createDefaultAdminUser(final String email, final String password, final String lastName, final String firstName,
 			final Organisation org) {
-		InitialisationService.logger.info("createDefaultAdminUser({})", email);
+		logger.info("createDefaultAdminUser({})", email);
 
 		if (!this.personService.isPasswordValid(password)) {
 			throw new InvalidPasswordException(this.personService.getPasswordRequirements());
@@ -367,7 +367,7 @@ public class InitialisationService {
 				wednesdayDuties.add(d);
 				break;
 			default:
-				InitialisationService.logger.warn("possible problem - we've got a default duty ({}) without an associated event.", d);
+				logger.warn("possible problem - we've got a default duty ({}) without an associated event.", d);
 				break;
 			}
 		}

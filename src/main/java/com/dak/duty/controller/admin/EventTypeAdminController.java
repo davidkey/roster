@@ -49,10 +49,10 @@ public class EventTypeAdminController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getEventTypes(final Model model) {
-		EventTypeAdminController.logger.debug("getEventTypes()");
+		logger.debug("getEventTypes()");
 
 		final List<EventType> eventTypes = this.eventTypeRepos.findByActiveTrue();
-		EventTypeAdminController.logger.debug("event types found: {}", eventTypes.size());
+		logger.debug("event types found: {}", eventTypes.size());
 
 		model.addAttribute("eventTypes", eventTypes);
 		return "admin/eventTypes";
@@ -61,7 +61,7 @@ public class EventTypeAdminController {
 	@RequestMapping(method = RequestMethod.POST)
 	public String saveEventType(@ModelAttribute @Valid final EventType eventType, final BindingResult result,
 			final RedirectAttributes redirectAttributes) {
-		EventTypeAdminController.logger.debug("saveEventType()");
+		logger.debug("saveEventType()");
 		final boolean alreadyExisted = eventType.getId() > 0;
 
 		if (result.hasErrors()) {
@@ -90,7 +90,7 @@ public class EventTypeAdminController {
 	@PreAuthorize("#e.organisation.id == principal.person.organisation.id")
 	@RequestMapping(value = "/{eventTypeId}", method = RequestMethod.GET)
 	public String getEventTypeById(@PathVariable("eventTypeId") @P("e") final EventType eventType, final Model model) {
-		EventTypeAdminController.logger.debug("getEventTypeById({})", eventType.getId());
+		logger.debug("getEventTypeById({})", eventType.getId());
 
 		if (!model.containsAttribute("eventType")) {
 			model.addAttribute("eventType", eventType);
@@ -102,7 +102,7 @@ public class EventTypeAdminController {
 
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
 	public String getAddEventType(final Model model) {
-		EventTypeAdminController.logger.debug("getAddEventType()");
+		logger.debug("getAddEventType()");
 
 		if (!model.containsAttribute("eventType")) {
 			model.addAttribute("eventType", new EventType());

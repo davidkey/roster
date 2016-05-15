@@ -42,7 +42,7 @@ public class SearchApi {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public @ResponseBody AutocompleteResponse getSearch(@RequestParam("query") final String searchString) {
-		SearchApi.logger.debug("getSearch({})", searchString);
+		logger.debug("getSearch({})", searchString);
 
 		final List<AutocompleteNode> nodes = new ArrayList<>();
 

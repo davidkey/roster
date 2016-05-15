@@ -36,7 +36,7 @@ public class PasswordResetController {
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String getForgotPassword(final Model model, final HttpServletRequest request) {
-		PasswordResetController.logger.debug("getForgotPassword({})", request.getRemoteAddr());
+		logger.debug("getForgotPassword({})", request.getRemoteAddr());
 
 		model.addAttribute("passwordForgotForm", new PasswordForgotForm());
 		return "passwordForgot";
@@ -45,7 +45,7 @@ public class PasswordResetController {
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public String forgotPassword(final Model model, final HttpServletRequest request, @Valid final PasswordForgotForm form,
 			final BindingResult bindingResult) {
-		PasswordResetController.logger.debug("forgotPassword({})", request.getRemoteAddr());
+		logger.debug("forgotPassword({})", request.getRemoteAddr());
 
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("passwordForgotForm", form);
@@ -62,7 +62,7 @@ public class PasswordResetController {
 		} catch (final Exception e) {
 			model.addAttribute("passwordForgotForm", form);
 			model.addAttribute("error", "An unknown error occured");
-			PasswordResetController.logger.error("exception during password reset: {}", e);
+			logger.error("exception during password reset: {}", e);
 		}
 
 		return "passwordForgot";
@@ -70,7 +70,7 @@ public class PasswordResetController {
 
 	@RequestMapping(value = "/{resetToken}", method = RequestMethod.GET)
 	public String getResetPassword(@PathVariable("resetToken") final String resetToken, final Model model) {
-		PasswordResetController.logger.debug("resetPassword({})", resetToken);
+		logger.debug("resetPassword({})", resetToken);
 
 		final Person person = this.personRepos.findByResetTokenAndResetTokenExpiresGreaterThan(resetToken, new Date());
 
@@ -86,7 +86,7 @@ public class PasswordResetController {
 	@RequestMapping(value = "/{resetToken}", method = RequestMethod.POST)
 	public String resetPassword(final @PathVariable("resetToken") String resetToken, @Valid final PasswordResetForm form,
 			final BindingResult bindingResult, final Model model, final HttpServletRequest request) {
-		PasswordResetController.logger.debug("resetPassword({})", resetToken);
+		logger.debug("resetPassword({})", resetToken);
 
 		if (bindingResult.hasErrors() || !form.getPassword().equals(form.getConfirmPassword())) {
 			if (form.getPassword() == null || !form.getPassword().equals(form.getConfirmPassword())) {

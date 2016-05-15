@@ -54,7 +54,7 @@ public class SetupController {
 	@RequestMapping(method = RequestMethod.POST)
 	public String postSetup(@Valid final SetupForm form, final BindingResult bindingResult, final Model model,
 			final HttpServletRequest request) {
-		SetupController.logger.info("postSetup({})", form);
+		logger.info("postSetup({})", form);
 
 		if (bindingResult.hasErrors() || !form.getPassword().equals(form.getConfirmPassword())) {
 			if (form.getPassword() == null || !form.getPassword().equals(form.getConfirmPassword())) {
@@ -75,7 +75,7 @@ public class SetupController {
 			this.emailService
 					.send(new Email("admin@roster.guru", form.getEmailAddress().trim(), "Welcome to Duty Roster!", "We hope you like it!"));
 		} catch (final Exception e) {
-			SetupController.logger.error("error: {}", e);
+			logger.error("error: {}", e);
 		}
 
 		return "redirect:/admin";

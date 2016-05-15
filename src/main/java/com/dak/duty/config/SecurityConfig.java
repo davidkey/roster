@@ -33,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(final HttpSecurity http) throws Exception {
-		SecurityConfig.LOGGER.debug("configure(http)");
+		LOGGER.debug("configure(http)");
 
 		http.authorizeRequests().antMatchers("/login", "/logout", "/console/**", "/info").permitAll().antMatchers("/admin/**")
 				.hasRole("ADMIN").antMatchers("/user/**").hasRole("USER")
@@ -45,14 +45,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
-		SecurityConfig.LOGGER.debug("configure(auth)");
+		LOGGER.debug("configure(auth)");
 		// auth.userDetailsService(userDetailsService).passwordEncoder(encoder);
 		auth.authenticationProvider(this.authProvider());
 	}
 
 	@Bean
 	public DaoAuthenticationProvider authProvider() {
-		SecurityConfig.LOGGER.debug("DaoAuthenticationProvider authProvider()");
+		LOGGER.debug("DaoAuthenticationProvider authProvider()");
 		final DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 		authProvider.setUserDetailsService(this.userDetailsService);
 		authProvider.setPasswordEncoder(this.encoder);

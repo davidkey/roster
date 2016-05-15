@@ -36,10 +36,10 @@ public class DutyAdminController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getDuties(final Model model) {
-		DutyAdminController.logger.debug("getDuties()");
+		logger.debug("getDuties()");
 
 		final List<Duty> duties = this.dutyRepos.findByActiveTrueOrderBySortOrderAsc();
-		DutyAdminController.logger.debug("duties found: {}", duties.size());
+		logger.debug("duties found: {}", duties.size());
 
 		model.addAttribute("duties", duties);
 		return "admin/duties";
@@ -47,7 +47,7 @@ public class DutyAdminController {
 
 	@RequestMapping(method = RequestMethod.POST)
 	public String saveDuty(@ModelAttribute @Valid final Duty duty, final BindingResult result, final RedirectAttributes redirectAttributes) {
-		DutyAdminController.logger.debug("saveDuty()");
+		logger.debug("saveDuty()");
 		final boolean alreadyExisted = duty.getId() > 0;
 
 		if (result.hasErrors()) {
@@ -68,7 +68,7 @@ public class DutyAdminController {
 
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
 	public String getNewDuty(final Model model) {
-		DutyAdminController.logger.debug("getNewDuty()");
+		logger.debug("getNewDuty()");
 
 		if (!model.containsAttribute("duty")) {
 			final Duty duty = new Duty();
@@ -84,7 +84,7 @@ public class DutyAdminController {
 	@PreAuthorize("#d.organisation.id == principal.person.organisation.id")
 	@RequestMapping(value = "/{dutyId}", method = RequestMethod.GET)
 	public String getEditDuty(@PathVariable("dutyId") @P("d") final Duty duty, final Model model) {
-		DutyAdminController.logger.debug("getEditDuty()");
+		logger.debug("getEditDuty()");
 
 		if (!model.containsAttribute("duty")) {
 			model.addAttribute("duty", duty);

@@ -39,7 +39,7 @@ public class UserController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getUserHome(final Model model, final Principal principal) {
-		UserController.logger.debug("getUserHome");
+		logger.debug("getUserHome");
 		final Person p = this.authenticationFacade.getPerson();
 
 		model.addAttribute("personName", p.getNameFirst() + " " + p.getNameLast());
@@ -48,7 +48,7 @@ public class UserController {
 
 	@RequestMapping(value = "/changePassword", method = RequestMethod.GET)
 	public String changePassword(final Model model, final Principal principal) {
-		UserController.logger.debug("changePassword({})", principal.getName());
+		logger.debug("changePassword({})", principal.getName());
 
 		model.addAttribute("changePasswordForm", new ChangePasswordForm());
 		return "user/changePassword";
@@ -57,7 +57,7 @@ public class UserController {
 	@RequestMapping(value = "/changePassword", method = RequestMethod.POST)
 	public String changePasswordPost(@Valid final ChangePasswordForm form, final BindingResult bindingResult, final Model model,
 			final Principal principal, final RedirectAttributes redirectAttributes) {
-		UserController.logger.debug("changePasswordPost({})", principal.getName());
+		logger.debug("changePasswordPost({})", principal.getName());
 
 		final Person person = this.authenticationFacade.getPerson();
 		final boolean currentPasswordMatches = this.personService.isCurrentPassword(person, form.getCurrentPassword());

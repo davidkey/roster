@@ -34,7 +34,7 @@ public class EventAdminController {
 	@RequestMapping(value = "/{year}/{month}/json", method = RequestMethod.GET)
 	public @ResponseBody List<EventCalendarNode> getEventCalendarItems(@PathVariable("year") final Integer year,
 			@PathVariable("month") final Integer month) throws ParseException {
-		EventAdminController.logger.info("getEventCalendarItems({}, {})", year, month);
+		logger.info("getEventCalendarItems({}, {})", year, month);
 		final Date monthDate = new DateTime(year, month, 1, 0, 0, 0).toDate();
 		return this.eventService.getEventCalendarNodesForMonth(monthDate);
 	}
