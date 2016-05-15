@@ -1,11 +1,9 @@
 package com.dak.duty.service;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Date;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,87 +21,88 @@ import com.dak.duty.security.mocking.WithMockCustomUserAdmin;
 @WithMockCustomUserAdmin
 public class IntervalServiceTest extends ServiceTest {
 
-   @Autowired
-   EventService eventService;
+	@Autowired
+	EventService eventService;
 
-   @Autowired
-   EventTypeRepository eventTypeRepos;
+	@Autowired
+	EventTypeRepository eventTypeRepos;
 
-   @Autowired
-   IntervalService intervalService;
-   
-   @Autowired
-   OrganisationRepository orgRepos;
+	@Autowired
+	IntervalService intervalService;
 
-   @Test
-   public void testSettingIntervalFromWeeklyToDaily(){
-      EventType et = new EventType();
-      et.setName("test event type");
-      et.setDescription(et.getName());
-      et.setInterval(EventTypeInterval.WEEKLY);
-      et.setIntervalDetail(IntervalWeekly.THURSDAY.toString());
-      et.setOrganisation(orgRepos.findAll().get(0));
+	@Autowired
+	OrganisationRepository orgRepos;
 
-      et = eventService.saveEventType(et);
+	@Test
+	public void testSettingIntervalFromWeeklyToDaily() {
+		EventType et = new EventType();
+		et.setName("test event type");
+		et.setDescription(et.getName());
+		et.setInterval(EventTypeInterval.WEEKLY);
+		et.setIntervalDetail(IntervalWeekly.THURSDAY.toString());
+		et.setOrganisation(this.orgRepos.findAll().get(0));
 
-      et.setInterval(EventTypeInterval.DAILY);
-      et = eventService.saveEventType(et);
+		et = this.eventService.saveEventType(et);
 
-      List<Date> dates = intervalService.getDaysOfMonthForInterval(intervalService.getCurrentSystemDate(), et.getInterval(), et.getIntervalDetail());
+		et.setInterval(EventTypeInterval.DAILY);
+		et = this.eventService.saveEventType(et);
 
-      assertNotNull(dates);
-      assertTrue("dates is empty", dates.size() > 0);
-   }
+		final List<Date> dates = this.intervalService.getDaysOfMonthForInterval(this.intervalService.getCurrentSystemDate(), et.getInterval(),
+				et.getIntervalDetail());
 
-   @Test
-   public void testDailyEventCanBeCreatedWithoutIntervalDetail(){
-      EventType et = new EventType();
-      et.setName("test event type two");
-      et.setDescription(et.getName());
-      et.setInterval(EventTypeInterval.DAILY);
-      et.setOrganisation(orgRepos.findAll().get(0));
+		Assert.assertNotNull(dates);
+		Assert.assertTrue("dates is empty", dates.size() > 0);
+	}
 
-      List<Date> dates = intervalService.getDaysOfMonthForInterval(intervalService.getCurrentSystemDate(), et.getInterval(), et.getIntervalDetail());
+	@Test
+	public void testDailyEventCanBeCreatedWithoutIntervalDetail() {
+		final EventType et = new EventType();
+		et.setName("test event type two");
+		et.setDescription(et.getName());
+		et.setInterval(EventTypeInterval.DAILY);
+		et.setOrganisation(this.orgRepos.findAll().get(0));
 
-      assertNotNull(dates);
-      assertTrue("dates is empty", dates.size() > 0);
-   }
-   
-   @Test(expected = IntervalValidationException.class)
-   public void testWeeklyEventCannotBeSetWithoutDetail(){
-      
-      EventType et = new EventType();
-      et.setName("test event type three");
-      et.setDescription(et.getName());
-      et.setInterval(EventTypeInterval.WEEKLY);
-      et.setOrganisation(orgRepos.findAll().get(0));
-      
-      intervalService.getDaysOfMonthForInterval(intervalService.getCurrentSystemDate(), et.getInterval(), et.getIntervalDetail());
-   }
-   
-   @Test(expected = IntervalValidationException.class)
-   public void testOnceEventCannotBeSetWithoutDetail(){
-      
-      EventType et = new EventType();
-      et.setName("test event type four");
-      et.setDescription(et.getName());
-      et.setInterval(EventTypeInterval.ONCE);
-      et.setOrganisation(orgRepos.findAll().get(0));
-      
-      intervalService.getDaysOfMonthForInterval(intervalService.getCurrentSystemDate(), et.getInterval(), et.getIntervalDetail());
-   }
-   
-   @Test(expected = IntervalValidationException.class)
-   public void testMonthlyEventCannotBeSetWithoutDetail(){
-      
-      EventType et = new EventType();
-      et.setName("test event type five");
-      et.setDescription(et.getName());
-      et.setInterval(EventTypeInterval.MONTHLY);
-      et.setOrganisation(orgRepos.findAll().get(0));
-      
-      intervalService.getDaysOfMonthForInterval(intervalService.getCurrentSystemDate(), et.getInterval(), et.getIntervalDetail());
-   }
+		final List<Date> dates = this.intervalService.getDaysOfMonthForInterval(this.intervalService.getCurrentSystemDate(), et.getInterval(),
+				et.getIntervalDetail());
 
+		Assert.assertNotNull(dates);
+		Assert.assertTrue("dates is empty", dates.size() > 0);
+	}
+
+	@Test(expected = IntervalValidationException.class)
+	public void testWeeklyEventCannotBeSetWithoutDetail() {
+
+		final EventType et = new EventType();
+		et.setName("test event type three");
+		et.setDescription(et.getName());
+		et.setInterval(EventTypeInterval.WEEKLY);
+		et.setOrganisation(this.orgRepos.findAll().get(0));
+
+		this.intervalService.getDaysOfMonthForInterval(this.intervalService.getCurrentSystemDate(), et.getInterval(), et.getIntervalDetail());
+	}
+
+	@Test(expected = IntervalValidationException.class)
+	public void testOnceEventCannotBeSetWithoutDetail() {
+
+		final EventType et = new EventType();
+		et.setName("test event type four");
+		et.setDescription(et.getName());
+		et.setInterval(EventTypeInterval.ONCE);
+		et.setOrganisation(this.orgRepos.findAll().get(0));
+
+		this.intervalService.getDaysOfMonthForInterval(this.intervalService.getCurrentSystemDate(), et.getInterval(), et.getIntervalDetail());
+	}
+
+	@Test(expected = IntervalValidationException.class)
+	public void testMonthlyEventCannotBeSetWithoutDetail() {
+
+		final EventType et = new EventType();
+		et.setName("test event type five");
+		et.setDescription(et.getName());
+		et.setInterval(EventTypeInterval.MONTHLY);
+		et.setOrganisation(this.orgRepos.findAll().get(0));
+
+		this.intervalService.getDaysOfMonthForInterval(this.intervalService.getCurrentSystemDate(), et.getInterval(), et.getIntervalDetail());
+	}
 
 }

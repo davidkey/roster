@@ -22,39 +22,39 @@ import com.dak.duty.service.EventService;
 @PreAuthorize("hasRole('ROLE_USER')")
 public class EventTypeApi {
 
-   private static final Logger logger = LoggerFactory.getLogger(EventTypeApi.class);
-   
-   @Autowired
-   EventTypeRepository eventTypeRepos;
-   
-   @Autowired
-   EventService eventService;
-   
-   @PreAuthorize("hasRole('ROLE_ADMIN')")
-   @RequestMapping(method = RequestMethod.DELETE)
-   public @ResponseBody JsonResponse delete(@RequestBody EventType eventType){
-      logger.debug("eventType.delete({})", eventType);
-      
-      eventType = eventTypeRepos.findOne(eventType.getId());
-      eventType.setActive(false);
-      eventTypeRepos.save(eventType);
-      
-      return new JsonResponse(ResponseStatus.OK, "EventType " + eventType.getId() + " deleted");
-   }
-   
-   @RequestMapping(value="/{id}", method = RequestMethod.GET)
-   public @ResponseBody EventType get(@PathVariable("id") Long id){
-      logger.debug("eventType.get({})", id);
-      
-      return eventTypeRepos.findOne(id);
-   }
-   
-   @PreAuthorize("hasRole('ROLE_ADMIN')")
-   @RequestMapping(method = RequestMethod.POST)
-   public @ResponseBody JsonResponse save(@RequestBody EventType eventType){
-      logger.debug("eventType.save({})", eventType);
-      eventType = eventService.saveEventType(eventType);
-      
-      return new JsonResponse(ResponseStatus.OK, "Event saved with id " + eventType.getId());
-   }
+	private static final Logger logger = LoggerFactory.getLogger(EventTypeApi.class);
+
+	@Autowired
+	EventTypeRepository eventTypeRepos;
+
+	@Autowired
+	EventService eventService;
+
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@RequestMapping(method = RequestMethod.DELETE)
+	public @ResponseBody JsonResponse delete(@RequestBody EventType eventType) {
+		logger.debug("eventType.delete({})", eventType);
+
+		eventType = this.eventTypeRepos.findOne(eventType.getId());
+		eventType.setActive(false);
+		this.eventTypeRepos.save(eventType);
+
+		return new JsonResponse(ResponseStatus.OK, "EventType " + eventType.getId() + " deleted");
+	}
+
+	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	public @ResponseBody EventType get(@PathVariable("id") final Long id) {
+		logger.debug("eventType.get({})", id);
+
+		return this.eventTypeRepos.findOne(id);
+	}
+
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@RequestMapping(method = RequestMethod.POST)
+	public @ResponseBody JsonResponse save(@RequestBody EventType eventType) {
+		logger.debug("eventType.save({})", eventType);
+		eventType = this.eventService.saveEventType(eventType);
+
+		return new JsonResponse(ResponseStatus.OK, "Event saved with id " + eventType.getId());
+	}
 }

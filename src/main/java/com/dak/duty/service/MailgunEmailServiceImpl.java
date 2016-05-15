@@ -6,8 +6,6 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.ws.rs.core.MediaType;
 
-import lombok.NonNull;
-
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -26,105 +24,106 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
+import lombok.NonNull;
+
 @Component
 public class MailgunEmailServiceImpl implements EmailService<MailgunMailMessage> {
-   
-   private static final Logger logger = LoggerFactory.getLogger(MailgunEmailServiceImpl.class);
 
-   @Value("${email.mailgun.apiKey}")
-   private String mailgunApiKey;
+	private static final Logger logger = LoggerFactory.getLogger(MailgunEmailServiceImpl.class);
 
-   @Value("${email.mailgun.host}")
-   private String mailgunHost;
+	@Value("${email.mailgun.apiKey:NONE}")
+	private String mailgunApiKey;
 
-   @Value("${email.mailgun.to}")
-   private String testEmailAddress;
-   
-   @Autowired
-   private MailMessageRepository mailMessageRepos;
+	@Value("${email.mailgun.host:NONE}")
+	private String mailgunHost;
 
-   @Override
-   public boolean send(Email email) {
-      if(mailgunApiKey == null || mailgunHost == null){
-         logger.error("no apikey and/or host defined for mailgun");
-         return false;
-      }
+	@Value("${email.mailgun.to:NONE}")
+	private String testEmailAddress;
 
-      if(email.getFrom() == null || email.getTo() == null || email.getSubject() == null || email.getMessage() == null){
-         logger.error("required email field is missing!");
-         return false;
-      }
+	@Autowired
+	private MailMessageRepository mailMessageRepos;
 
-      Client client = Client.create();
-      client.addFilter(new HTTPBasicAuthFilter("api", mailgunApiKey));
+	@Override
+	public boolean send(final Email email) {
+		if (this.mailgunApiKey == null || this.mailgunHost == null || "NONE".equals(this.mailgunApiKey) || "NONE".equals(this.mailgunHost)) {
+			logger.warn("no apikey and/or host defined for mailgun");
+			return false;
+		}
 
-      WebResource webResource = client.resource("https://api.mailgun.net/v3/" + mailgunHost +  "/messages");
+		if (email.getFrom() == null || email.getTo() == null || email.getSubject() == null || email.getMessage() == null) {
+			logger.warn("required email field is missing!");
+			return false;
+		}
 
-      MultivaluedMapImpl formData = new MultivaluedMapImpl();
-      formData.add("from", email.getFrom());
+		final Client client = Client.create();
+		client.addFilter(new HTTPBasicAuthFilter("api", this.mailgunApiKey));
 
-      if(testEmailAddress != null && testEmailAddress.length() > 0){
-         formData.add("to", testEmailAddress);
-      } else {
-         for(String to : email.getTo()){
-            formData.add("to", to);
-         }
-      }
+		final WebResource webResource = client.resource("https://api.mailgun.net/v3/" + this.mailgunHost + "/messages");
 
-      if(email.getCc() != null){
-         for(String cc : email.getCc()){
-            formData.add("cc", cc);
-         }
-      }
+		final MultivaluedMapImpl formData = new MultivaluedMapImpl();
+		formData.add("from", email.getFrom());
 
-      if(email.getBcc() != null){
-         for(String bcc : email.getBcc()){
-            formData.add("bcc", bcc);
-         }
-      }
+		if (this.testEmailAddress != null && this.testEmailAddress.length() > 0) {
+			formData.add("to", this.testEmailAddress);
+		} else {
+			for (final String to : email.getTo()) {
+				formData.add("to", to);
+			}
+		}
 
-      formData.add("subject", email.getSubject());
-      formData.add("html", email.getMessage());
+		if (email.getCc() != null) {
+			for (final String cc : email.getCc()) {
+				formData.add("cc", cc);
+			}
+		}
 
-      ClientResponse clientResponse = webResource.type(MediaType.APPLICATION_FORM_URLENCODED).post(ClientResponse.class, formData);
-      String output = clientResponse.getEntity(String.class);
+		if (email.getBcc() != null) {
+			for (final String bcc : email.getBcc()) {
+				formData.add("bcc", bcc);
+			}
+		}
 
-      logger.info("Email sent successfully : " + output);
-      return true;
-   }
+		formData.add("subject", email.getSubject());
+		formData.add("html", email.getMessage());
 
-   private String encode(@NonNull final String key, @NonNull final String data) {
-      try{
-         Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
-         SecretKeySpec secret_key = new SecretKeySpec(key.getBytes("UTF-8"), "HmacSHA256");
-         sha256_HMAC.init(secret_key);
+		final ClientResponse clientResponse = webResource.type(MediaType.APPLICATION_FORM_URLENCODED).post(ClientResponse.class, formData);
+		final String output = clientResponse.getEntity(String.class);
 
-         return Hex.encodeHexString(sha256_HMAC.doFinal(data.getBytes("UTF-8")));
-      } catch (RuntimeException re) {
-         throw re;
-      } catch (Exception e){
-         throw new MailValidationException("Could not encode!");
-      }
-   }
+		logger.info("Email sent successfully : " + output);
+		return true;
+	}
 
+	private String encode(@NonNull final String key, @NonNull final String data) {
+		try {
+			final Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+			final SecretKeySpec secret_key = new SecretKeySpec(key.getBytes("UTF-8"), "HmacSHA256");
+			sha256_HMAC.init(secret_key);
 
-   @Override
-   public boolean validateIncoming(MailgunMailMessage msg) {
-      if(mailgunApiKey != null && mailgunApiKey.length() > 0){
-         final String mySig = encode(mailgunApiKey, String.valueOf(msg.getTimestamp()) + msg.getToken());
-         if(mySig == null || !mySig.equals(msg.getSignature())){
-            logger.debug("email validation failed: signature doesn't match expected value.");
-            return false;
-         }
-         
-         final List<MailgunMailMessage> msgsWithSameSignature = mailMessageRepos.findAllBySignature(mySig);
-         if(!CollectionUtils.isEmpty(msgsWithSameSignature)){
-            logger.debug("email validation failed: email with this signature already received.");
-            return false;
-         }
-      }
-      
-      return true;
-   }
-   
+			return Hex.encodeHexString(sha256_HMAC.doFinal(data.getBytes("UTF-8")));
+		} catch (final RuntimeException re) {
+			throw re;
+		} catch (final Exception e) {
+			throw new MailValidationException("Could not encode!");
+		}
+	}
+
+	@Override
+	public boolean validateIncoming(final MailgunMailMessage msg) {
+		if (this.mailgunApiKey != null && this.mailgunApiKey.length() > 0) {
+			final String mySig = this.encode(this.mailgunApiKey, String.valueOf(msg.getTimestamp()) + msg.getToken());
+			if (mySig == null || !mySig.equals(msg.getSignature())) {
+				logger.debug("email validation failed: signature doesn't match expected value.");
+				return false;
+			}
+
+			final List<MailgunMailMessage> msgsWithSameSignature = this.mailMessageRepos.findAllBySignature(mySig);
+			if (!CollectionUtils.isEmpty(msgsWithSameSignature)) {
+				logger.debug("email validation failed: email with this signature already received.");
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 }

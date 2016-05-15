@@ -24,10 +24,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
@@ -38,6 +34,10 @@ import com.dak.duty.security.CustomUserDetails;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 @Entity
 @Table(name = "event")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -45,94 +45,97 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 @Setter
 @ToString
 public class Event implements Serializable {
-   private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-   @Id
-   @SequenceGenerator(name = "event_id_seq", sequenceName = "event_id_seq")
-   @GeneratedValue(strategy = GenerationType.AUTO, generator = "event_id_seq")
-   @Column(nullable = false)
-   private long id;
-   
-   @ManyToOne
-   @JoinColumn(name="org_id", nullable=false)
-   private Organisation organisation;
+	@Id
+	@SequenceGenerator(name = "event_id_seq", sequenceName = "event_id_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "event_id_seq")
+	@Column(nullable = false)
+	private long id;
 
-   @Temporal(TemporalType.DATE)
-   @Column(nullable = false)
-   @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
-   private Date dateEvent;
+	@ManyToOne
+	@JoinColumn(name = "org_id", nullable = false)
+	private Organisation organisation;
 
-   @ManyToOne
-   @JoinColumn(name="event_type_id", nullable=false)
-   private EventType eventType;
+	@Temporal(TemporalType.DATE)
+	@Column(nullable = false)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private Date dateEvent;
 
-   private String name;
+	@ManyToOne
+	@JoinColumn(name = "event_type_id", nullable = false)
+	private EventType eventType;
 
-   private Boolean approved = false;
+	private String name;
 
-   @OneToMany(mappedBy="event", orphanRemoval=true, fetch=FetchType.EAGER)
-   @JsonManagedReference
-   @Cascade({CascadeType.ALL})
-   private Set<EventRosterItem> roster;
-   
-   @PrePersist
-   protected void onPersist() {
-      if(organisation == null){ // hack?
-         organisation = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson().getOrganisation();
-      }
-   }
-   
-   @PreUpdate
-   protected void onUpdate() {
-      if(organisation == null){ // hack?
-         organisation = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson().getOrganisation();
-      }
-   }
+	private Boolean approved = false;
 
-   @Transient
-   public boolean isRosterFullyPopulated(){
-      return eventType != null && eventType.getDuties() != null && roster != null && eventType.getDuties().size() == roster.size();
-   }
+	@OneToMany(mappedBy = "event", orphanRemoval = true, fetch = FetchType.EAGER)
+	@JsonManagedReference
+	@Cascade({ CascadeType.ALL })
+	private Set<EventRosterItem> roster;
 
-   @Transient
-   public boolean isRosterGenerated(){
-      return roster != null && roster.size() > 0;
-   }
+	@PrePersist
+	protected void onPersist() {
+		if (this.organisation == null) { // hack?
+			this.organisation = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson()
+					.getOrganisation();
+		}
+	}
 
-   @Transient
-   public void addEventRosterItem(final EventRosterItem eri){
-      if(eri == null){
-         return;
-      }
+	@PreUpdate
+	protected void onUpdate() {
+		if (this.organisation == null) { // hack?
+			this.organisation = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getPerson()
+					.getOrganisation();
+		}
+	}
 
-      if(roster == null){
-         roster = new HashSet<EventRosterItem>();
-      }
+	@Transient
+	public boolean isRosterFullyPopulated() {
+		return this.eventType != null && this.eventType.getDuties() != null && this.roster != null
+				&& this.eventType.getDuties().size() == this.roster.size();
+	}
 
-      eri.setEvent(this);
-      roster.add(eri);
-   }
+	@Transient
+	public boolean isRosterGenerated() {
+		return this.roster != null && this.roster.size() > 0;
+	}
 
-   @Transient 
-   public void setEventRoster(final EventRoster er){
-      if(er == null){
-         return;
-      }
+	@Transient
+	public void addEventRosterItem(final EventRosterItem eri) {
+		if (eri == null) {
+			return;
+		}
 
-      if(roster != null){
-         roster.clear();
-      }
+		if (this.roster == null) {
+			this.roster = new HashSet<>();
+		}
 
-      final List<Entry<Duty, Person>> dutiesAndPeople = er.getDutiesAndPeople();
+		eri.setEvent(this);
+		this.roster.add(eri);
+	}
 
-      for(Entry<Duty, Person> dutyAndPerson : dutiesAndPeople){
-         if(dutyAndPerson.getValue() != null){
-            EventRosterItem eri = new EventRosterItem();
-            eri.setDuty(dutyAndPerson.getKey());
-            eri.setPerson(dutyAndPerson.getValue());
+	@Transient
+	public void setEventRoster(final EventRoster er) {
+		if (er == null) {
+			return;
+		}
 
-            this.addEventRosterItem(eri);
-         }
-      }
-   }
+		if (this.roster != null) {
+			this.roster.clear();
+		}
+
+		final List<Entry<Duty, Person>> dutiesAndPeople = er.getDutiesAndPeople();
+
+		for (final Entry<Duty, Person> dutyAndPerson : dutiesAndPeople) {
+			if (dutyAndPerson.getValue() != null) {
+				final EventRosterItem eri = new EventRosterItem();
+				eri.setDuty(dutyAndPerson.getKey());
+				eri.setPerson(dutyAndPerson.getValue());
+
+				this.addEventRosterItem(eri);
+			}
+		}
+	}
 }

@@ -15,16 +15,16 @@ import com.dak.duty.repository.MailMessageRepository;
 @RequestMapping("/admin/messages")
 
 public class MessageController {
-   private static final Logger logger = LoggerFactory.getLogger(MessageController.class);
-   
-   @Autowired
-   MailMessageRepository mailMessageRepos;
-   
-   @RequestMapping(method = RequestMethod.GET)
-   public String getMessages(Model model){
-      logger.debug("getMessages()");
-      
-      model.addAttribute("messages", mailMessageRepos.findAllByActiveTrue(new Sort(Sort.Direction.DESC, "timestamp")));
-      return "admin/messages";
-   }
+	private static final Logger logger = LoggerFactory.getLogger(MessageController.class);
+
+	@Autowired
+	MailMessageRepository mailMessageRepos;
+
+	@RequestMapping(method = RequestMethod.GET)
+	public String getMessages(final Model model) {
+		logger.debug("getMessages()");
+
+		model.addAttribute("messages", this.mailMessageRepos.findAllByActiveTrue(new Sort(Sort.Direction.DESC, "timestamp")));
+		return "admin/messages";
+	}
 }

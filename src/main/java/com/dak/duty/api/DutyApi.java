@@ -26,55 +26,54 @@ import com.dak.duty.service.container.SortOrder;
 @PreAuthorize("hasRole('ROLE_USER')")
 public class DutyApi {
 
-   private static final Logger logger = LoggerFactory.getLogger(DutyApi.class);
+	private static final Logger logger = LoggerFactory.getLogger(DutyApi.class);
 
-   @Autowired
-   DutyRepository dutyRepos;
+	@Autowired
+	DutyRepository dutyRepos;
 
-   @Autowired
-   DutyService dutyService;
-   
+	@Autowired
+	DutyService dutyService;
 
-   @PreAuthorize("hasRole('ROLE_ADMIN')")
-   @RequestMapping(method = RequestMethod.DELETE)
-   public @ResponseBody JsonResponse delete(@RequestBody Duty duty){
-      logger.debug("duty.delete({})", duty);
-      duty = dutyService.softDeleteDuty(duty);
-      return new JsonResponse(ResponseStatus.OK, "Duty " + duty.getId() + " deleted");
-   }
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@RequestMapping(method = RequestMethod.DELETE)
+	public @ResponseBody JsonResponse delete(@RequestBody Duty duty) {
+		logger.debug("duty.delete({})", duty);
+		duty = this.dutyService.softDeleteDuty(duty);
+		return new JsonResponse(ResponseStatus.OK, "Duty " + duty.getId() + " deleted");
+	}
 
-   @RequestMapping(value="/{id}", method = RequestMethod.GET)
-   public @ResponseBody Duty get(@PathVariable("id") Long id){
-      logger.debug("duty.get({})", id);
-      return dutyRepos.findOne(id);
-   }
+	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	public @ResponseBody Duty get(@PathVariable("id") final Long id) {
+		logger.debug("duty.get({})", id);
+		return this.dutyRepos.findOne(id);
+	}
 
-   @PreAuthorize("hasRole('ROLE_ADMIN')")
-   @RequestMapping(method = RequestMethod.POST)
-   public @ResponseBody JsonResponse save(@RequestBody Duty duty){
-      logger.debug("duty.save({})", duty);
-      duty = dutyService.saveOrUpdateDuty(duty);
-      return new JsonResponse(ResponseStatus.OK, "Duty saved with id " + duty.getId());
-   }
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@RequestMapping(method = RequestMethod.POST)
+	public @ResponseBody JsonResponse save(@RequestBody Duty duty) {
+		logger.debug("duty.save({})", duty);
+		duty = this.dutyService.saveOrUpdateDuty(duty);
+		return new JsonResponse(ResponseStatus.OK, "Duty saved with id " + duty.getId());
+	}
 
-   @PreAuthorize("hasRole('ROLE_ADMIN')")
-   @RequestMapping(value = "/sortOrder", method = RequestMethod.POST)
-   public @ResponseBody JsonResponse saveSortOrder(@RequestBody List<SortOrder> params){
-      logger.debug("duty.saveSortOrder({})", params);
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@RequestMapping(value = "/sortOrder", method = RequestMethod.POST)
+	public @ResponseBody JsonResponse saveSortOrder(@RequestBody final List<SortOrder> params) {
+		logger.debug("duty.saveSortOrder({})", params);
 
-      try{
-         dutyService.updateSortOrder(params);
-      } catch (SortOrderException soe){
-         return new JsonResponse(ResponseStatus.ERROR, soe.getMessage());
-      }
+		try {
+			this.dutyService.updateSortOrder(params);
+		} catch (final SortOrderException soe) {
+			return new JsonResponse(ResponseStatus.ERROR, soe.getMessage());
+		}
 
-      return new JsonResponse(ResponseStatus.OK, "Sort orders updated");
-   }
+		return new JsonResponse(ResponseStatus.OK, "Sort orders updated");
+	}
 
-   @RequestMapping(value = "/sortOrder", method = RequestMethod.GET)
-   public @ResponseBody List<SortOrder> getSortOrder(){
-      logger.debug("duty.getSortOrder({})");
-      return dutyService.getSortOrders();
-   }
+	@RequestMapping(value = "/sortOrder", method = RequestMethod.GET)
+	public @ResponseBody List<SortOrder> getSortOrder() {
+		logger.debug("duty.getSortOrder({})");
+		return this.dutyService.getSortOrders();
+	}
 
 }

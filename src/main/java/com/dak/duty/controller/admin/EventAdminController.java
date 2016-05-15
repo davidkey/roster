@@ -20,31 +20,33 @@ import com.dak.duty.service.container.EventCalendarNode;
 
 @Controller
 @RequestMapping("/admin/events")
-//FIXME: move to api (along with jsp calls)
+// FIXME: move to api (along with jsp calls)
 public class EventAdminController {
 
-   private static final Logger logger = LoggerFactory.getLogger(EventAdminController.class);
-   
-   @Autowired
-   EventService eventService;
-   
-   @Autowired
-   IntervalService intervalService;
-   
-   @RequestMapping(value = "/{year}/{month}/json", method = RequestMethod.GET)
-   public @ResponseBody List<EventCalendarNode> getEventCalendarItems(@PathVariable("year") final Integer year, @PathVariable("month") final Integer month) throws ParseException{
-      logger.info("getEventCalendarItems({}, {})", year, month);
-      final Date monthDate = new DateTime(year, month, 1, 0, 0 ,0).toDate();
-      return eventService.getEventCalendarNodesForMonth(monthDate);
-   }
-   
-   @RequestMapping(value = "/all/json", method = RequestMethod.GET)
-   public @ResponseBody List<EventCalendarNode> getFutureEventCalendarItems(){
-      return eventService.getAllFutureEventCalendarNodes(intervalService.getFirstDayOfMonth(intervalService.getCurrentSystemDate()));
-   }
+	private static final Logger logger = LoggerFactory.getLogger(EventAdminController.class);
 
-   @RequestMapping(value = "/current/json", method = RequestMethod.GET)
-   public @ResponseBody List<EventCalendarNode> getCurrentEventCalendarItems(){
-      return eventService.getEventCalendarNodesForMonth(intervalService.getCurrentSystemDate());
-   }
+	@Autowired
+	EventService eventService;
+
+	@Autowired
+	IntervalService intervalService;
+
+	@RequestMapping(value = "/{year}/{month}/json", method = RequestMethod.GET)
+	public @ResponseBody List<EventCalendarNode> getEventCalendarItems(@PathVariable("year") final Integer year,
+			@PathVariable("month") final Integer month) throws ParseException {
+		logger.info("getEventCalendarItems({}, {})", year, month);
+		final Date monthDate = new DateTime(year, month, 1, 0, 0, 0).toDate();
+		return this.eventService.getEventCalendarNodesForMonth(monthDate);
+	}
+
+	@RequestMapping(value = "/all/json", method = RequestMethod.GET)
+	public @ResponseBody List<EventCalendarNode> getFutureEventCalendarItems() {
+		return this.eventService
+				.getAllFutureEventCalendarNodes(this.intervalService.getFirstDayOfMonth(this.intervalService.getCurrentSystemDate()));
+	}
+
+	@RequestMapping(value = "/current/json", method = RequestMethod.GET)
+	public @ResponseBody List<EventCalendarNode> getCurrentEventCalendarItems() {
+		return this.eventService.getEventCalendarNodesForMonth(this.intervalService.getCurrentSystemDate());
+	}
 }

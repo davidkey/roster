@@ -26,54 +26,54 @@ import com.dak.duty.service.EmailService;
 @RequestMapping("/mail")
 public class MailMessageController {
 
-   @Autowired
-   MailMessageRepository mailMessageRepos;
-   
-   @Autowired
-   EmailService<MailgunMailMessage> emailService;
+	@Autowired
+	MailMessageRepository mailMessageRepos;
 
-   private static final Logger logger = LoggerFactory.getLogger(MailMessageController.class);
+	@Autowired
+	EmailService<MailgunMailMessage> emailService;
 
-   @RequestMapping(method = RequestMethod.POST)
-   public @ResponseBody Boolean postMessage(@ModelAttribute @Valid MailgunMailMessage mailgunMailMessage){
-      logger.debug("postMessage({})", mailgunMailMessage);
+	private static final Logger logger = LoggerFactory.getLogger(MailMessageController.class);
 
-      if(!emailService.validateIncoming(mailgunMailMessage)){
-         throw new MailValidationException("Email validation failed!");
-      }
-      
-      mailMessageRepos.save(mailgunMailMessage);
-      return true;
-   }
+	@RequestMapping(method = RequestMethod.POST)
+	public @ResponseBody Boolean postMessage(@ModelAttribute @Valid final MailgunMailMessage mailgunMailMessage) {
+		logger.debug("postMessage({})", mailgunMailMessage);
 
-   @InitBinder(value="mailgunMailMessage")
-   private void bind(WebDataBinder dataBinder, WebRequest webRequest, 
-         @RequestParam(value="body-plain", required=false) String bodyPlain,
-         @RequestParam(value="stripped-text", required=false) String strippedText,
-         @RequestParam(value="stripped-signature", required=false) String strippedSignature,
-         @RequestParam(value="body-html", required=false) String bodyHtml,
-         @RequestParam(value="stripped-html", required=false) String strippedHtml,
-         @RequestParam(value="attachment-count", required=false) Integer attachmentCount,
-         @RequestParam(value="attachment-x", required=false) String attachementX,
-         @RequestParam(value="message-headers", required=false) String messageHeaders,
-         @RequestParam(value="content-id-map", required=false) String contentIdMap,
-         @RequestParam(value="timestamp", required=false) Integer timestamp) {
+		if (!this.emailService.validateIncoming(mailgunMailMessage)) {
+			throw new MailValidationException("Email validation failed!");
+		}
 
-      MailgunMailMessage mailgunMailMessage = (MailgunMailMessage) dataBinder.getTarget();
+		this.mailMessageRepos.save(mailgunMailMessage);
+		return true;
+	}
 
-      mailgunMailMessage.setBodyPlain(bodyPlain);
-      mailgunMailMessage.setStrippedText(strippedText);
-      mailgunMailMessage.setStrippedSignature(strippedSignature);
-      mailgunMailMessage.setBodyHtml(bodyHtml);
-      mailgunMailMessage.setStrippedHtml(strippedHtml);
-      mailgunMailMessage.setAttachmentCount(attachmentCount == null ? 0 : attachmentCount);
-      mailgunMailMessage.setAttachementX(attachementX);
-      mailgunMailMessage.setMessageHeaders(messageHeaders);
-      mailgunMailMessage.setContentIdMap(contentIdMap);
-      
-      if(timestamp != null){
-         mailgunMailMessage.setTimestamp(timestamp);
-         mailgunMailMessage.setTimestampDate(new Date(timestamp * 1000L));
-      }
-   }
+	@InitBinder(value = "mailgunMailMessage")
+	private void bind(final WebDataBinder dataBinder, final WebRequest webRequest,
+			@RequestParam(value = "body-plain", required = false) final String bodyPlain,
+			@RequestParam(value = "stripped-text", required = false) final String strippedText,
+			@RequestParam(value = "stripped-signature", required = false) final String strippedSignature,
+			@RequestParam(value = "body-html", required = false) final String bodyHtml,
+			@RequestParam(value = "stripped-html", required = false) final String strippedHtml,
+			@RequestParam(value = "attachment-count", required = false) final Integer attachmentCount,
+			@RequestParam(value = "attachment-x", required = false) final String attachementX,
+			@RequestParam(value = "message-headers", required = false) final String messageHeaders,
+			@RequestParam(value = "content-id-map", required = false) final String contentIdMap,
+			@RequestParam(value = "timestamp", required = false) final Integer timestamp) {
+
+		final MailgunMailMessage mailgunMailMessage = (MailgunMailMessage) dataBinder.getTarget();
+
+		mailgunMailMessage.setBodyPlain(bodyPlain);
+		mailgunMailMessage.setStrippedText(strippedText);
+		mailgunMailMessage.setStrippedSignature(strippedSignature);
+		mailgunMailMessage.setBodyHtml(bodyHtml);
+		mailgunMailMessage.setStrippedHtml(strippedHtml);
+		mailgunMailMessage.setAttachmentCount(attachmentCount == null ? 0 : attachmentCount);
+		mailgunMailMessage.setAttachementX(attachementX);
+		mailgunMailMessage.setMessageHeaders(messageHeaders);
+		mailgunMailMessage.setContentIdMap(contentIdMap);
+
+		if (timestamp != null) {
+			mailgunMailMessage.setTimestamp(timestamp);
+			mailgunMailMessage.setTimestampDate(new Date(timestamp * 1000L));
+		}
+	}
 }

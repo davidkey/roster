@@ -13,11 +13,12 @@ import com.dak.duty.model.Person;
 @Repository
 @RepositoryDefinition(domainClass = Person.class, idClass = Long.class)
 public interface PersonRepository extends JpaRepository<Person, Long>, JpaSpecificationExecutor<Person> {
-   
-   @Query("select p from Person p where p.organisation = ?#{principal.person.organisation} and p.id = ?1")
-   public Person findOne(final Long id);
-   
-   public Person findByEmailAddress(String emailAddress);
-   
-   public Person findByResetTokenAndResetTokenExpiresGreaterThan(String resetToken, Date expireDate);
+
+	@Override
+	@Query("select p from Person p where p.organisation = ?#{principal.person.organisation} and p.id = ?1")
+	Person findOne(final Long id);
+
+	Person findByEmailAddress(String emailAddress);
+
+	Person findByResetTokenAndResetTokenExpiresGreaterThan(String resetToken, Date expireDate);
 }

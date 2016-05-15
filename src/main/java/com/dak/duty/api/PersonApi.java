@@ -28,87 +28,86 @@ import com.dak.duty.service.PersonService;
 
 @Controller
 @RequestMapping("/api/person")
-//@PreAuthorize("hasRole('ROLE_USER')") // set in security context xml
+// @PreAuthorize("hasRole('ROLE_USER')") // set in security context xml
 public class PersonApi {
 
-   private static final Logger logger = LoggerFactory.getLogger(PersonApi.class);
+	private static final Logger logger = LoggerFactory.getLogger(PersonApi.class);
 
-   @Autowired
-   PersonRepository personRepos;
+	@Autowired
+	PersonRepository personRepos;
 
-   @Autowired
-   PersonService personService;
+	@Autowired
+	PersonService personService;
 
-   @Autowired
-   EventRepository eventRepos;
-   
-   @Autowired
-   IntervalService intervalService;
+	@Autowired
+	EventRepository eventRepos;
 
-   @Autowired
-   BCryptPasswordEncoder encoder;
-   
-   @Autowired
-   IAuthenticationFacade authenticationFacade;
+	@Autowired
+	IntervalService intervalService;
 
-   @PreAuthorize("hasRole('ROLE_ADMIN')")
-   @RequestMapping(method = RequestMethod.DELETE)
-   public @ResponseBody JsonResponse delete(@RequestBody Person person){
-      logger.debug("person.delete({})", person);
+	@Autowired
+	BCryptPasswordEncoder encoder;
 
-      person = personRepos.findOne(person.getId());
-      person.setActive(false);
-      personService.save(person);
+	@Autowired
+	IAuthenticationFacade authenticationFacade;
 
-      return new JsonResponse(ResponseStatus.OK, "Person " + person.getId() + " deleted");
-   }
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@RequestMapping(method = RequestMethod.DELETE)
+	public @ResponseBody JsonResponse delete(@RequestBody Person person) {
+		logger.debug("person.delete({})", person);
 
-   @RequestMapping(value="/{id}", method = RequestMethod.GET)
-   @PreAuthorize("#p.emailAddress == authentication.name or (hasRole('ROLE_ADMIN') and #p.organisation.id == principal.person.organisation.id)")
-   public @ResponseBody Person get(@PathVariable("id") @P("p") Person person){
-      logger.debug("person.get({})", person.getId());
+		person = this.personRepos.findOne(person.getId());
+		person.setActive(false);
+		this.personService.save(person);
 
-      return person;
-   }
+		return new JsonResponse(ResponseStatus.OK, "Person " + person.getId() + " deleted");
+	}
 
-   @RequestMapping(value="/{id}/upcomingDuties", method = RequestMethod.GET)
-   @PreAuthorize("#p.emailAddress == authentication.name or (hasRole('ROLE_ADMIN') and #p.organisation.id == principal.person.organisation.id)")
-   public @ResponseBody List<DutyNode> getUpcomingDuties(@PathVariable("id") @P("p") Person person){
-      return personService.getUpcomingDuties(person);
-   }
+	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	@PreAuthorize("#p.emailAddress == authentication.name or (hasRole('ROLE_ADMIN') and #p.organisation.id == principal.person.organisation.id)")
+	public @ResponseBody Person get(@PathVariable("id") @P("p") final Person person) {
+		logger.debug("person.get({})", person.getId());
 
+		return person;
+	}
 
-   @PreAuthorize("hasRole('ROLE_ADMIN')")
-   @RequestMapping(method = RequestMethod.POST)
-   public @ResponseBody JsonResponse save(@RequestBody Person person){
-      logger.debug("person.save({})", person.getEmailAddress());
-      
-      person = personService.save(person);
+	@RequestMapping(value = "/{id}/upcomingDuties", method = RequestMethod.GET)
+	@PreAuthorize("#p.emailAddress == authentication.name or (hasRole('ROLE_ADMIN') and #p.organisation.id == principal.person.organisation.id)")
+	public @ResponseBody List<DutyNode> getUpcomingDuties(@PathVariable("id") @P("p") final Person person) {
+		return this.personService.getUpcomingDuties(person);
+	}
 
-      return new JsonResponse(ResponseStatus.OK, "Person saved with id " + person.getId());
-   }
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@RequestMapping(method = RequestMethod.POST)
+	public @ResponseBody JsonResponse save(@RequestBody Person person) {
+		logger.debug("person.save({})", person.getEmailAddress());
 
-   @PreAuthorize("hasRole('ROLE_ADMIN')")
-   @RequestMapping(value = "/password", method = RequestMethod.POST)
-   public @ResponseBody JsonResponse setPassword(@RequestBody Person person){
-      logger.debug("setPassword.save({})", person.getId());
+		person = this.personService.save(person);
 
-      Person personToUpdate = personRepos.findOne(person.getId());
-      if(personToUpdate != null){
-         if(!personService.isPasswordValid(person.getPassword())){
-            return new JsonResponse(ResponseStatus.ERROR, 
-                  "Password does not meet requirements: " + personService.getPasswordRequirements());
-         }
-         
-         if(!personToUpdate.getOrganisation().getId().equals(authenticationFacade.getOrganisation().getId())){
-            throw new RosterSecurityException("can't do that");
-         }
-         
-         personToUpdate.setPassword(encoder.encode(person.getPassword()));
-         personToUpdate = personService.save(personToUpdate);
-         return new JsonResponse(ResponseStatus.OK, "Password updated for Person " + personToUpdate.getId());
-      } else {
-         return new JsonResponse(ResponseStatus.ERROR, "Person not found - id " + person.getId());
-      }
-   }
+		return new JsonResponse(ResponseStatus.OK, "Person saved with id " + person.getId());
+	}
+
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@RequestMapping(value = "/password", method = RequestMethod.POST)
+	public @ResponseBody JsonResponse setPassword(@RequestBody final Person person) {
+		logger.debug("setPassword.save({})", person.getId());
+
+		Person personToUpdate = this.personRepos.findOne(person.getId());
+		if (personToUpdate != null) {
+			if (!this.personService.isPasswordValid(person.getPassword())) {
+				return new JsonResponse(ResponseStatus.ERROR,
+						"Password does not meet requirements: " + this.personService.getPasswordRequirements());
+			}
+
+			if (!personToUpdate.getOrganisation().getId().equals(this.authenticationFacade.getOrganisation().getId())) {
+				throw new RosterSecurityException("can't do that");
+			}
+
+			personToUpdate.setPassword(this.encoder.encode(person.getPassword()));
+			personToUpdate = this.personService.save(personToUpdate);
+			return new JsonResponse(ResponseStatus.OK, "Password updated for Person " + personToUpdate.getId());
+		} else {
+			return new JsonResponse(ResponseStatus.ERROR, "Person not found - id " + person.getId());
+		}
+	}
 }

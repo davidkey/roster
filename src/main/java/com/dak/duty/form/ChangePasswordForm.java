@@ -12,14 +12,14 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ChangePasswordForm {
-   @NotEmpty
-   private String currentPassword;
-   
-   @Size(min=6, max=64)
-   @NotEmpty
-   private String newPassword;
-   
-   @Size(min=6, max=64)
-   @NotEmpty
-   private String newPasswordConfirm;
+	@NotEmpty
+	private String currentPassword;
+
+	@Size(min = 6, max = 64)
+	@NotEmpty
+	private String newPassword;
+
+	@Size(min = 6, max = 64)
+	@NotEmpty
+	private String newPasswordConfirm;
 }

@@ -18,30 +18,30 @@ import com.dak.duty.service.InitialisationService;
 @Controller
 public class HomeController {
 
-   private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
+	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
-   @Autowired
-   InitialisationService initService;
+	@Autowired
+	InitialisationService initService;
 
-   @RequestMapping(value = "/", method = RequestMethod.GET)
-   public String home(Locale locale, Model model) {
-      //if(!initService.initSetupComplete()){
-      //   return "redirect:/setup";
-      //}
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public String home(final Locale locale, final Model model) {
+		// if(!initService.initSetupComplete()){
+		// return "redirect:/setup";
+		// }
 
-      return "home";
-   }
+		return "home";
+	}
 
-   @RequestMapping(value = "/login", method = RequestMethod.GET)
-   public String getLogin(@RequestParam(value = "error", required = false) String error, 
-         Model model, HttpServletRequest request){
+	@RequestMapping(value = "/login", method = RequestMethod.GET)
+	public String getLogin(@RequestParam(value = "error", required = false) final String error, final Model model,
+			final HttpServletRequest request) {
 
-      logger.debug("getLogin() by ip {}", request.getRemoteAddr());
-      
-      if (error != null) {
-         model.addAttribute("error", "Invalid username and password!");
-      }
+		logger.debug("getLogin() by ip {}", request.getRemoteAddr());
 
-      return "login";
-   }
+		if (error != null) {
+			model.addAttribute("error", "Invalid username and password!");
+		}
+
+		return "login";
+	}
 }
