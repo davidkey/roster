@@ -136,20 +136,11 @@
 			<version>1.0.1.Final</version>
 		</dependency>
 
-		<!-- Servlet <dependency> <groupId>javax.servlet</groupId> <artifactId>servlet-api</artifactId> 
-			<version>2.5</version> <scope>provided</scope> </dependency> <dependency> 
-			<groupId>javax.servlet.jsp</groupId> <artifactId>jsp-api</artifactId> <version>2.1</version> 
-			<scope>provided</scope> </dependency> <dependency> <groupId>javax.servlet</groupId> 
-			<artifactId>jstl</artifactId> <version>1.2</version> </dependency> -->
-
 		<!-- time -->
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
 		</dependency>
-
-		<!-- monitoring <dependency> <groupId>net.bull.javamelody</groupId> <artifactId>javamelody-core</artifactId> 
-			<version>1.55.0</version> </dependency> -->
 
 		<!-- caching -->
 		<dependency>
@@ -170,10 +161,6 @@
 			<artifactId>appinfo</artifactId>
 			<version>0.5.2</version>
 		</dependency>
-
-		<!-- swagger-spring - for rest api docs <dependency> <groupId>com.mangofactory</groupId> 
-			<artifactId>swagger-springmvc</artifactId> <version>1.0.2</version> </dependency> -->
-
 
 		<!-- email stuff -->
 		<dependency>
@@ -345,10 +332,6 @@
 							<charset>UTF-8</charset>
 							<skipMerge>true</skipMerge> <!-- do not create one big file -->
 							<nosuffix>true</nosuffix> <!-- do not use suffix like 'min' -->
-
-							<!-- <cssSourceDir>css</cssSourceDir> <cssSourceIncludes> <cssSourceInclude>*.css</cssSourceInclude> 
-								</cssSourceIncludes> -->
-
 							<jsSourceDir>resources/app</jsSourceDir>
 							<jsSourceIncludes>
 								<jsSourceInclude>*.js</jsSourceInclude>
