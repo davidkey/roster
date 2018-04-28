@@ -2,6 +2,7 @@ package com.dak.duty.repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -52,7 +53,7 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
 	// @Query("select e from Event e where e.organisation = ?#{principal.person.organisation} and e.roster.person = ?1
 	// and e.dateEvent >= ?2 "
 	// + "order by e.dateEvent asc")
-	List<Event> findAllByRoster_PersonAndDateEventGreaterThanEqualOrderByDateEventAsc(Person person, Date d);
+	Set<Event> findAllByRoster_PersonAndDateEventGreaterThanEqualOrderByDateEventAsc(Person person, Date d);
 
 	@Override
 	@Query("select e from Event e where e.organisation = ?#{principal.person.organisation}")

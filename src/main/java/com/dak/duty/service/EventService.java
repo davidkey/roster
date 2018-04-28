@@ -201,7 +201,7 @@ public class EventService {
 				this.eventRepos.save(event);
 
 				// try to repopulate hole in roster
-				// SHOULD THIS HAPPEN AUTOMATICALLY OR BE A MANUAL STEP? Maybe this should be a setting somewhere ...
+				// TODO: SHOULD THIS HAPPEN AUTOMATICALLY OR BE A MANUAL STEP? Maybe this should be a setting somewhere ...
 				final int slotsFilled = this.fillEmptySlots(event, person);
 				logger.debug("optPersonAndDutyOutOfEvent() - was slot replaced successfully ? Slots filled: {}", slotsFilled);
 

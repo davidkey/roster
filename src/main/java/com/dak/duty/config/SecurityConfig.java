@@ -39,12 +39,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(final HttpSecurity http) throws Exception {
 		LOGGER.debug("configure(http)");
 
-		http.authorizeRequests().antMatchers("/login", "/logout", "/console/**", "/info").permitAll().antMatchers("/admin/**")
-				.hasRole("ADMIN").antMatchers("/user/**").hasRole("USER")
+		http.authorizeRequests()
+			.antMatchers("/login", "/logout", "/console/**", "/info").permitAll()
+			.antMatchers("/admin/**").hasRole("ADMIN")
+			.antMatchers("/user/**").hasRole("USER")
+			.antMatchers("/h2-console/**").permitAll()
 				// .anyRequest().fullyAuthenticated()
-				.and().formLogin().loginPage("/login").defaultSuccessUrl("/user").failureUrl("/login?error=true").and().logout()
-				.logoutRequestMatcher(new AntPathRequestMatcher("/logout")).deleteCookies("JSESSIONID").invalidateHttpSession(true).and()
-				.exceptionHandling().accessDeniedPage("/error?error=accessdenied");
+		.and()
+			.formLogin().loginPage("/login").defaultSuccessUrl("/user").failureUrl("/login?error=true")
+		.and()
+			.logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).deleteCookies("JSESSIONID").invalidateHttpSession(true)
+		.and().exceptionHandling().accessDeniedPage("/error?error=accessdenied");
 	}
 
 	@Override

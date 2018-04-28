@@ -1,5 +1,6 @@
 package com.dak.duty.service;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -9,14 +10,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +29,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.velocity.VelocityEngineUtils;
 import org.springframework.util.MultiValueMap;
 
 import com.dak.duty.api.util.DutyNode;
@@ -63,35 +64,35 @@ public class PersonService {
 	private static final Logger logger = LoggerFactory.getLogger(PersonService.class);
 
 	@Autowired
-	PersonRepository personRepos;
+	private PersonRepository personRepos;
 
 	@Autowired
-	EventRepository eventRepos;
+	private EventRepository eventRepos;
 
 	@Autowired
-	DutyRepository dutyRepos;
+	private DutyRepository dutyRepos;
 
 	@Autowired
-	IntervalService intervalService;
+	private IntervalService intervalService;
 
 	@Autowired
-	IAuthenticationFacade authenticationFacade;
+	private IAuthenticationFacade authenticationFacade;
 
 	@Autowired
-	Random rand;
+	private Random rand;
 
 	@Autowired
-	BCryptPasswordEncoder encoder;
+	private PasswordEncoder encoder;
 
 	@Autowired
 	@Qualifier("authenticationManagerBean")
-	AuthenticationManager authenticationManager;
+	private AuthenticationManager authenticationManager;
 
 	@Autowired
-	IPasswordResetTokenFacade passwordResetTokenGenerator;
+	private IPasswordResetTokenFacade passwordResetTokenGenerator;
 
 	@Autowired
-	EmailService<MailgunMailMessage> emailService;
+	private EmailService<MailgunMailMessage> emailService;
 
 	@Autowired
 	private VelocityEngine velocityEngine;
@@ -115,7 +116,6 @@ public class PersonService {
 		this.initiatePasswordReset(person, resetBaseUrl);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Transactional
 	public void initiatePasswordReset(final Person person, final String resetBaseUrl) {
 		final int EXPIRE_MIN = 90;
@@ -126,17 +126,17 @@ public class PersonService {
 
 		this.personRepos.save(person);
 
-		@SuppressWarnings("rawtypes")
-		final Map model = new HashMap();
-		model.put("name", person.getNameFirst() + " " + person.getNameLast());
-		model.put("email", person.getEmailAddress());
-		model.put("resetAddress", resetBaseUrl + resetToken);
-		model.put("expireMinutes", EXPIRE_MIN);
-		model.put("imageUrl", "https://roster.guru/resources/images/rosterGuruEmailHeader.png");
+		VelocityContext context = new VelocityContext();
+		context.put("name", person.getNameFirst() + " " + person.getNameLast());
+		context.put("email", person.getEmailAddress());
+		context.put("resetAddress", resetBaseUrl + resetToken);
+		context.put("expireMinutes", EXPIRE_MIN);
+		context.put("imageUrl", "https://roster.guru/resources/images/rosterGuruEmailHeader.png");
 
-		this.emailService.send(new Email("admin@roster.guru", person.getEmailAddress(), "Password Reset Initiated",
-				VelocityEngineUtils.mergeTemplateIntoString(this.velocityEngine, "velocity/passwordReset.vm", "UTF-8", model)));
+		StringWriter stringWriter = new StringWriter();
+		velocityEngine.mergeTemplate("velocity/passwordReset.vm", "UTF-8", context, stringWriter);
 
+		this.emailService.send(new Email("admin@roster.guru", person.getEmailAddress(), "Password Reset Initiated", stringWriter.toString()));
 	}
 
 	private Date getMinutesInFuture(final Date d, final int minutes) {
@@ -204,15 +204,13 @@ public class PersonService {
 	public List<DutyNode> getUpcomingDuties(final Person person) {
 		final List<DutyNode> myDuties = new ArrayList<>();
 
-		final List<Event> eventsWithPerson = this.eventRepos.findAllByRoster_PersonAndDateEventGreaterThanEqualOrderByDateEventAsc(person,
-				this.intervalService.getCurrentSystemDate());
+		final Set<Event> eventsWithPerson = this.eventRepos.findAllByRoster_PersonAndDateEventGreaterThanEqualOrderByDateEventAsc(person, this.intervalService.getCurrentSystemDate());
 
 		for (final Event event : eventsWithPerson) {
 			final Set<EventRosterItem> roster = event.getRoster();
 			for (final EventRosterItem eri : roster) {
 				if (eri.getPerson().getId() == person.getId()) {
-					myDuties.add(new DutyNode(event.getName(), event.getDateEvent(), eri.getDuty().getName(), eri.getDuty().getId(),
-							eri.getEvent().getId()));
+					myDuties.add(new DutyNode(event.getName(), event.getDateEvent(), eri.getDuty().getName(), eri.getDuty().getId(), eri.getEvent().getId()));
 				}
 			}
 		}
