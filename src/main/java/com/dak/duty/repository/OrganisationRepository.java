@@ -7,5 +7,5 @@ import com.dak.duty.model.Organisation;
 
 @Repository
 public interface OrganisationRepository extends JpaRepository<Organisation, Long> {
-
+	Long countByRegistrationCodeStartsWith(String registrationCode);
 }

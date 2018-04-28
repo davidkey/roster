@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.util.Random;
 import java.util.Set;
 
@@ -267,17 +268,8 @@ public class PersonService {
 		return this.getPersonForDuty(duty, currentEventRoster, new HashSet<Person>());
 	}
 
-	public Person getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster,
-			@NonNull final Set<Person> peopleExcluded) {
-		final Set<Long> ids = new HashSet<>();
-
-		if (peopleExcluded != null) {
-			for (final Person p : peopleExcluded) {
-				ids.add(p.getId());
-			}
-		}
-
-		return this.getPersonForDutyExcludedById(duty, currentEventRoster, ids);
+	public Person getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster, @NonNull final Set<Person> peopleExcluded) {
+		return this.getPersonForDutyExcludedById(duty, currentEventRoster, peopleExcluded.stream().map(Person::getId).collect(Collectors.toSet()));
 	}
 
 	public Person getPersonForDutyExcludedById(@NonNull final Duty duty, final EventRoster currentEventRoster,

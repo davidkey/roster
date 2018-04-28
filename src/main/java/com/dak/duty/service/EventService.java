@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -75,12 +76,12 @@ public class EventService {
 	public int fillEmptySlots() {
 
 		int slotsFilled = 0;
-		final List<Event> allCurrentAndFutureEvents = this.eventRepos
-				.findAllByDateEventGreaterThanEqual(this.intervalService.getCurrentSystemDate());
+		final List<Event> allCurrentAndFutureEvents = this.eventRepos.findAllByDateEventGreaterThanEqual(this.intervalService.getCurrentSystemDate());
 
 		for (final Event event : allCurrentAndFutureEvents) {
 			if (!event.isRosterFullyPopulated()) {
-				slotsFilled += this.fillEmptySlots(event);
+				//slotsFilled += this.fillEmptySlots(event);
+				slotsFilled += this.fillEmptySlots(event, event.getRoster().stream().map(EventRosterItem::getPerson).collect(Collectors.toSet()));
 			}
 		}
 
@@ -140,6 +141,8 @@ public class EventService {
 
 					event.addEventRosterItem(eri);
 					slotsFilled++;
+					
+					peopleExcluded.add(personForDuty); /* added to fix bug - need to merge back to master */
 				}
 			}
 		}

@@ -134,16 +134,22 @@ public class InitialisationService {
 	public Organisation createOrganisation(@NonNull final String name) {
 		final Organisation org = new Organisation();
 		org.setName(name.trim());
-
-		final String nameSquashed = name.trim().toUpperCase().replace(" ", "");
-		if (nameSquashed.length() > 5) {
-			org.setRegistrationCode(nameSquashed.substring(0, 5) + "001"); // FIXME: needs to poll database to make sure
-																								// this is unique
-		} else {
-			org.setRegistrationCode(nameSquashed + "001");
-		}
+		org.setRegistrationCode(getRegistrationCode(org.getName()));
 
 		return this.orgRepos.save(org);
+	}
+	
+	private String getRegistrationCode(final String orgName) {
+
+		String nameSquashed = orgName.trim().toUpperCase().replace(" ", "");
+		
+		if (nameSquashed.length() > 5) {
+			nameSquashed = nameSquashed.substring(0, 5);
+		}
+		
+		final Long orgNumber = orgRepos.countByRegistrationCodeStartsWith(nameSquashed);
+		
+		return nameSquashed + String.format("%05d", orgNumber + 1);
 	}
 
 	public void createDefaultAdminUser(final Person defaultAdminUser) {

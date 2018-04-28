@@ -71,8 +71,7 @@ public class Person implements Serializable {
 	@NotEmpty
 	private String nameLast;
 
-	@Column(nullable = true) // can either be null OR a valid email address - if null, won't be able to log in as
-										// email=username
+	@Column(nullable = true) // can either be null OR a valid email address - if null, won't be able to log in as email=username
 	@Email
 	private String emailAddress;
 
