@@ -19,7 +19,7 @@
 	<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 		<h1 class="page-header">Person</h1>
 
-		<form:form action="${pageContext.request.contextPath}/admin/people" commandName="person">
+		<form:form action="${pageContext.request.contextPath}/admin/people" modelAttribute="person">
 			<form:hidden path="id"/>
 			<div class="form-group">
 				<label for="nameFirst">First Name</label>

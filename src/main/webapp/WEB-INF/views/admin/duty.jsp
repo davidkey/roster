@@ -12,7 +12,7 @@
 	<jsp:include page="../shared/nav.jsp" />
 	<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 		<h1 class="page-header">Duty</h1>
-		<form:form action="${pageContext.request.contextPath}/admin/duties" commandName="duty">
+		<form:form action="${pageContext.request.contextPath}/admin/duties" modelAttribute="duty">
 			<form:hidden path="id"/>
 			<div class="form-group">
 				<label for="nameFirst">Name</label>

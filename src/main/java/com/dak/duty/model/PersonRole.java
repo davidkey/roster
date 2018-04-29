@@ -15,9 +15,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 import com.dak.duty.model.enums.Role;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -26,7 +23,6 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "person_role")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Getter
 @Setter
 public class PersonRole implements Serializable {

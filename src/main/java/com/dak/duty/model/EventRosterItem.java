@@ -13,9 +13,6 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.Getter;
@@ -23,7 +20,6 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "event_roster_item", uniqueConstraints = { @UniqueConstraint(columnNames = { "event_id", "duty_id", "person_id" }) })
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Getter
 @Setter
 public class EventRosterItem implements Serializable {

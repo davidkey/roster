@@ -7,8 +7,7 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specifications;
-import org.springframework.security.access.method.P;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -52,7 +51,7 @@ public class PeopleAdminController {
 		logger.debug("getPeople()");
 
 		final List<Person> people = this.personRepos
-				.findAll(Specifications.where(PersonSpecs.sameOrg()).and(PersonSpecs.orderByNameLastAscNameFirstAsc()));
+				.findAll(PersonSpecs.sameOrg().and(PersonSpecs.orderByNameLastAscNameFirstAsc()));
 
 		logger.debug("people found: {}", people.size());
 

@@ -13,7 +13,7 @@
 	<div class="container">
 		<jsp:include page="../shared/flashMessages.jsp" />
 		<h1 class="page-header">Change Password</h1>
-		<form:form commandName="changePasswordForm">
+		<form:form modelAttribute="changePasswordForm">
 			<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 			
 			<div class="form-group">

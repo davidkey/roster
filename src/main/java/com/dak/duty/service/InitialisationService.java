@@ -13,7 +13,6 @@ import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -86,7 +85,7 @@ public class InitialisationService {
 
 	public boolean initSetupComplete() {
 		return !this.personRepos
-				.findAll(Specifications.where(PersonSpecs.isActive()).and(PersonSpecs.sameOrg()).and(PersonSpecs.hasRole(Role.ROLE_ADMIN)))
+				.findAll(PersonSpecs.isActive().and(PersonSpecs.sameOrg()).and(PersonSpecs.hasRole(Role.ROLE_ADMIN)))
 				.isEmpty();
 	}
 
@@ -96,15 +95,15 @@ public class InitialisationService {
 
 		final List<Organisation> defaultOrgs = this.getDefaultOrganisations();
 		logger.debug("defaultOrganisations: {}", defaultOrgs);
-		this.orgRepos.save(defaultOrgs);
+		this.orgRepos.saveAll(defaultOrgs);
 
 		final List<Duty> defaultDuties = this.getDefaultDuties(defaultOrgs);
 		logger.debug("defaultDuties: {}", defaultDuties);
-		this.dutyRepos.save(defaultDuties);
+		this.dutyRepos.saveAll(defaultDuties);
 
 		final List<EventType> defaultEventTypes = this.getDefaultEventTypes(defaultDuties, defaultOrgs);
 		logger.debug("defaultEventTypes: {}", defaultEventTypes);
-		this.eventTypeRepos.save(defaultEventTypes);
+		this.eventTypeRepos.saveAll(defaultEventTypes);
 
 		final List<Person> defaultPeople = this.getDefaultPeople(defaultDuties, defaultOrgs);
 		logger.debug("defaultPeople: {}", defaultPeople);
@@ -112,7 +111,7 @@ public class InitialisationService {
 
 		final List<Event> defaultEvents = this.getDefaultEvents(defaultEventTypes, defaultOrgs);
 		logger.debug("defaultEvents: {}", defaultEvents);
-		this.eventRepos.save(defaultEvents);
+		this.eventRepos.saveAll(defaultEvents);
 
 		this.createDefaultAdminUser(this.getDefaultAdminUser());
 

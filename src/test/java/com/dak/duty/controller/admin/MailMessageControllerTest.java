@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -58,7 +58,7 @@ public class MailMessageControllerTest extends ServiceTest {
 	public void testMailMessageBinding() throws Exception {
 
 		// skip validation (auto-true)
-		Mockito.when(this.emailService.validateIncoming((MailgunMailMessage) Matchers.notNull())).thenReturn(true);
+		Mockito.when(this.emailService.validateIncoming((MailgunMailMessage) ArgumentMatchers.notNull())).thenReturn(true);
 
 		// capture message when .save action occurs
 		final ArgumentCaptor<MailgunMailMessage> msg = ArgumentCaptor.forClass(MailgunMailMessage.class);

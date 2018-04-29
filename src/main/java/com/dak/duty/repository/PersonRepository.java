@@ -14,7 +14,6 @@ import com.dak.duty.model.Person;
 @RepositoryDefinition(domainClass = Person.class, idClass = Long.class)
 public interface PersonRepository extends JpaRepository<Person, Long>, JpaSpecificationExecutor<Person> {
 
-	@Override
 	@Query("select p from Person p where p.organisation = ?#{principal.person.organisation} and p.id = ?1")
 	Person findOne(final Long id);
 
