@@ -403,13 +403,6 @@ public class EventService {
 				.map(Person::getDuties)
 				.flatMap(Collection::stream)
 				.forEach(PersonDuty::incrementWeightedPreferenceIfNeeded);
-
-			/*for (final Person p : peopleNotServing) {
-				final Set<PersonDuty> personDuties = p.getDuties();
-				for (final PersonDuty pd : personDuties) {
-					pd.incrementWeightedPreferenceIfNeeded();
-				}
-			}*/
 		}
 
 		this.personRepos.save(peopleNotServing);
@@ -479,14 +472,7 @@ public class EventService {
 			return 0;
 		}
 		
-		int num = 0;
-		for (final Duty d : duties) {
-			if (d.getId() == duty.getId()) {
-				num++;
-			}
-		}
-		
-		return num;
+		return (int) duties.stream().filter(d -> d.getId() == duty.getId()).count();
 	}
 
 	private static boolean personDidThisDuty(final Person person, final Duty duty, final EventRoster eventRoster) {
