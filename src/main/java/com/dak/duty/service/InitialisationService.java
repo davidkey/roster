@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specifications;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.dak.duty.exception.InvalidPasswordException;
@@ -42,31 +42,31 @@ import lombok.NonNull;
 public class InitialisationService {
 
 	private static final Logger logger = LoggerFactory.getLogger(InitialisationService.class);
-	public static final DateTimeFormatter fmt = DateTimeFormat.forPattern("MM/dd/yyyy");
+	private static final DateTimeFormatter fmt = DateTimeFormat.forPattern("MM/dd/yyyy");
 
 	@Autowired
-	BCryptPasswordEncoder encoder;
+	private PasswordEncoder encoder;
 
 	@Autowired
-	EventTypeRepository eventTypeRepos;
+	private EventTypeRepository eventTypeRepos;
 
 	@Autowired
-	DutyRepository dutyRepos;
+	private DutyRepository dutyRepos;
 
 	@Autowired
-	PersonRepository personRepos;
+	private PersonRepository personRepos;
 
 	@Autowired
-	EventRepository eventRepos;
+	private EventRepository eventRepos;
 
 	@Autowired
-	IntervalService intervalService;
+	private IntervalService intervalService;
 
 	@Autowired
-	PersonService personService;
+	private PersonService personService;
 
 	@Autowired
-	OrganisationRepository orgRepos;
+	private OrganisationRepository orgRepos;
 
 	protected void clearAllData() {
 		logger.info("clearAllData");

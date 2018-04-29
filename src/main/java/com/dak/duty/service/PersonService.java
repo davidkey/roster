@@ -68,6 +68,8 @@ public class PersonService {
 	
 	private static final Integer DUTY_CHANCE_NEVER = -1;
 	private static final Integer DUTY_CHANCE_LOWEST = 0;
+	
+	private static final Integer EXPIRE_MIN = 90;
 
 	@Autowired
 	private PersonRepository personRepos;
@@ -121,7 +123,6 @@ public class PersonService {
 
 	@Transactional
 	public void initiatePasswordReset(final Person person, final String resetBaseUrl) {
-		final int EXPIRE_MIN = 90;
 		final String resetToken = this.passwordResetTokenGenerator.getNextPasswordResetToken();
 
 		person.setResetToken(resetToken);

@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import com.dak.duty.model.Event;
 import com.dak.duty.model.EventType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -44,6 +45,10 @@ public class EventCalendarNode {
 			this.endDate = null;
 		}
 
+	}
+	
+	public static EventCalendarNode fromEvent(final Event e) {
+		return new EventCalendarNode(e.getId(), e.getEventType().getName(), e.getDateEvent(), e.getEventType());
 	}
 
 	private static Date addTime(final Date eventDate, final Date dateWithTime) {
