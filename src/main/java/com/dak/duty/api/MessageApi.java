@@ -25,7 +25,7 @@ public class MessageApi {
 	private static final Logger logger = LoggerFactory.getLogger(MessageApi.class);
 
 	@Autowired
-	MailMessageRepository messageRepos;
+	private MailMessageRepository messageRepos;
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public @ResponseBody MailgunMailMessage getMessage(@PathVariable("id") final MailgunMailMessage msg) {

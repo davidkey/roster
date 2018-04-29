@@ -26,10 +26,10 @@ public class EventAdminController {
 	private static final Logger logger = LoggerFactory.getLogger(EventAdminController.class);
 
 	@Autowired
-	EventService eventService;
+	private EventService eventService;
 
 	@Autowired
-	IntervalService intervalService;
+	private IntervalService intervalService;
 
 	@RequestMapping(value = "/{year}/{month}/json", method = RequestMethod.GET)
 	public @ResponseBody List<EventCalendarNode> getEventCalendarItems(@PathVariable("year") final Integer year,

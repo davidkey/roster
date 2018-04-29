@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.dak.duty.form.SetupForm;
 import com.dak.duty.model.Email;
 import com.dak.duty.model.MailgunMailMessage;
-import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.service.EmailService;
 import com.dak.duty.service.InitialisationService;
 import com.dak.duty.service.PersonService;
@@ -29,20 +28,17 @@ public class SetupController {
 	private static final Logger logger = LoggerFactory.getLogger(SetupController.class);
 
 	@Autowired
-	EmailService<MailgunMailMessage> emailService;
+	private EmailService<MailgunMailMessage> emailService;
 
 	@Autowired
-	InitialisationService initService;
+	private InitialisationService initService;
 
 	@Autowired
-	PersonRepository personRepos;
-
-	@Autowired
-	PersonService personService;
+	private PersonService personService;
 
 	@Autowired
 	@Qualifier("authenticationManagerBean")
-	AuthenticationManager authenticationManager;
+	private AuthenticationManager authenticationManager;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getSetup(final Model model) {

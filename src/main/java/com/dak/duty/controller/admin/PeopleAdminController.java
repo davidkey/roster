@@ -35,16 +35,16 @@ public class PeopleAdminController {
 	private static final Logger logger = LoggerFactory.getLogger(PeopleAdminController.class);
 
 	@Autowired
-	PersonRepository personRepos;
+	private PersonRepository personRepos;
 
 	@Autowired
-	PersonService personService;
+	private PersonService personService;
 
 	@Autowired
-	DutyRepository dutyRepos;
+	private DutyRepository dutyRepos;
 
 	@Autowired
-	IAuthenticationFacade authenticationFacade;
+	private IAuthenticationFacade authenticationFacade;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getPeople(final Model model) {

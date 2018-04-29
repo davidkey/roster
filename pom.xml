@@ -13,7 +13,7 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.0.1.RELEASE</version>
-		<relativePath /> <!-- lookup parent from repository -->
+		<relativePath />
 	</parent>
 
 	<properties>
@@ -25,7 +25,6 @@
 		<display_version>v${project.version} - build ${BUILD_NUMBER} @
 			${timestamp} - git ${GIT_COMMIT}</display_version>
 		<git_commit>${GIT_COMMIT}</git_commit>
-		<!-- <hibernate.version>5.1.0.Final</hibernate.version> -->
 		<main.basedir>${basedir}/../..</main.basedir>
 		<m2eclipse.wtp.contextRoot>/</m2eclipse.wtp.contextRoot>
 	</properties>
@@ -134,9 +133,6 @@
 			<artifactId>commons-io</artifactId>
 			<version>2.4</version>
 		</dependency>
-
-		<!-- <dependency> <groupId>org.hibernate.javax.persistence</groupId> <artifactId>hibernate-jpa-2.0-api</artifactId> 
-			<version>1.0.1.Final</version> </dependency> -->
 
 		<!-- time -->
 		<dependency>

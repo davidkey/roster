@@ -29,10 +29,10 @@ public class PasswordResetController {
 	private static final Logger logger = LoggerFactory.getLogger(PasswordResetController.class);
 
 	@Autowired
-	PersonService personService;
+	private PersonService personService;
 
 	@Autowired
-	PersonRepository personRepos;
+	private PersonRepository personRepos;
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String getForgotPassword(final Model model, final HttpServletRequest request) {

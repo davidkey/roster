@@ -5,9 +5,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.parameters.P;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,10 +20,8 @@ import com.dak.duty.api.util.JsonResponse;
 import com.dak.duty.api.util.JsonResponse.ResponseStatus;
 import com.dak.duty.exception.RosterSecurityException;
 import com.dak.duty.model.Person;
-import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.security.IAuthenticationFacade;
-import com.dak.duty.service.IntervalService;
 import com.dak.duty.service.PersonService;
 
 @Controller
@@ -34,22 +32,16 @@ public class PersonApi {
 	private static final Logger logger = LoggerFactory.getLogger(PersonApi.class);
 
 	@Autowired
-	PersonRepository personRepos;
+	private PersonRepository personRepos;
 
 	@Autowired
-	PersonService personService;
+	private PersonService personService;
 
 	@Autowired
-	EventRepository eventRepos;
+	private PasswordEncoder encoder;
 
 	@Autowired
-	IntervalService intervalService;
-
-	@Autowired
-	BCryptPasswordEncoder encoder;
-
-	@Autowired
-	IAuthenticationFacade authenticationFacade;
+	private IAuthenticationFacade authenticationFacade;
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(method = RequestMethod.DELETE)

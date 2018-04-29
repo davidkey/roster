@@ -28,10 +28,10 @@ public class RosterAdminController {
 	private static final Logger logger = LoggerFactory.getLogger(RosterAdminController.class);
 
 	@Autowired
-	EventRepository eventRepos;
+	private EventRepository eventRepos;
 
 	@Autowired
-	EventService eventService;
+	private EventService eventService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getRostersAndEvents(final Model model) {

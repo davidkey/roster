@@ -29,10 +29,10 @@ public class DutyAdminController {
 	private static final Logger logger = LoggerFactory.getLogger(DutyAdminController.class);
 
 	@Autowired
-	DutyRepository dutyRepos;
+	private DutyRepository dutyRepos;
 
 	@Autowired
-	DutyService dutyService;
+	private DutyService dutyService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getDuties(final Model model) {

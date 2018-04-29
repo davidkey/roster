@@ -31,13 +31,13 @@ public class SearchApi {
 	private static final Logger logger = LoggerFactory.getLogger(SearchApi.class);
 
 	@Autowired
-	PersonRepository personRepos;
+	private PersonRepository personRepos;
 
 	@Autowired
-	EventTypeRepository eventTypeRepos;
+	private EventTypeRepository eventTypeRepos;
 
 	@Autowired
-	DutyRepository dutyRepos;
+	private DutyRepository dutyRepos;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public @ResponseBody AutocompleteResponse getSearch(@RequestParam("query") final String searchString) {

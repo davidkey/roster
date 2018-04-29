@@ -27,10 +27,10 @@ import com.dak.duty.service.EmailService;
 public class MailMessageController {
 
 	@Autowired
-	MailMessageRepository mailMessageRepos;
+	private MailMessageRepository mailMessageRepos;
 
 	@Autowired
-	EmailService<MailgunMailMessage> emailService;
+	private EmailService<MailgunMailMessage> emailService;
 
 	private static final Logger logger = LoggerFactory.getLogger(MailMessageController.class);
 
