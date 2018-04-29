@@ -9,9 +9,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -19,7 +19,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 
 import com.dak.duty.exception.InvalidIdException;
@@ -138,12 +137,12 @@ public class EventService {
 
 		return slotsFilled;
 	}
-	
+
 	private int fillEmptySlotsRecursive(@NonNull final EventRoster currentEventRoster, @NonNull final Set<Person> peopleExcluded) {
 		if (currentEventRoster.getEvent().isRosterFullyPopulated()) {
 			return 0; // nothing to fill
 		}
-		
+
 		for(final Entry<Duty, Person> dutyAndPerson : currentEventRoster.getDutiesAndPeople()) {
 			final Person currentPerson = dutyAndPerson.getValue();
 
@@ -225,9 +224,9 @@ public class EventService {
 
 	public List<EventCalendarNode> getAllFutureEventCalendarNodes(final Date startDate) {
 		return this.eventRepos.findAllByDateEventGreaterThanEqual(startDate).stream()
-			.map(EventCalendarNode::fromEvent)
-			.sorted(new EventCalendarNodeSortByDate())
-			.collect(Collectors.toList());
+				.map(EventCalendarNode::fromEvent)
+				.sorted(new EventCalendarNodeSortByDate())
+				.collect(Collectors.toList());
 	}
 
 	public List<EventCalendarNode> getEventCalendarNodesForMonth(final Date monthDate) {
@@ -264,7 +263,7 @@ public class EventService {
 			this.updatePreferenceRankingsBasedOnRoster(er);
 		}
 
-		this.eventRepos.save(missingEvents);
+		this.eventRepos.saveAll(missingEvents);
 
 		return missingEvents.size();
 	}
@@ -355,7 +354,7 @@ public class EventService {
 			this.updatePreferenceRankingsBasedOnRoster(er);
 		}
 
-		this.eventRepos.save(eventsToAdd);
+		this.eventRepos.saveAll(eventsToAdd);
 
 		return eventsToAdd.size();
 	}
@@ -373,7 +372,7 @@ public class EventService {
 			final Set<PersonDuty> personDuties = p.getDuties();
 			for (final PersonDuty pd : personDuties) {
 				// did this person do this duty today?
-				if (EventService.personDidThisDuty(p, pd.getDuty(), eventRoster)) {
+				if (this.personDidThisDuty(p, pd.getDuty(), eventRoster)) {
 					// make them very unlikely to have to do the same thing again
 					pd.setAdjustedPreference(0);
 				} else {
@@ -383,7 +382,7 @@ public class EventService {
 			}
 		}
 
-		this.personRepos.save(peopleWithDuties);
+		this.personRepos.saveAll(peopleWithDuties);
 
 		// increment everyone else's adjusted preference by 1
 		List<Person> peopleNotServing = null;
@@ -391,42 +390,51 @@ public class EventService {
 			peopleNotServing = this.personRepos.findAll();
 		} else {
 			// peopleNotServing = personRepos.findByActiveTrueAndIdNotIn(getIds(peopleWithDuties));
-			peopleNotServing = this.personRepos.findAll(
+			
+			peopleNotServing = this.personRepos.findAll(PersonSpecs.isActive().and(PersonSpecs.sameOrg()).and(PersonSpecs.idNotIn(getIds(peopleWithDuties))));
+			
+/*			peopleNotServing = this.personRepos.findAll(
 					Specifications.where(PersonSpecs.isActive())
 					.and(PersonSpecs.sameOrg())
-					.and(PersonSpecs.idNotIn(EventService.getIds(peopleWithDuties)))); /* TODO TEST THIS!!! */
+					.and(PersonSpecs.idNotIn(EventService.getIds(peopleWithDuties))));  TODO TEST THIS!!! */
 		}
 
 		if (!CollectionUtils.isEmpty(peopleNotServing)) {
-			
+
 			peopleNotServing.stream()
-				.map(Person::getDuties)
-				.flatMap(Collection::stream)
-				.forEach(PersonDuty::incrementWeightedPreferenceIfNeeded);
+			.map(Person::getDuties)
+			.flatMap(Collection::stream)
+			.forEach(PersonDuty::incrementWeightedPreferenceIfNeeded);
 		}
 
-		this.personRepos.save(peopleNotServing);
+		this.personRepos.saveAll(peopleNotServing);
 	}
 
 	public EventRoster getRosterForEvent(final Event event) {
 		// populate event roster
 		final EventRoster eventRoster = new EventRoster(event);
-		
+
 		for(Entry<Duty, Person> dutyAndPerson : eventRoster.getDutiesAndPeople()) {
 			final Optional<Person> personForDuty = this.personService.getPersonForDuty(dutyAndPerson.getKey(), eventRoster);
-			
+
 			if(personForDuty.isPresent()) {
 				dutyAndPerson.setValue(personForDuty.get());
 			}
 		}
-		
+
 		// updatePreferenceRankingsBasedOnRoster(eventRoster); // <- don't forget to call this from controller once user has "approved" event roster
 
 		return eventRoster;
 	}
 
 	public List<EventRosterItem> getSortedRosterIncludingEmptySlots(@NonNull final Long eventId) {
-		return this.getSortedRosterIncludingEmptySlots(this.eventRepos.findOne(eventId));
+		Optional<Event> event = this.eventRepos.findById(eventId);
+
+		if(event.isPresent()) {
+			return this.getSortedRosterIncludingEmptySlots(event.get());
+		} else {
+			return Collections.emptyList();
+		}
 	}
 
 	public List<EventRosterItem> getSortedRosterIncludingEmptySlots(@NonNull final Event event) {
@@ -463,7 +471,7 @@ public class EventService {
 		if(items == null) {
 			return Collections.emptyList();
 		}
-		
+
 		return items.stream().map(EventRosterItem::getDuty).collect(Collectors.toList());
 	}
 
@@ -471,12 +479,12 @@ public class EventService {
 		if(duties == null || duties.isEmpty()) {
 			return 0;
 		}
-		
+
 		return (int) duties.stream().filter(d -> d.getId() == duty.getId()).count();
 	}
 
-	private static boolean personDidThisDuty(final Person person, final Duty duty, final EventRoster eventRoster) {
-		
+	private boolean personDidThisDuty(final Person person, final Duty duty, final EventRoster eventRoster) {
+
 		for(Entry<Duty, Person> dutyAndPerson : eventRoster.getDutiesAndPeople()) {
 			final Duty d = dutyAndPerson.getKey();
 			if (d != null && d.getId() == duty.getId()) {
@@ -488,7 +496,7 @@ public class EventService {
 		return false;
 	}
 
-	private static Set<Long> getIds(@NonNull final Set<Person> people) {
+	private Set<Long> getIds(@NonNull final Set<Person> people) {
 		return people.stream().map(Person::getId).collect(Collectors.toSet());
 	}
 }

@@ -13,7 +13,6 @@ import com.dak.duty.model.Duty;
 @Repository
 public interface DutyRepository extends JpaRepository<Duty, Long> {
 
-	@Override
 	@Query("select d from Duty d where d.organisation = ?#{principal.person.organisation} and d.id = ?1")
 	Duty findOne(Long id);
 

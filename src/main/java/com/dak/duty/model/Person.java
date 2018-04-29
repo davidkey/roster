@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -23,13 +24,9 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.dak.duty.security.CustomUserDetails;
@@ -45,7 +42,6 @@ import lombok.ToString;
 
 @Entity
 @Table(name = "person", uniqueConstraints = { @UniqueConstraint(columnNames = { "nameFirst", "nameLast", "org_id" }) })
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -86,16 +82,12 @@ public class Person implements Serializable {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm aaa")
 	private Date lastUpdated = new Date();
 
-	@OneToMany(mappedBy = "person", fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "person", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JsonManagedReference
-	@Cascade({ CascadeType.ALL })
-	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	private Set<PersonDuty> duties;
 
-	@OneToMany(mappedBy = "person", fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "person", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JsonManagedReference
-	@Cascade({ CascadeType.ALL })
-	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	private Set<PersonRole> roles;
 
 	@Column(nullable = true)

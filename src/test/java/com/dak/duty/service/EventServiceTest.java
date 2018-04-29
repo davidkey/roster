@@ -83,7 +83,7 @@ public class EventServiceTest extends ServiceTest {
 		for (final DutyNode dn : duties) {
 			if (dn.getDutyId().equals(duty.getId())) {
 				Assert.assertTrue("couldn't opt out of event",
-						this.eventService.optPersonAndDutyOutOfEvent(person, duty, this.eventRepos.findOne(dn.getEventId())));
+						this.eventService.optPersonAndDutyOutOfEvent(person, duty, this.eventRepos.findById(dn.getEventId()).get()));
 				foundOne = true;
 				// break;
 			}

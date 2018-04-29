@@ -105,7 +105,7 @@ public class DutyService {
 		}
 
 		if (dutiesToUpdate.size() > 0) {
-			this.dutyRepos.save(dutiesToUpdate);
+			this.dutyRepos.saveAll(dutiesToUpdate);
 		}
 	}
 

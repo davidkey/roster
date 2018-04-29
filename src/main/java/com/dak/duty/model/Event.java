@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -24,10 +25,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.dak.duty.security.CustomUserDetails;
@@ -40,7 +37,6 @@ import lombok.ToString;
 
 @Entity
 @Table(name = "event")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Getter
 @Setter
 @ToString
@@ -70,9 +66,8 @@ public class Event implements Serializable {
 
 	private Boolean approved = false;
 
-	@OneToMany(mappedBy = "event", orphanRemoval = true, fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "event", orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JsonManagedReference
-	@Cascade({ CascadeType.ALL })
 	private Set<EventRosterItem> roster;
 
 	@PrePersist
