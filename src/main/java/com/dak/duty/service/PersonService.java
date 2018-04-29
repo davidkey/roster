@@ -3,13 +3,16 @@ package com.dak.duty.service;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,7 +45,6 @@ import com.dak.duty.model.Duty;
 import com.dak.duty.model.Email;
 import com.dak.duty.model.Event;
 import com.dak.duty.model.EventRoster;
-import com.dak.duty.model.EventRosterItem;
 import com.dak.duty.model.MailgunMailMessage;
 import com.dak.duty.model.Person;
 import com.dak.duty.model.PersonDuty;
@@ -62,6 +64,9 @@ import lombok.NonNull;
 public class PersonService {
 
 	private static final Logger logger = LoggerFactory.getLogger(PersonService.class);
+	
+	private static final Integer DUTY_CHANCE_NEVER = -1;
+	private static final Integer DUTY_CHANCE_LOWEST = 0;
 
 	@Autowired
 	private PersonRepository personRepos;
@@ -200,22 +205,14 @@ public class PersonService {
 	public String getPasswordRequirements() {
 		return "Password must be at least 6 digits";
 	}
-
+	
 	public List<DutyNode> getUpcomingDuties(final Person person) {
-		final List<DutyNode> myDuties = new ArrayList<>();
-
-		final Set<Event> eventsWithPerson = this.eventRepos.findAllByRoster_PersonAndDateEventGreaterThanEqualOrderByDateEventAsc(person, this.intervalService.getCurrentSystemDate());
-
-		for (final Event event : eventsWithPerson) {
-			final Set<EventRosterItem> roster = event.getRoster();
-			for (final EventRosterItem eri : roster) {
-				if (eri.getPerson().getId() == person.getId()) {
-					myDuties.add(new DutyNode(event.getName(), event.getDateEvent(), eri.getDuty().getName(), eri.getDuty().getId(), eri.getEvent().getId()));
-				}
-			}
-		}
-
-		return myDuties;
+		return this.eventRepos.findAllByRoster_PersonAndDateEventGreaterThanEqualOrderByDateEventAsc(person, this.intervalService.getCurrentSystemDate()).stream()
+			.map(Event::getRoster)
+			.flatMap(Collection::stream)
+			.filter(eri -> eri.getPerson().getId() == person.getId())
+			.map(eri -> new DutyNode(eri.getEvent().getName(), eri.getEvent().getDateEvent(), eri.getDuty().getName(), eri.getDuty().getId(), eri.getEvent().getId()))
+			.collect(Collectors.toList());
 	}
 
 	@Transactional
@@ -262,16 +259,24 @@ public class PersonService {
 		return this.save(person, false);
 	}
 
-	public Person getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster) {
-		return this.getPersonForDuty(duty, currentEventRoster, new HashSet<Person>());
+	public Optional<Person> getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster) {
+		return this.getPersonForDuty(duty, currentEventRoster, Collections.emptySet());
 	}
 
-	public Person getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster, @NonNull final Set<Person> peopleExcluded) {
+	public Optional<Person> getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster, @NonNull final Set<Person> peopleExcluded) {
 		return this.getPersonForDutyExcludedById(duty, currentEventRoster, peopleExcluded.stream().map(Person::getId).collect(Collectors.toSet()));
 	}
 
-	public Person getPersonForDutyExcludedById(@NonNull final Duty duty, final EventRoster currentEventRoster,
-			@NonNull final Set<Long> peopleIdsExcluded) {
+	/**
+	 * There are much more efficient methods to handle this...
+	 * see https://stackoverflow.com/questions/6737283/weighted-randomness-in-java/11926952
+	 * https://stackoverflow.com/questions/6409652/random-weighted-selection-in-java
+	 * @param duty
+	 * @param currentEventRoster
+	 * @param peopleIdsExcluded
+	 * @return
+	 */
+	public Optional<Person> getPersonForDutyExcludedById(@NonNull final Duty duty, final EventRoster currentEventRoster, @NonNull final Set<Long> peopleIdsExcluded) {
 		final List<Person> people = this.personRepos
 				.findAll(Specifications.where(PersonSpecs.isActive()).and(PersonSpecs.sameOrg()).and(PersonSpecs.hasDuty(duty)));
 		if (CollectionUtils.isEmpty(people)) {
@@ -282,21 +287,22 @@ public class PersonService {
 
 		final Map<Person, Integer> personPreferenceRanking = new HashMap<>();
 		for (final Person person : people) {
-			if (peopleIdsExcluded != null && peopleIdsExcluded.contains(person.getId())) {
-				personPreferenceRanking.put(person, -1);
+			if (peopleIdsExcluded.contains(person.getId())) {
+				personPreferenceRanking.put(person, DUTY_CHANCE_NEVER);
 			} else if (!CollectionUtils.isEmpty(peopleAlreadyServing) && peopleAlreadyServing.contains(person)) {
-				if (this.getPeopleServingDuty(duty, currentEventRoster).contains(person)) {
+				if (this.getPeopleServingDutyById(duty, currentEventRoster).contains(person.getId())) { // i think this is where the bug is ... - dak 4/28/2018
 					// if this person is already doing THIS exact duty today, don't let them do it again!
-					personPreferenceRanking.put(person, -1);
+					personPreferenceRanking.put(person, DUTY_CHANCE_NEVER);
 				} else {
 					// if this person is already doing something today, make it as unlikely as possible to do something else
-					personPreferenceRanking.put(person, 0);
+					personPreferenceRanking.put(person, Math.min(this.getDutyPreference(person, duty), DUTY_CHANCE_LOWEST));
 				}
 			} else {
 				personPreferenceRanking.put(person, this.getDutyPreference(person, duty));
 			}
 		}
 
+		
 		final ArrayList<Person> listOfPeopleTimesPreferenceRanking = new ArrayList<>();
 		for (final Map.Entry<Person, Integer> entry : personPreferenceRanking.entrySet()) {
 			final Person key = entry.getKey();
@@ -314,54 +320,48 @@ public class PersonService {
 			for (final Map.Entry<Person, Integer> entry : personPreferenceRanking.entrySet()) {
 				final Person key = entry.getKey();
 				final Integer value = entry.getValue();
-				if (value.equals(0)) {
+				if (value.equals(DUTY_CHANCE_LOWEST)) {
 					listOfPeopleTimesPreferenceRanking.add(key);
 				}
 			}
 		}
 
-		return CollectionUtils.isEmpty(listOfPeopleTimesPreferenceRanking) ? null
-				: listOfPeopleTimesPreferenceRanking.get(this.rand.nextInt(listOfPeopleTimesPreferenceRanking.size()));
+		return CollectionUtils.isEmpty(listOfPeopleTimesPreferenceRanking) 
+				? Optional.empty() : Optional.of(listOfPeopleTimesPreferenceRanking.get(this.rand.nextInt(listOfPeopleTimesPreferenceRanking.size())));
+	}
+	
+	private Set<Long> getPeopleServingDutyById(@NonNull final Duty duty, @NonNull final EventRoster currentEventRoster){
+		return getPeopleServingDuty(duty, currentEventRoster).stream().map(Person::getId).collect(Collectors.toSet());
 	}
 
 	private Set<Person> getPeopleServingDuty(@NonNull final Duty duty, @NonNull final EventRoster currentEventRoster) {
-		final Set<Person> peopleServingDuty = new HashSet<>();
-
-		for (final Entry<Duty, Person> entry : currentEventRoster.getDutiesAndPeople()) {
-			if (entry.getKey() == null || entry.getValue() == null) {
-				continue;
-			}
-
-			if (entry.getKey().getId() == duty.getId()) {
-				peopleServingDuty.add(entry.getValue());
-			}
+		if(currentEventRoster.getDutiesAndPeople() == null) {
+			return Collections.emptySet();
 		}
-
-		return peopleServingDuty;
+		
+		return currentEventRoster.getDutiesAndPeople().stream()
+			.filter(e -> e.getKey() != null && e.getValue() != null)
+			.filter(e -> e.getKey().getId() == duty.getId())
+			.map(Entry::getValue)
+			.collect(Collectors.toSet());
 	}
 
 	private Set<Person> getPeopleWhoServed(final EventRoster er) {
-		final Set<Person> people = new HashSet<>();
-
-		if (er != null) {
-			for (int i = 0; i < er.getDutiesAndPeople().size(); i++) {
-				CollectionUtils.addIgnoreNull(people, er.getDutiesAndPeople().get(i).getValue());
-			}
+		if(er == null) {
+			return Collections.emptySet();
 		}
-
-		return people;
+		
+		return er.getDutiesAndPeople().stream().map(Entry::getValue).filter(Objects::nonNull).collect(Collectors.toSet());
 	}
 
-	private int getDutyPreference(@NonNull final Person p, @NonNull final Duty d) {
-		final Set<PersonDuty> personDuties = p.getDuties();
-		for (final PersonDuty pd : personDuties) {
-			if (pd.getDuty().getId() == d.getId()) {
-				return pd.getWeightedPreference();
-
-			}
+	private int getDutyPreference(@NonNull final Person p, @NonNull final Duty duty) {
+		Optional<PersonDuty> personDuty = p.getDuties().stream().filter(pd -> pd.getDuty().getId() == duty.getId()).findFirst();
+		
+		if(personDuty.isPresent()) {
+			return personDuty.get().getWeightedPreference();
+		} else {
+			return -1;
 		}
-
-		return -1;
 	}
 
 	@Transactional

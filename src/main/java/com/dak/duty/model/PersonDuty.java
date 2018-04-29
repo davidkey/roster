@@ -60,7 +60,7 @@ public class PersonDuty implements Serializable {
 
 	@Transient
 	public int getWeightedPreference() {
-		return this.adjustedPreference == null ? this.preference : this.adjustedPreference;
+		return this.adjustedPreference == null || this.preference == -1 ? this.preference : this.adjustedPreference;
 	}
 
 	@Transient

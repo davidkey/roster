@@ -7,8 +7,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -75,13 +76,19 @@ public class EventService {
 	 */
 	public int fillEmptySlots() {
 
+		/*
+		  Should we allow the same person to have multiple duties on the same day?
+			- generate next set allows it
+			- fill empty slots does not
+		 */
+
 		int slotsFilled = 0;
 		final List<Event> allCurrentAndFutureEvents = this.eventRepos.findAllByDateEventGreaterThanEqual(this.intervalService.getCurrentSystemDate());
 
 		for (final Event event : allCurrentAndFutureEvents) {
 			if (!event.isRosterFullyPopulated()) {
-				//slotsFilled += this.fillEmptySlots(event);
-				slotsFilled += this.fillEmptySlots(event, event.getRoster().stream().map(EventRosterItem::getPerson).collect(Collectors.toSet()));
+				slotsFilled += this.fillEmptySlots(event);
+				//slotsFilled += this.fillEmptySlots(event, event.getRoster().stream().map(EventRosterItem::getPerson).collect(Collectors.toSet()));
 			}
 		}
 
@@ -94,7 +101,7 @@ public class EventService {
 	 * @return number of slots filled
 	 */
 	public int fillEmptySlots(final Event event) {
-		return this.fillEmptySlots(event, new HashSet<Person>());
+		return this.fillEmptySlots(event, Collections.emptySet());
 	}
 
 	/**
@@ -116,36 +123,14 @@ public class EventService {
 	 * @param peopleExcluded : Set of People to exclude from duty
 	 * @return number of slots filled
 	 */
-	public int fillEmptySlots(@NonNull final Event event, @NonNull final Set<Person> peopleExcluded) { // boolean ??
+	public int fillEmptySlots(@NonNull final Event event, @NonNull final Set<Person> peopleExcluded) {
 		if (event.isRosterFullyPopulated()) {
 			return 0; // nothing to fill
 		}
 
-		final EventRoster currentEventRoster = new EventRoster(event, event.getRoster()); // need to populate (as much as
-																														// we
-		// can...) from event.getRoster()
+		final EventRoster currentEventRoster = new EventRoster(event, event.getRoster()); // need to populate (as much as we can...) from event.getRoster()
 
-		int slotsFilled = 0;
-		for (int i = 0; i < currentEventRoster.getDutiesAndPeople().size(); i++) {
-			final Person currentPerson = currentEventRoster.getDutiesAndPeople().get(i).getValue();
-
-			if (currentPerson == null) { // empty slot
-				final Duty currentDuty = currentEventRoster.getDutiesAndPeople().get(i).getKey();
-				final Person personForDuty = this.personService.getPersonForDuty(currentDuty, currentEventRoster, peopleExcluded);
-
-				if (personForDuty != null) { // if we found a candidate, add them to Event Roster
-					final EventRosterItem eri = new EventRosterItem();
-					eri.setDuty(currentDuty);
-					eri.setPerson(personForDuty);
-					eri.setEvent(event);
-
-					event.addEventRosterItem(eri);
-					slotsFilled++;
-					
-					peopleExcluded.add(personForDuty); /* added to fix bug - need to merge back to master */
-				}
-			}
-		}
+		final int slotsFilled = fillEmptySlotsRecursive(currentEventRoster, peopleExcluded);
 
 		if (slotsFilled > 0) {
 			event.setApproved(false); // un-approve !!
@@ -153,6 +138,36 @@ public class EventService {
 		}
 
 		return slotsFilled;
+	}
+	
+	private int fillEmptySlotsRecursive(@NonNull final EventRoster currentEventRoster, @NonNull final Set<Person> peopleExcluded) {
+		if (currentEventRoster.getEvent().isRosterFullyPopulated()) {
+			return 0; // nothing to fill
+		}
+		
+		for(final Entry<Duty, Person> dutyAndPerson : currentEventRoster.getDutiesAndPeople()) {
+			final Person currentPerson = dutyAndPerson.getValue();
+
+			if (currentPerson == null) { // empty slot
+				final Duty currentDuty = dutyAndPerson.getKey();
+				final Optional<Person> personForDuty = this.personService.getPersonForDuty(currentDuty, currentEventRoster, peopleExcluded);
+
+				if (personForDuty.isPresent()) { // if we found a candidate, add them to Event Roster
+					final EventRosterItem eri = new EventRosterItem();
+					eri.setDuty(currentDuty);
+					eri.setPerson(personForDuty.get());
+					eri.setEvent(currentEventRoster.getEvent());
+
+					currentEventRoster.getEvent().addEventRosterItem(eri);
+
+					return 1 + fillEmptySlotsRecursive(new EventRoster(currentEventRoster.getEvent(), currentEventRoster.getEvent().getRoster()), peopleExcluded);
+
+					//peopleExcluded.add(personForDuty.get()); /* added to fix bug - need to merge back to master */
+				}
+			}
+		}
+
+		return 0;
 	}
 
 	public EventType saveEventType(final EventType eventType) {
@@ -252,7 +267,7 @@ public class EventService {
 
 		if (maxEventDate == null) {
 			return 0; // there's never even been a normal event generation process, so don't bother trying to create
-							// missing events
+			// missing events
 		}
 
 		final List<Event> missingEvents = this.getMissingEventsForRange(this.intervalService.getCurrentSystemDate(), maxEventDate);
@@ -285,8 +300,8 @@ public class EventService {
 				final List<Date> eventDays = this.intervalService.getDaysOfMonthForEventType(currDate, et);
 				for (final Date day : eventDays) {
 					if (day.compareTo(startDate) >= 0 /* && day.compareTo(endDate) <= 0 */) { // commented out because we
-																														// want to generate possible
-																														// events through EOM
+						// want to generate possible
+						// events through EOM
 						final Event event = new Event();
 						event.setEventType(et);
 						event.setDateEvent(day);
@@ -417,12 +432,13 @@ public class EventService {
 		// populate event roster
 		final EventRoster eventRoster = new EventRoster(event);
 		for (int i = 0; i < eventRoster.getDutiesAndPeople().size(); i++) {
-			final Person personForDuty = this.personService.getPersonForDuty(eventRoster.getDutiesAndPeople().get(i).getKey(), eventRoster);
-			eventRoster.getDutiesAndPeople().get(i).setValue(personForDuty);
+			final Optional<Person> personForDuty = this.personService.getPersonForDuty(eventRoster.getDutiesAndPeople().get(i).getKey(), eventRoster);
+			if(personForDuty.isPresent()) {
+				eventRoster.getDutiesAndPeople().get(i).setValue(personForDuty.get());
+			}
 		}
 
-		// updatePreferenceRankingsBasedOnRoster(eventRoster); // <- don't forget to call this from controller once user
-		// has "approved" event roster
+		// updatePreferenceRankingsBasedOnRoster(eventRoster); // <- don't forget to call this from controller once user has "approved" event roster
 
 		return eventRoster;
 	}
