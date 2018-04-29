@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,6 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.math3.distribution.EnumeratedDistribution;
+import org.apache.commons.math3.util.Pair;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.slf4j.Logger;
@@ -82,10 +83,7 @@ public class PersonService {
 
 	@Autowired
 	private IAuthenticationFacade authenticationFacade;
-
-	@Autowired
-	private Random rand;
-
+	
 	@Autowired
 	private PasswordEncoder encoder;
 
@@ -266,16 +264,7 @@ public class PersonService {
 	public Optional<Person> getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster, @NonNull final Set<Person> peopleExcluded) {
 		return this.getPersonForDutyExcludedById(duty, currentEventRoster, peopleExcluded.stream().map(Person::getId).collect(Collectors.toSet()));
 	}
-
-	/**
-	 * There are much more efficient methods to handle this...
-	 * see https://stackoverflow.com/questions/6737283/weighted-randomness-in-java/11926952
-	 * https://stackoverflow.com/questions/6409652/random-weighted-selection-in-java
-	 * @param duty
-	 * @param currentEventRoster
-	 * @param peopleIdsExcluded
-	 * @return
-	 */
+	
 	public Optional<Person> getPersonForDutyExcludedById(@NonNull final Duty duty, final EventRoster currentEventRoster, @NonNull final Set<Long> peopleIdsExcluded) {
 		final List<Person> people = this.personRepos
 				.findAll(Specifications.where(PersonSpecs.isActive()).and(PersonSpecs.sameOrg()).and(PersonSpecs.hasDuty(duty)));
@@ -290,7 +279,7 @@ public class PersonService {
 			if (peopleIdsExcluded.contains(person.getId())) {
 				personPreferenceRanking.put(person, DUTY_CHANCE_NEVER);
 			} else if (!CollectionUtils.isEmpty(peopleAlreadyServing) && peopleAlreadyServing.contains(person)) {
-				if (this.getPeopleServingDutyById(duty, currentEventRoster).contains(person.getId())) { // i think this is where the bug is ... - dak 4/28/2018
+				if (this.getPeopleServingDutyById(duty, currentEventRoster).contains(person.getId())) { 
 					// if this person is already doing THIS exact duty today, don't let them do it again!
 					personPreferenceRanking.put(person, DUTY_CHANCE_NEVER);
 				} else {
@@ -301,33 +290,25 @@ public class PersonService {
 				personPreferenceRanking.put(person, this.getDutyPreference(person, duty));
 			}
 		}
-
 		
-		final ArrayList<Person> listOfPeopleTimesPreferenceRanking = new ArrayList<>();
-		for (final Map.Entry<Person, Integer> entry : personPreferenceRanking.entrySet()) {
-			final Person key = entry.getKey();
-			final Integer value = entry.getValue();
-			if (value > 0) {
-				for (int i = 0; i < value * 2; i++) {
-					listOfPeopleTimesPreferenceRanking.add(key);
-				}
-			}
+		// build list for enumerated distribution
+		final List<Pair<Person,Double>> itemWeights = personPreferenceRanking.entrySet().stream()
+			.filter(e -> e.getValue() > DUTY_CHANCE_LOWEST)
+			.map(e -> new Pair<Person, Double>(e.getKey(), Double.valueOf(e.getValue())))
+			.collect(Collectors.toList());
+		
+		// if there's nobody available w/ a duty chance > 0, add all the 0s to the distribution with a weight of 1 (equal chance)
+		if(itemWeights.isEmpty()) {
+			itemWeights.addAll(
+					personPreferenceRanking.entrySet().stream()
+					.filter(e -> e.getValue() == DUTY_CHANCE_LOWEST)
+					.map(e -> new Pair<Person, Double>(e.getKey(), 1d))
+					.collect(Collectors.toList())
+					);
 		}
 
-		// if we haven't found any candidates ...
-		if (listOfPeopleTimesPreferenceRanking.isEmpty()) {
-			// ... we'll need to include people that served last time and / or have already served today
-			for (final Map.Entry<Person, Integer> entry : personPreferenceRanking.entrySet()) {
-				final Person key = entry.getKey();
-				final Integer value = entry.getValue();
-				if (value.equals(DUTY_CHANCE_LOWEST)) {
-					listOfPeopleTimesPreferenceRanking.add(key);
-				}
-			}
-		}
-
-		return CollectionUtils.isEmpty(listOfPeopleTimesPreferenceRanking) 
-				? Optional.empty() : Optional.of(listOfPeopleTimesPreferenceRanking.get(this.rand.nextInt(listOfPeopleTimesPreferenceRanking.size())));
+		return CollectionUtils.isEmpty(itemWeights) 
+				? Optional.empty() : Optional.of(new EnumeratedDistribution<>(itemWeights).sample());
 	}
 	
 	private Set<Long> getPeopleServingDutyById(@NonNull final Duty duty, @NonNull final EventRoster currentEventRoster){
