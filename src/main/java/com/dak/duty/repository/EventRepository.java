@@ -1,7 +1,8 @@
 package com.dak.duty.repository;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -27,7 +28,7 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
 	List<Event> findMostRecentEventsByEventType(final EventType et);
 
 	@Query("select max(e.dateEvent) from Event e where e.organisation = ?#{principal.person.organisation}")
-	Date findMaxEventDate();
+	LocalDate findMaxEventDate();
 
 	@Modifying
 	@Query("update Event e set e.approved = ?1 where e.approved != ?1 and e.organisation = ?#{principal.person.organisation}")
@@ -40,19 +41,19 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
 	List<Event> findAllByOrderByDateEventDesc();
 
 	@Query("select e from Event e where e.organisation = ?#{principal.person.organisation} and e.dateEvent >= ?1 and e.dateEvent <= ?2")
-	List<Event> findEventsByDateBetween(final Date startDate, final Date endDate);
+	List<Event> findEventsByDateBetween(final LocalDate startDate, final LocalDate endDate);
 
 	@Query("select e from Event e where e.organisation = ?#{principal.person.organisation} and e.dateEvent >= ?1")
-	List<Event> findAllByDateEventGreaterThanEqual(final Date d);
+	List<Event> findAllByDateEventGreaterThanEqual(final LocalDate d);
 
 	// @Query("select e from Event e where e.organisation = ?#{principal.person.organisation} and e.roster.person = ?1
 	// and e.dateEvent >= ?2")
-	List<Event> findAllByRoster_PersonAndDateEventGreaterThanEqual(Person person, Date d);
+	List<Event> findAllByRoster_PersonAndDateEventGreaterThanEqual(Person person, LocalDate d);
 
 	// @Query("select e from Event e where e.organisation = ?#{principal.person.organisation} and e.roster.person = ?1
 	// and e.dateEvent >= ?2 "
 	// + "order by e.dateEvent asc")
-	List<Event> findAllByRoster_PersonAndDateEventGreaterThanEqualOrderByDateEventAsc(Person person, Date d);
+	Set<Event> findAllByRoster_PersonAndDateEventGreaterThanEqualOrderByDateEventAsc(Person person, LocalDate d);
 
 	@Override
 	@Query("select e from Event e where e.organisation = ?#{principal.person.organisation}")

@@ -7,8 +7,8 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -24,7 +24,6 @@ import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.EventTypeRepository;
 import com.dak.duty.security.IAuthenticationFacade;
 import com.dak.duty.service.EventService;
-import com.dak.duty.service.PersonService;
 
 @Controller
 @RequestMapping("/admin/eventTypes")
@@ -33,19 +32,16 @@ public class EventTypeAdminController {
 	private static final Logger logger = LoggerFactory.getLogger(EventTypeAdminController.class);
 
 	@Autowired
-	EventTypeRepository eventTypeRepos;
+	private EventTypeRepository eventTypeRepos;
 
 	@Autowired
-	EventService eventService;
+	private EventService eventService;
 
 	@Autowired
-	DutyRepository dutyRepos;
+	private DutyRepository dutyRepos;
 
 	@Autowired
-	PersonService personService;
-
-	@Autowired
-	IAuthenticationFacade authenticationFacade;
+	private IAuthenticationFacade authenticationFacade;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getEventTypes(final Model model) {

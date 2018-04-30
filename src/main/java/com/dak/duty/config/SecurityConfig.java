@@ -1,5 +1,7 @@
 package com.dak.duty.config;
 
+import java.util.Random;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +15,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.dak.duty.security.SecurityEvaluationContextExtension;
@@ -21,26 +23,39 @@ import com.dak.duty.security.SecurityEvaluationContextExtension;
 // @Configuration
 // @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
-@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
+@Order(SecurityProperties.BASIC_AUTH_ORDER - 1) // max order
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SecurityConfig.class);
+	
+
 
 	@Autowired
 	UserDetailsService userDetailsService;
 
 	@Autowired
-	BCryptPasswordEncoder encoder;
+	PasswordEncoder encoder;
 
 	@Override
 	protected void configure(final HttpSecurity http) throws Exception {
 		LOGGER.debug("configure(http)");
 
-		http.authorizeRequests().antMatchers("/login", "/logout", "/console/**", "/info").permitAll().antMatchers("/admin/**")
-				.hasRole("ADMIN").antMatchers("/user/**").hasRole("USER")
+		http.authorizeRequests()
+			.antMatchers("/login", "/logout", "/console/**", "/info").permitAll()
+			.antMatchers("/admin/**").hasRole("ADMIN")
+			.antMatchers("/user/**").hasRole("USER")
+			.antMatchers("/h2-console/**").permitAll()
 				// .anyRequest().fullyAuthenticated()
-				.and().formLogin().loginPage("/login").defaultSuccessUrl("/user").failureUrl("/login?error=true").and().logout()
-				.logoutRequestMatcher(new AntPathRequestMatcher("/logout")).deleteCookies("JSESSIONID").invalidateHttpSession(true).and()
-				.exceptionHandling().accessDeniedPage("/error?error=accessdenied");
+		.and()
+			.formLogin().loginPage("/login").defaultSuccessUrl("/user").failureUrl("/login?error=true")
+		.and()
+			.logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).deleteCookies("JSESSIONID").invalidateHttpSession(true)
+		.and()
+			.exceptionHandling().accessDeniedPage("/error?error=accessdenied")
+		.and()
+			.csrf().ignoringAntMatchers("/h2-console/**")
+		.and()
+			.headers().frameOptions().sameOrigin()
+			;
 	}
 
 	@Override
@@ -55,7 +70,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		LOGGER.debug("DaoAuthenticationProvider authProvider()");
 		final DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 		authProvider.setUserDetailsService(this.userDetailsService);
-		authProvider.setPasswordEncoder(this.encoder);
+		authProvider.setPasswordEncoder(encoder);
 		return authProvider;
 	}
 
@@ -69,5 +84,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	public SecurityEvaluationContextExtension getSecurityEvaluationContextExtension() {
 		return new SecurityEvaluationContextExtension();
 	}
+	
+	@Bean
+	public Random getRand() {
+		return new Random();
+	}
+
+
 
 }

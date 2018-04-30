@@ -1,7 +1,7 @@
 package com.dak.duty.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,15 +12,11 @@ import javax.persistence.PreUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Table(name = "organisation")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Getter
 @Setter
 public class Organisation implements Serializable {
@@ -39,13 +35,13 @@ public class Organisation implements Serializable {
 	private String registrationCode;
 
 	@Column(nullable = false)
-	private Date dateCreated = new Date();
+	private LocalDateTime dateCreated = LocalDateTime.now();
 
 	@Column(nullable = false)
-	private Date dateUpdated = new Date();
+	private LocalDateTime dateUpdated = LocalDateTime.now();
 
 	@PreUpdate
 	protected void onUpdate() {
-		this.dateUpdated = new Date();
+		this.dateUpdated = LocalDateTime.now();
 	}
 }

@@ -1,7 +1,7 @@
 package com.dak.duty.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,9 +10,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import com.dak.duty.model.interfaces.MailMessageInterface;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -26,7 +23,6 @@ import lombok.ToString;
 
 @Entity
 @Table(name = "mail_msg")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -84,7 +80,7 @@ public class MailgunMailMessage implements Serializable, MailMessageInterface {
 	private int timestamp;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm aaa")
-	private Date timestampDate;
+	private LocalDateTime timestampDate;
 
 	@Column(columnDefinition = "text")
 	@JsonIgnore

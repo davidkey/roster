@@ -1,5 +1,7 @@
 package com.dak.duty.service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,13 +10,10 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.fluttercode.datafactory.impl.DataFactory;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specifications;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.dak.duty.exception.InvalidPasswordException;
@@ -42,31 +41,31 @@ import lombok.NonNull;
 public class InitialisationService {
 
 	private static final Logger logger = LoggerFactory.getLogger(InitialisationService.class);
-	public static final DateTimeFormatter fmt = DateTimeFormat.forPattern("MM/dd/yyyy");
+	private static final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
 	@Autowired
-	BCryptPasswordEncoder encoder;
+	private PasswordEncoder encoder;
 
 	@Autowired
-	EventTypeRepository eventTypeRepos;
+	private EventTypeRepository eventTypeRepos;
 
 	@Autowired
-	DutyRepository dutyRepos;
+	private DutyRepository dutyRepos;
 
 	@Autowired
-	PersonRepository personRepos;
+	private PersonRepository personRepos;
 
 	@Autowired
-	EventRepository eventRepos;
+	private EventRepository eventRepos;
 
 	@Autowired
-	IntervalService intervalService;
+	private IntervalService intervalService;
 
 	@Autowired
-	PersonService personService;
+	private PersonService personService;
 
 	@Autowired
-	OrganisationRepository orgRepos;
+	private OrganisationRepository orgRepos;
 
 	protected void clearAllData() {
 		logger.info("clearAllData");
@@ -86,7 +85,7 @@ public class InitialisationService {
 
 	public boolean initSetupComplete() {
 		return !this.personRepos
-				.findAll(Specifications.where(PersonSpecs.isActive()).and(PersonSpecs.sameOrg()).and(PersonSpecs.hasRole(Role.ROLE_ADMIN)))
+				.findAll(PersonSpecs.isActive().and(PersonSpecs.sameOrg()).and(PersonSpecs.hasRole(Role.ROLE_ADMIN)))
 				.isEmpty();
 	}
 
@@ -96,15 +95,15 @@ public class InitialisationService {
 
 		final List<Organisation> defaultOrgs = this.getDefaultOrganisations();
 		logger.debug("defaultOrganisations: {}", defaultOrgs);
-		this.orgRepos.save(defaultOrgs);
+		this.orgRepos.saveAll(defaultOrgs);
 
 		final List<Duty> defaultDuties = this.getDefaultDuties(defaultOrgs);
 		logger.debug("defaultDuties: {}", defaultDuties);
-		this.dutyRepos.save(defaultDuties);
+		this.dutyRepos.saveAll(defaultDuties);
 
 		final List<EventType> defaultEventTypes = this.getDefaultEventTypes(defaultDuties, defaultOrgs);
 		logger.debug("defaultEventTypes: {}", defaultEventTypes);
-		this.eventTypeRepos.save(defaultEventTypes);
+		this.eventTypeRepos.saveAll(defaultEventTypes);
 
 		final List<Person> defaultPeople = this.getDefaultPeople(defaultDuties, defaultOrgs);
 		logger.debug("defaultPeople: {}", defaultPeople);
@@ -112,7 +111,7 @@ public class InitialisationService {
 
 		final List<Event> defaultEvents = this.getDefaultEvents(defaultEventTypes, defaultOrgs);
 		logger.debug("defaultEvents: {}", defaultEvents);
-		this.eventRepos.save(defaultEvents);
+		this.eventRepos.saveAll(defaultEvents);
 
 		this.createDefaultAdminUser(this.getDefaultAdminUser());
 
@@ -121,6 +120,8 @@ public class InitialisationService {
 	protected List<Organisation> getDefaultOrganisations() {
 		final List<Organisation> orgs = new ArrayList<>();
 		orgs.add(this.getDefaultOrg());
+		orgs.add(this.getDefaultOrg2());
+		orgs.add(this.getDefaultOrg3());
 
 		return orgs;
 	}
@@ -134,16 +135,22 @@ public class InitialisationService {
 	public Organisation createOrganisation(@NonNull final String name) {
 		final Organisation org = new Organisation();
 		org.setName(name.trim());
-
-		final String nameSquashed = name.trim().toUpperCase().replace(" ", "");
-		if (nameSquashed.length() > 5) {
-			org.setRegistrationCode(nameSquashed.substring(0, 5) + "001"); // FIXME: needs to poll database to make sure
-																								// this is unique
-		} else {
-			org.setRegistrationCode(nameSquashed + "001");
-		}
+		org.setRegistrationCode(getRegistrationCode(org.getName()));
 
 		return this.orgRepos.save(org);
+	}
+	
+	private String getRegistrationCode(final String orgName) {
+
+		String nameSquashed = orgName.trim().toUpperCase().replace(" ", "");
+		
+		if (nameSquashed.length() > 5) {
+			nameSquashed = nameSquashed.substring(0, 5);
+		}
+		
+		final Long orgNumber = orgRepos.countByRegistrationCodeStartsWith(nameSquashed);
+		
+		return nameSquashed + String.format("%05d", orgNumber + 1);
 	}
 
 	public void createDefaultAdminUser(final Person defaultAdminUser) {
@@ -185,7 +192,23 @@ public class InitialisationService {
 		final Organisation org = new Organisation();
 		org.setId(1L);
 		org.setName("My First Org");
-		org.setRegistrationCode("MYFIRST001");
+		org.setRegistrationCode("MYFIRST00001");
+		return org;
+	}
+	
+	public Organisation getDefaultOrg2() {
+		final Organisation org = new Organisation();
+		org.setId(2L);
+		org.setName("My Second Org");
+		org.setRegistrationCode("MYFIRST00002");
+		return org;
+	}
+	
+	public Organisation getDefaultOrg3() {
+		final Organisation org = new Organisation();
+		org.setId(3L);
+		org.setName("My Third Org");
+		org.setRegistrationCode("MYFIRST00003");
 		return org;
 	}
 
@@ -223,9 +246,9 @@ public class InitialisationService {
 			e.setName(et.getName());
 			try {
 				if (e.getName().contains("Sunday")) {
-					e.setDateEvent(InitialisationService.fmt.parseDateTime("05/24/2015").toDate()); // sunday
+					e.setDateEvent(LocalDate.parse("05/24/2015", fmt)); // sunday
 				} else {
-					e.setDateEvent(InitialisationService.fmt.parseDateTime("05/27/2015").toDate()); // wednesday
+					e.setDateEvent(LocalDate.parse("05/24/2015", fmt)); // wednesday
 				}
 			} catch (final IllegalArgumentException iae) {
 				// do nothing

@@ -1,11 +1,12 @@
 package com.dak.duty.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -19,17 +20,11 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.dak.duty.security.CustomUserDetails;
@@ -45,7 +40,6 @@ import lombok.ToString;
 
 @Entity
 @Table(name = "person", uniqueConstraints = { @UniqueConstraint(columnNames = { "nameFirst", "nameLast", "org_id" }) })
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -71,8 +65,7 @@ public class Person implements Serializable {
 	@NotEmpty
 	private String nameLast;
 
-	@Column(nullable = true) // can either be null OR a valid email address - if null, won't be able to log in as
-										// email=username
+	@Column(nullable = true) // can either be null OR a valid email address - if null, won't be able to log in as email=username
 	@Email
 	private String emailAddress;
 
@@ -83,27 +76,23 @@ public class Person implements Serializable {
 	private Boolean active = true;
 
 	@Column(nullable = false)
-	@Temporal(TemporalType.TIMESTAMP)
+	//@Temporal(TemporalType.TIMESTAMP)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm aaa")
-	private Date lastUpdated = new Date();
+	private LocalDateTime lastUpdated = LocalDateTime.now();
 
-	@OneToMany(mappedBy = "person", fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "person", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JsonManagedReference
-	@Cascade({ CascadeType.ALL })
-	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	private Set<PersonDuty> duties;
 
-	@OneToMany(mappedBy = "person", fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "person", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JsonManagedReference
-	@Cascade({ CascadeType.ALL })
-	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	private Set<PersonRole> roles;
 
 	@Column(nullable = true)
 	private String resetToken;
 
 	@Column(nullable = true)
-	private Date resetTokenExpires;
+	private LocalDateTime resetTokenExpires;
 
 	@PrePersist
 	protected void onPersist() {
@@ -175,7 +164,7 @@ public class Person implements Serializable {
 		final PersonDuty pd = new PersonDuty();
 		pd.setDuty(duty);
 		pd.setPreference(preference);
-		this.setLastUpdated(new Date());
+		this.setLastUpdated(LocalDateTime.now());
 		this.addPersonDuty(pd);
 	}
 
@@ -194,7 +183,7 @@ public class Person implements Serializable {
 				if (pd.getDuty() != null && pd.getDuty().getId() == duty.getId()) {
 					found = true;
 					pd.setPreference(preference);
-					this.setLastUpdated(new Date());
+					this.setLastUpdated(LocalDateTime.now());
 					break;
 				}
 			}

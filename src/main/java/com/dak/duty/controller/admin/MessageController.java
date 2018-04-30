@@ -18,7 +18,7 @@ public class MessageController {
 	private static final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
 	@Autowired
-	MailMessageRepository mailMessageRepos;
+	private MailMessageRepository mailMessageRepos;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getMessages(final Model model) {

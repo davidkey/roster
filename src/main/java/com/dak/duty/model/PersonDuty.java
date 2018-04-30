@@ -17,9 +17,6 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.Getter;
@@ -27,7 +24,6 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "person_duty", uniqueConstraints = { @UniqueConstraint(columnNames = { "person_id", "duty_id" }) })
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Getter
 @Setter
 public class PersonDuty implements Serializable {
@@ -60,7 +56,7 @@ public class PersonDuty implements Serializable {
 
 	@Transient
 	public int getWeightedPreference() {
-		return this.adjustedPreference == null ? this.preference : this.adjustedPreference;
+		return this.adjustedPreference == null || this.preference == -1 ? this.preference : this.adjustedPreference;
 	}
 
 	@Transient

@@ -1,15 +1,17 @@
 package com.dak.duty.model.validation;
 
-import java.util.Date;
-
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 import com.dak.duty.model.enums.EventTypeInterval;
 import com.dak.duty.model.enums.IntervalWeekly;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public final class EventTypeIntervalValidation {
-	public static final DateTimeFormatter fmt = DateTimeFormat.forPattern("MM/dd/yyyy");
+	private static final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
 	private EventTypeIntervalValidation() {
 		// private & empty constructor
@@ -52,20 +54,20 @@ public final class EventTypeIntervalValidation {
 	public static boolean isValidDate(final String input) {
 
 		try {
-			EventTypeIntervalValidation.fmt.parseDateTime(input);
+			fmt.parse(input);
 			return true;
-		} catch (final IllegalArgumentException iae) {
+		} catch (final DateTimeParseException iae) {
 			// do nothing
 		}
 
 		return false;
 	}
 
-	public static Date strToDate(final String str) {
+	public static LocalDate strToDate(final String str) {
 		try {
-			return EventTypeIntervalValidation.fmt.parseDateTime(str).toDate();
-		} catch (final IllegalArgumentException iae) {
-			// do nothing
+			fmt.parse(str);
+		} catch (final DateTimeParseException iae) {
+			log.debug("error formatting date {}", str, iae);
 		}
 
 		return null;

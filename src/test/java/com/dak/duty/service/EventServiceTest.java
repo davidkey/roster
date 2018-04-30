@@ -1,6 +1,7 @@
 package com.dak.duty.service;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.junit.Assert;
@@ -66,15 +67,15 @@ public class EventServiceTest extends ServiceTest {
 		eventType.setActive(true);
 		eventType.setInterval(EventTypeInterval.DAILY);
 		eventType.setOrganisation(person.getOrganisation());
-		eventType.setStartTime(new Date());
-		eventType.setEndTime(new Date());
+		eventType.setStartTime(LocalTime.now());
+		eventType.setEndTime(LocalTime.now());
 		eventType.setName("My New Event That Nobody Likes");
 
 		eventType.addDuty(duty);
 
 		this.eventTypeRepos.save(eventType);
 		this.personService.save(person);
-		this.eventService.createAndSaveEventsForMonth(new Date());
+		this.eventService.createAndSaveEventsForMonth(LocalDate.now());
 
 		final List<DutyNode> duties = this.personService.getUpcomingDuties(person);
 		Assert.assertFalse("duties shouldn't be empty here!", duties.isEmpty());
@@ -83,7 +84,7 @@ public class EventServiceTest extends ServiceTest {
 		for (final DutyNode dn : duties) {
 			if (dn.getDutyId().equals(duty.getId())) {
 				Assert.assertTrue("couldn't opt out of event",
-						this.eventService.optPersonAndDutyOutOfEvent(person, duty, this.eventRepos.findOne(dn.getEventId())));
+						this.eventService.optPersonAndDutyOutOfEvent(person, duty, this.eventRepos.findById(dn.getEventId()).get()));
 				foundOne = true;
 				// break;
 			}

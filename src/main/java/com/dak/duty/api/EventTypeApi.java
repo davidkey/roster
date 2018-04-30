@@ -25,10 +25,10 @@ public class EventTypeApi {
 	private static final Logger logger = LoggerFactory.getLogger(EventTypeApi.class);
 
 	@Autowired
-	EventTypeRepository eventTypeRepos;
+	private EventTypeRepository eventTypeRepos;
 
 	@Autowired
-	EventService eventService;
+	private EventService eventService;
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(method = RequestMethod.DELETE)

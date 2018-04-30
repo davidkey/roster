@@ -1,13 +1,17 @@
 package com.dak.duty.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -15,7 +19,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 
 import com.dak.duty.exception.InvalidIdException;
@@ -48,25 +51,25 @@ public class EventService {
 	private static final Logger logger = LoggerFactory.getLogger(EventService.class);
 
 	@Autowired
-	PersonRepository personRepos;
+	private PersonRepository personRepos;
 
 	@Autowired
-	PersonService personService;
+	private PersonService personService;
 
 	@Autowired
-	EventRepository eventRepos;
+	private EventRepository eventRepos;
 
 	@Autowired
-	EventTypeRepository eventTypeRepos;
+	private EventTypeRepository eventTypeRepos;
 
 	@Autowired
-	IntervalService intervalService;
+	private IntervalService intervalService;
 
 	@Autowired
-	DutyRepository dutyRepos;
+	private DutyRepository dutyRepos;
 
 	@Autowired
-	IAuthenticationFacade authenticationFacade;
+	private IAuthenticationFacade authenticationFacade;
 
 	/**
 	 * Attempt to fill any empty slots in any current and future events.
@@ -74,13 +77,19 @@ public class EventService {
 	 */
 	public int fillEmptySlots() {
 
+		/*
+		  Should we allow the same person to have multiple duties on the same day?
+			- generate next set allows it
+			- fill empty slots does not
+		 */
+
 		int slotsFilled = 0;
-		final List<Event> allCurrentAndFutureEvents = this.eventRepos
-				.findAllByDateEventGreaterThanEqual(this.intervalService.getCurrentSystemDate());
+		final List<Event> allCurrentAndFutureEvents = this.eventRepos.findAllByDateEventGreaterThanEqual(this.intervalService.getCurrentSystemDate());
 
 		for (final Event event : allCurrentAndFutureEvents) {
 			if (!event.isRosterFullyPopulated()) {
 				slotsFilled += this.fillEmptySlots(event);
+				//slotsFilled += this.fillEmptySlots(event, event.getRoster().stream().map(EventRosterItem::getPerson).collect(Collectors.toSet()));
 			}
 		}
 
@@ -93,7 +102,7 @@ public class EventService {
 	 * @return number of slots filled
 	 */
 	public int fillEmptySlots(final Event event) {
-		return this.fillEmptySlots(event, new HashSet<Person>());
+		return this.fillEmptySlots(event, Collections.emptySet());
 	}
 
 	/**
@@ -103,10 +112,7 @@ public class EventService {
 	 * @return number of slots filled
 	 */
 	public int fillEmptySlots(final Event event, final Person person) {
-		final Set<Person> singlePersonSet = new HashSet<>(1);
-		singlePersonSet.add(person);
-
-		return this.fillEmptySlots(event, singlePersonSet);
+		return this.fillEmptySlots(event, Collections.singleton(person));
 	}
 
 	/**
@@ -115,34 +121,14 @@ public class EventService {
 	 * @param peopleExcluded : Set of People to exclude from duty
 	 * @return number of slots filled
 	 */
-	public int fillEmptySlots(@NonNull final Event event, @NonNull final Set<Person> peopleExcluded) { // boolean ??
+	public int fillEmptySlots(@NonNull final Event event, @NonNull final Set<Person> peopleExcluded) {
 		if (event.isRosterFullyPopulated()) {
 			return 0; // nothing to fill
 		}
 
-		final EventRoster currentEventRoster = new EventRoster(event, event.getRoster()); // need to populate (as much as
-																														// we
-		// can...) from event.getRoster()
+		final EventRoster currentEventRoster = new EventRoster(event, event.getRoster()); // need to populate (as much as we can...) from event.getRoster()
 
-		int slotsFilled = 0;
-		for (int i = 0; i < currentEventRoster.getDutiesAndPeople().size(); i++) {
-			final Person currentPerson = currentEventRoster.getDutiesAndPeople().get(i).getValue();
-
-			if (currentPerson == null) { // empty slot
-				final Duty currentDuty = currentEventRoster.getDutiesAndPeople().get(i).getKey();
-				final Person personForDuty = this.personService.getPersonForDuty(currentDuty, currentEventRoster, peopleExcluded);
-
-				if (personForDuty != null) { // if we found a candidate, add them to Event Roster
-					final EventRosterItem eri = new EventRosterItem();
-					eri.setDuty(currentDuty);
-					eri.setPerson(personForDuty);
-					eri.setEvent(event);
-
-					event.addEventRosterItem(eri);
-					slotsFilled++;
-				}
-			}
-		}
+		final int slotsFilled = fillEmptySlotsRecursive(currentEventRoster, peopleExcluded);
 
 		if (slotsFilled > 0) {
 			event.setApproved(false); // un-approve !!
@@ -152,10 +138,37 @@ public class EventService {
 		return slotsFilled;
 	}
 
+	private int fillEmptySlotsRecursive(@NonNull final EventRoster currentEventRoster, @NonNull final Set<Person> peopleExcluded) {
+		if (currentEventRoster.getEvent().isRosterFullyPopulated()) {
+			return 0; // nothing to fill
+		}
+
+		for(final Entry<Duty, Person> dutyAndPerson : currentEventRoster.getDutiesAndPeople()) {
+			final Person currentPerson = dutyAndPerson.getValue();
+
+			if (currentPerson == null) { // empty slot
+				final Duty currentDuty = dutyAndPerson.getKey();
+				final Optional<Person> personForDuty = this.personService.getPersonForDuty(currentDuty, currentEventRoster, peopleExcluded);
+
+				if (personForDuty.isPresent()) { // if we found a candidate, add them to Event Roster
+					final EventRosterItem eri = new EventRosterItem();
+					eri.setDuty(currentDuty);
+					eri.setPerson(personForDuty.get());
+					eri.setEvent(currentEventRoster.getEvent());
+
+					currentEventRoster.getEvent().addEventRosterItem(eri);
+
+					return 1 + fillEmptySlotsRecursive(new EventRoster(currentEventRoster.getEvent(), currentEventRoster.getEvent().getRoster()), peopleExcluded);
+				}
+			}
+		}
+
+		return 0;
+	}
+
 	public EventType saveEventType(final EventType eventType) {
 
-		if (eventType.getOrganisation() != null
-				&& !eventType.getOrganisation().getId().equals(this.authenticationFacade.getOrganisation().getId())) {
+		if (eventType.getOrganisation() != null && !eventType.getOrganisation().getId().equals(this.authenticationFacade.getOrganisation().getId())) {
 			throw new RosterSecurityException("can't do that");
 		} else {
 			eventType.setOrganisation(this.authenticationFacade.getOrganisation());
@@ -198,7 +211,7 @@ public class EventService {
 				this.eventRepos.save(event);
 
 				// try to repopulate hole in roster
-				// SHOULD THIS HAPPEN AUTOMATICALLY OR BE A MANUAL STEP? Maybe this should be a setting somewhere ...
+				// TODO: SHOULD THIS HAPPEN AUTOMATICALLY OR BE A MANUAL STEP? Maybe this should be a setting somewhere ...
 				final int slotsFilled = this.fillEmptySlots(event, person);
 				logger.debug("optPersonAndDutyOutOfEvent() - was slot replaced successfully ? Slots filled: {}", slotsFilled);
 
@@ -209,31 +222,21 @@ public class EventService {
 		return false;
 	}
 
-	public List<EventCalendarNode> getAllFutureEventCalendarNodes(final Date startDate) {
-		final List<EventCalendarNode> nodes = new ArrayList<>();
-
-		final List<Event> events = this.eventRepos.findAllByDateEventGreaterThanEqual(startDate);
-		for (final Event e : events) {
-			nodes.add(new EventCalendarNode(e.getId(), e.getEventType().getName(), e.getDateEvent(), e.getEventType()));
-		}
-
-		Collections.sort(nodes, new EventCalendarNodeSortByDate());
-		return nodes;
+	public List<EventCalendarNode> getAllFutureEventCalendarNodes(final LocalDate startDate) {
+		return this.eventRepos.findAllByDateEventGreaterThanEqual(startDate).stream()
+				.map(EventCalendarNode::fromEvent)
+				.sorted(new EventCalendarNodeSortByDate())
+				.collect(Collectors.toList());
 	}
 
-	public List<EventCalendarNode> getEventCalendarNodesForMonth(final Date monthDate) {
-		final List<EventCalendarNode> nodes = new ArrayList<>();
+	public List<EventCalendarNode> getEventCalendarNodesForMonth(final LocalDate monthDate) {
+		final LocalDate startDate = this.intervalService.getFirstDayOfMonth(monthDate);
+		final LocalDate endDate = this.intervalService.getLastDayOfMonth(startDate);
 
-		final Date startDate = this.intervalService.getFirstDayOfMonth(monthDate);
-		final Date endDate = this.intervalService.getLastDayOfMonth(startDate);
-
-		final List<Event> events = this.eventRepos.findEventsByDateBetween(startDate, endDate);
-		for (final Event e : events) {
-			nodes.add(new EventCalendarNode(e.getId(), e.getEventType().getName(), e.getDateEvent(), e.getEventType()));
-		}
-
-		Collections.sort(nodes, new EventCalendarNodeSortByDate());
-		return nodes;
+		return this.eventRepos.findEventsByDateBetween(startDate, endDate).stream()
+				.map(EventCalendarNode::fromEvent)
+				.sorted(new EventCalendarNodeSortByDate())
+				.collect(Collectors.toList());
 	}
 
 	public int approveAllRosters() {
@@ -245,11 +248,11 @@ public class EventService {
 	}
 
 	public int createAndSaveMissingEvents() {
-		final Date maxEventDate = this.eventRepos.findMaxEventDate();
+		final LocalDate maxEventDate = this.eventRepos.findMaxEventDate();
 
 		if (maxEventDate == null) {
 			return 0; // there's never even been a normal event generation process, so don't bother trying to create
-							// missing events
+			// missing events
 		}
 
 		final List<Event> missingEvents = this.getMissingEventsForRange(this.intervalService.getCurrentSystemDate(), maxEventDate);
@@ -260,7 +263,7 @@ public class EventService {
 			this.updatePreferenceRankingsBasedOnRoster(er);
 		}
 
-		this.eventRepos.save(missingEvents);
+		this.eventRepos.saveAll(missingEvents);
 
 		return missingEvents.size();
 	}
@@ -271,19 +274,17 @@ public class EventService {
 	 * @param endDate (inclusive)
 	 * @return
 	 */
-	protected List<Event> getMissingEventsForRange(final Date startDate, final Date endDate) {
+	protected List<Event> getMissingEventsForRange(final LocalDate startDate, final LocalDate endDate) {
 		final List<Event> missingEvents = new ArrayList<>();
 		final List<EventType> eventTypesWithNoEvents = this.eventTypeRepos.getEventTypesWithNoEvents();
 
 		for (final EventType et : eventTypesWithNoEvents) {
-			Date currDate = this.intervalService.getFirstDayOfMonth(startDate);
+			LocalDate currDate = this.intervalService.getFirstDayOfMonth(startDate);
 
 			while (currDate.compareTo(endDate) <= 0) {
-				final List<Date> eventDays = this.intervalService.getDaysOfMonthForEventType(currDate, et);
-				for (final Date day : eventDays) {
-					if (day.compareTo(startDate) >= 0 /* && day.compareTo(endDate) <= 0 */) { // commented out because we
-																														// want to generate possible
-																														// events through EOM
+				final List<LocalDate> eventDays = this.intervalService.getDaysOfMonthForEventType(currDate, et);
+				for (final LocalDate day : eventDays) {
+					if (day.compareTo(startDate) >= 0 /* && day.compareTo(endDate) <= 0 */) { /* commented out because we  want to generate possible events through EOM */
 						final Event event = new Event();
 						event.setEventType(et);
 						event.setDateEvent(day);
@@ -302,8 +303,8 @@ public class EventService {
 	}
 
 	public int createAndSaveEventsForNextMonth() {
-		final Date mostRecentGenerationDate = this.eventRepos.findMaxEventDate();
-		Date startDate = null;
+		final LocalDate mostRecentGenerationDate = this.eventRepos.findMaxEventDate();
+		LocalDate startDate = null;
 		if (mostRecentGenerationDate == null) {
 			startDate = this.intervalService.getFirstDayOfMonth(this.intervalService.getCurrentSystemDate());
 		} else {
@@ -313,9 +314,9 @@ public class EventService {
 		return this.createAndSaveEventsForMonth(startDate);
 	}
 
-	public int createAndSaveEventsForMonth(final Date startDate) {
+	public int createAndSaveEventsForMonth(final LocalDate startDate) {
 
-		final Map<EventTypeDetailNode, List<Date>> eventTypeDays = new HashMap<>();
+		final Map<EventTypeDetailNode, List<LocalDate>> eventTypeDays = new HashMap<>();
 
 		for (final EventTypeInterval eti : EventTypeInterval.values()) {
 			final List<EventType> eventTypes = this.eventTypeRepos.findByInterval(eti);
@@ -323,7 +324,7 @@ public class EventService {
 
 				final EventTypeDetailNode etdn = this.intervalService.createEventTypeDetailNode(eti, et.getIntervalDetail());
 				if (!eventTypeDays.containsKey(etdn)) {
-					final List<Date> results = this.intervalService.getDaysOfMonthForInterval(startDate, eti, et.getIntervalDetail());
+					final List<LocalDate> results = this.intervalService.getDaysOfMonthForInterval(startDate, eti, et.getIntervalDetail());
 					eventTypeDays.put(etdn, results);
 				}
 			}
@@ -335,8 +336,8 @@ public class EventService {
 		for (final EventType et : allEventTypes) {
 			final EventTypeDetailNode etdn = this.intervalService.createEventTypeDetailNode(et.getInterval(), et.getIntervalDetail());
 			if (eventTypeDays.containsKey(etdn)) {
-				final List<Date> daysToProcessForEvent = eventTypeDays.get(etdn);
-				for (final Date d : daysToProcessForEvent) {
+				final List<LocalDate> daysToProcessForEvent = eventTypeDays.get(etdn);
+				for (final LocalDate d : daysToProcessForEvent) {
 					final Event e = new Event();
 					e.setDateEvent(d);
 					e.setEventType(et);
@@ -353,7 +354,7 @@ public class EventService {
 			this.updatePreferenceRankingsBasedOnRoster(er);
 		}
 
-		this.eventRepos.save(eventsToAdd);
+		this.eventRepos.saveAll(eventsToAdd);
 
 		return eventsToAdd.size();
 	}
@@ -371,7 +372,7 @@ public class EventService {
 			final Set<PersonDuty> personDuties = p.getDuties();
 			for (final PersonDuty pd : personDuties) {
 				// did this person do this duty today?
-				if (EventService.personDidThisDuty(p, pd.getDuty(), eventRoster)) {
+				if (this.personDidThisDuty(p, pd.getDuty(), eventRoster)) {
 					// make them very unlikely to have to do the same thing again
 					pd.setAdjustedPreference(0);
 				} else {
@@ -381,7 +382,7 @@ public class EventService {
 			}
 		}
 
-		this.personRepos.save(peopleWithDuties);
+		this.personRepos.saveAll(peopleWithDuties);
 
 		// increment everyone else's adjusted preference by 1
 		List<Person> peopleNotServing = null;
@@ -389,43 +390,51 @@ public class EventService {
 			peopleNotServing = this.personRepos.findAll();
 		} else {
 			// peopleNotServing = personRepos.findByActiveTrueAndIdNotIn(getIds(peopleWithDuties));
-			peopleNotServing = this.personRepos.findAll(Specifications.where(PersonSpecs.isActive()).and(PersonSpecs.sameOrg())
-					.and(PersonSpecs.idNotIn(EventService.getIds(peopleWithDuties)))); // TO
-			// DO
-			// --
-			// TEST
-			// THIS!!!
+			
+			peopleNotServing = this.personRepos.findAll(PersonSpecs.isActive().and(PersonSpecs.sameOrg()).and(PersonSpecs.idNotIn(getIds(peopleWithDuties))));
+			
+/*			peopleNotServing = this.personRepos.findAll(
+					Specifications.where(PersonSpecs.isActive())
+					.and(PersonSpecs.sameOrg())
+					.and(PersonSpecs.idNotIn(EventService.getIds(peopleWithDuties))));  TODO TEST THIS!!! */
 		}
 
 		if (!CollectionUtils.isEmpty(peopleNotServing)) {
-			for (final Person p : peopleNotServing) {
-				final Set<PersonDuty> personDuties = p.getDuties();
-				for (final PersonDuty pd : personDuties) {
-					pd.incrementWeightedPreferenceIfNeeded();
-				}
-			}
+
+			peopleNotServing.stream()
+			.map(Person::getDuties)
+			.flatMap(Collection::stream)
+			.forEach(PersonDuty::incrementWeightedPreferenceIfNeeded);
 		}
 
-		this.personRepos.save(peopleNotServing);
+		this.personRepos.saveAll(peopleNotServing);
 	}
 
 	public EventRoster getRosterForEvent(final Event event) {
-
 		// populate event roster
 		final EventRoster eventRoster = new EventRoster(event);
-		for (int i = 0; i < eventRoster.getDutiesAndPeople().size(); i++) {
-			final Person personForDuty = this.personService.getPersonForDuty(eventRoster.getDutiesAndPeople().get(i).getKey(), eventRoster);
-			eventRoster.getDutiesAndPeople().get(i).setValue(personForDuty);
+
+		for(Entry<Duty, Person> dutyAndPerson : eventRoster.getDutiesAndPeople()) {
+			final Optional<Person> personForDuty = this.personService.getPersonForDuty(dutyAndPerson.getKey(), eventRoster);
+
+			if(personForDuty.isPresent()) {
+				dutyAndPerson.setValue(personForDuty.get());
+			}
 		}
 
-		// updatePreferenceRankingsBasedOnRoster(eventRoster); // <- don't forget to call this from controller once user
-		// has "approved" event roster
+		// updatePreferenceRankingsBasedOnRoster(eventRoster); // <- don't forget to call this from controller once user has "approved" event roster
 
 		return eventRoster;
 	}
 
 	public List<EventRosterItem> getSortedRosterIncludingEmptySlots(@NonNull final Long eventId) {
-		return this.getSortedRosterIncludingEmptySlots(this.eventRepos.findOne(eventId));
+		Optional<Event> event = this.eventRepos.findById(eventId);
+
+		if(event.isPresent()) {
+			return this.getSortedRosterIncludingEmptySlots(event.get());
+		} else {
+			return Collections.emptyList();
+		}
 	}
 
 	public List<EventRosterItem> getSortedRosterIncludingEmptySlots(@NonNull final Event event) {
@@ -459,37 +468,27 @@ public class EventService {
 	}
 
 	private List<Duty> getDuties(final List<EventRosterItem> items) {
-		final List<Duty> duties = new ArrayList<>();
-
-		if (items != null) {
-			for (final EventRosterItem eri : items) {
-				duties.add(eri.getDuty());
-			}
+		if(items == null) {
+			return Collections.emptyList();
 		}
 
-		return duties;
+		return items.stream().map(EventRosterItem::getDuty).collect(Collectors.toList());
 	}
 
 	private int getNumberOccurencesDuty(final List<Duty> duties, final Duty duty) {
-		int num = 0;
-
-		if (duties != null) {
-			for (final Duty d : duties) {
-				if (d.getId() == duty.getId()) {
-					num++;
-				}
-			}
+		if(duties == null || duties.isEmpty()) {
+			return 0;
 		}
 
-		return num;
+		return (int) duties.stream().filter(d -> d.getId() == duty.getId()).count();
 	}
 
-	private static boolean personDidThisDuty(final Person person, final Duty duty, final EventRoster eventRoster) {
+	private boolean personDidThisDuty(final Person person, final Duty duty, final EventRoster eventRoster) {
 
-		for (int i = 0; i < eventRoster.getDutiesAndPeople().size(); i++) {
-			final Duty d = eventRoster.getDutiesAndPeople().get(i).getKey();
+		for(Entry<Duty, Person> dutyAndPerson : eventRoster.getDutiesAndPeople()) {
+			final Duty d = dutyAndPerson.getKey();
 			if (d != null && d.getId() == duty.getId()) {
-				final Person dutyDoer = eventRoster.getDutiesAndPeople().get(i).getValue();
+				final Person dutyDoer = dutyAndPerson.getValue();
 				return dutyDoer != null && dutyDoer.getId() == person.getId();
 			}
 		}
@@ -497,14 +496,7 @@ public class EventService {
 		return false;
 	}
 
-	private static Set<Long> getIds(@NonNull final Set<Person> people) {
-		final Set<Long> ids = new HashSet<>(people.size());
-
-		for (final Person p : people) {
-			ids.add(p.getId());
-		}
-
-		return ids;
-
+	private Set<Long> getIds(@NonNull final Set<Person> people) {
+		return people.stream().map(Person::getId).collect(Collectors.toSet());
 	}
 }

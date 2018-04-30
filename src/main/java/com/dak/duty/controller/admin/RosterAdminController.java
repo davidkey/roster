@@ -6,7 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.method.P;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,10 +28,10 @@ public class RosterAdminController {
 	private static final Logger logger = LoggerFactory.getLogger(RosterAdminController.class);
 
 	@Autowired
-	EventRepository eventRepos;
+	private EventRepository eventRepos;
 
 	@Autowired
-	EventService eventService;
+	private EventService eventService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getRostersAndEvents(final Model model) {
@@ -90,7 +90,7 @@ public class RosterAdminController {
 			}
 		}
 
-		this.eventRepos.save(eventsToApprove);
+		this.eventRepos.saveAll(eventsToApprove);
 
 		redirectAttributes.addFlashAttribute("msg_success", eventsToApprove.size() + " rosters approved!");
 		return "redirect:/admin/rosters";

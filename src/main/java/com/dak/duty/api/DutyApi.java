@@ -29,10 +29,10 @@ public class DutyApi {
 	private static final Logger logger = LoggerFactory.getLogger(DutyApi.class);
 
 	@Autowired
-	DutyRepository dutyRepos;
+	private DutyRepository dutyRepos;
 
 	@Autowired
-	DutyService dutyService;
+	private DutyService dutyService;
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(method = RequestMethod.DELETE)

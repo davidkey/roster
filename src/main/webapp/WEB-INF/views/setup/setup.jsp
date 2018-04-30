@@ -16,7 +16,7 @@
 			<h1>Welcome to Roster Guru!</h1>
 		</div>
 		<p class="lead">Just a couple of housekeeping items and then you can get started.</p>
-		<form:form commandName="setupForm">
+		<form:form modelAttribute="setupForm">
 			<div class="form-group">
 				<label for="organisationName">Organisation Name</label> 
 				<form:input path="organisationName" class="form-control" placeholder="First Baptist" />

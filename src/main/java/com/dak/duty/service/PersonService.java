@@ -1,35 +1,39 @@
 package com.dak.duty.service;
 
+import java.io.StringWriter;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.math3.distribution.EnumeratedDistribution;
+import org.apache.commons.math3.util.Pair;
+import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.velocity.VelocityEngineUtils;
 import org.springframework.util.MultiValueMap;
 
 import com.dak.duty.api.util.DutyNode;
@@ -40,7 +44,6 @@ import com.dak.duty.model.Duty;
 import com.dak.duty.model.Email;
 import com.dak.duty.model.Event;
 import com.dak.duty.model.EventRoster;
-import com.dak.duty.model.EventRosterItem;
 import com.dak.duty.model.MailgunMailMessage;
 import com.dak.duty.model.Person;
 import com.dak.duty.model.PersonDuty;
@@ -60,37 +63,39 @@ import lombok.NonNull;
 public class PersonService {
 
 	private static final Logger logger = LoggerFactory.getLogger(PersonService.class);
+	
+	private static final Integer DUTY_CHANCE_NEVER = -1;
+	private static final Integer DUTY_CHANCE_LOWEST = 0;
+	
+	private static final Integer EXPIRE_MIN = 90;
 
 	@Autowired
-	PersonRepository personRepos;
+	private PersonRepository personRepos;
 
 	@Autowired
-	EventRepository eventRepos;
+	private EventRepository eventRepos;
 
 	@Autowired
-	DutyRepository dutyRepos;
+	private DutyRepository dutyRepos;
 
 	@Autowired
-	IntervalService intervalService;
+	private IntervalService intervalService;
 
 	@Autowired
-	IAuthenticationFacade authenticationFacade;
-
+	private IAuthenticationFacade authenticationFacade;
+	
 	@Autowired
-	Random rand;
-
-	@Autowired
-	BCryptPasswordEncoder encoder;
+	private PasswordEncoder encoder;
 
 	@Autowired
 	@Qualifier("authenticationManagerBean")
-	AuthenticationManager authenticationManager;
+	private AuthenticationManager authenticationManager;
 
 	@Autowired
-	IPasswordResetTokenFacade passwordResetTokenGenerator;
+	private IPasswordResetTokenFacade passwordResetTokenGenerator;
 
 	@Autowired
-	EmailService<MailgunMailMessage> emailService;
+	private EmailService<MailgunMailMessage> emailService;
 
 	@Autowired
 	private VelocityEngine velocityEngine;
@@ -114,35 +119,26 @@ public class PersonService {
 		this.initiatePasswordReset(person, resetBaseUrl);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Transactional
 	public void initiatePasswordReset(final Person person, final String resetBaseUrl) {
-		final int EXPIRE_MIN = 90;
 		final String resetToken = this.passwordResetTokenGenerator.getNextPasswordResetToken();
 
 		person.setResetToken(resetToken);
-		person.setResetTokenExpires(this.getMinutesInFuture(new Date(), EXPIRE_MIN));
+		person.setResetTokenExpires(LocalDateTime.now().plusMinutes(EXPIRE_MIN));
 
 		this.personRepos.save(person);
 
-		@SuppressWarnings("rawtypes")
-		final Map model = new HashMap();
-		model.put("name", person.getNameFirst() + " " + person.getNameLast());
-		model.put("email", person.getEmailAddress());
-		model.put("resetAddress", resetBaseUrl + resetToken);
-		model.put("expireMinutes", EXPIRE_MIN);
-		model.put("imageUrl", "https://roster.guru/resources/images/rosterGuruEmailHeader.png");
+		VelocityContext context = new VelocityContext();
+		context.put("name", person.getNameFirst() + " " + person.getNameLast());
+		context.put("email", person.getEmailAddress());
+		context.put("resetAddress", resetBaseUrl + resetToken);
+		context.put("expireMinutes", EXPIRE_MIN);
+		context.put("imageUrl", "https://roster.guru/resources/images/rosterGuruEmailHeader.png");
 
-		this.emailService.send(new Email("admin@roster.guru", person.getEmailAddress(), "Password Reset Initiated",
-				VelocityEngineUtils.mergeTemplateIntoString(this.velocityEngine, "velocity/passwordReset.vm", "UTF-8", model)));
+		StringWriter stringWriter = new StringWriter();
+		velocityEngine.mergeTemplate("velocity/passwordReset.vm", "UTF-8", context, stringWriter);
 
-	}
-
-	private Date getMinutesInFuture(final Date d, final int minutes) {
-		final Calendar calendar = Calendar.getInstance();
-		calendar.setTime(d);
-		calendar.add(Calendar.MINUTE, minutes);
-		return calendar.getTime();
+		this.emailService.send(new Email("admin@roster.guru", person.getEmailAddress(), "Password Reset Initiated", stringWriter.toString()));
 	}
 
 	public boolean loginAsPerson(final String username, final String password, final HttpServletRequest request) {
@@ -199,24 +195,14 @@ public class PersonService {
 	public String getPasswordRequirements() {
 		return "Password must be at least 6 digits";
 	}
-
+	
 	public List<DutyNode> getUpcomingDuties(final Person person) {
-		final List<DutyNode> myDuties = new ArrayList<>();
-
-		final List<Event> eventsWithPerson = this.eventRepos.findAllByRoster_PersonAndDateEventGreaterThanEqualOrderByDateEventAsc(person,
-				this.intervalService.getCurrentSystemDate());
-
-		for (final Event event : eventsWithPerson) {
-			final Set<EventRosterItem> roster = event.getRoster();
-			for (final EventRosterItem eri : roster) {
-				if (eri.getPerson().getId() == person.getId()) {
-					myDuties.add(new DutyNode(event.getName(), event.getDateEvent(), eri.getDuty().getName(), eri.getDuty().getId(),
-							eri.getEvent().getId()));
-				}
-			}
-		}
-
-		return myDuties;
+		return this.eventRepos.findAllByRoster_PersonAndDateEventGreaterThanEqualOrderByDateEventAsc(person, this.intervalService.getCurrentSystemDate()).stream()
+			.map(Event::getRoster)
+			.flatMap(Collection::stream)
+			.filter(eri -> eri.getPerson().getId() == person.getId())
+			.map(eri -> new DutyNode(eri.getEvent().getName(), eri.getEvent().getDateEvent(), eri.getDuty().getName(), eri.getDuty().getId(), eri.getEvent().getId()))
+			.collect(Collectors.toList());
 	}
 
 	@Transactional
@@ -235,7 +221,7 @@ public class PersonService {
 			}
 		}
 
-		return this.personRepos.save(people);
+		return this.personRepos.saveAll(people);
 	}
 
 	@Transactional
@@ -263,115 +249,92 @@ public class PersonService {
 		return this.save(person, false);
 	}
 
-	public Person getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster) {
-		return this.getPersonForDuty(duty, currentEventRoster, new HashSet<Person>());
+	public Optional<Person> getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster) {
+		return this.getPersonForDuty(duty, currentEventRoster, Collections.emptySet());
 	}
 
-	public Person getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster,
-			@NonNull final Set<Person> peopleExcluded) {
-		final Set<Long> ids = new HashSet<>();
-
-		if (peopleExcluded != null) {
-			for (final Person p : peopleExcluded) {
-				ids.add(p.getId());
-			}
-		}
-
-		return this.getPersonForDutyExcludedById(duty, currentEventRoster, ids);
+	public Optional<Person> getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster, @NonNull final Set<Person> peopleExcluded) {
+		return this.getPersonForDutyExcludedById(duty, currentEventRoster, peopleExcluded.stream().map(Person::getId).collect(Collectors.toSet()));
 	}
-
-	public Person getPersonForDutyExcludedById(@NonNull final Duty duty, final EventRoster currentEventRoster,
-			@NonNull final Set<Long> peopleIdsExcluded) {
+	
+	public Optional<Person> getPersonForDutyExcludedById(@NonNull final Duty duty, final EventRoster currentEventRoster, @NonNull final Set<Long> peopleIdsExcluded) {
 		final List<Person> people = this.personRepos
-				.findAll(Specifications.where(PersonSpecs.isActive()).and(PersonSpecs.sameOrg()).and(PersonSpecs.hasDuty(duty)));
+				.findAll(PersonSpecs.isActive().and(PersonSpecs.sameOrg()).and(PersonSpecs.hasDuty(duty)));
 		if (CollectionUtils.isEmpty(people)) {
-			return null;
+			return Optional.empty();
 		}
 
 		final Set<Person> peopleAlreadyServing = this.getPeopleWhoServed(currentEventRoster);
 
 		final Map<Person, Integer> personPreferenceRanking = new HashMap<>();
 		for (final Person person : people) {
-			if (peopleIdsExcluded != null && peopleIdsExcluded.contains(person.getId())) {
-				personPreferenceRanking.put(person, -1);
+			if (peopleIdsExcluded.contains(person.getId())) {
+				personPreferenceRanking.put(person, DUTY_CHANCE_NEVER);
 			} else if (!CollectionUtils.isEmpty(peopleAlreadyServing) && peopleAlreadyServing.contains(person)) {
-				if (this.getPeopleServingDuty(duty, currentEventRoster).contains(person)) {
+				if (this.getPeopleServingDutyById(duty, currentEventRoster).contains(person.getId())) { 
 					// if this person is already doing THIS exact duty today, don't let them do it again!
-					personPreferenceRanking.put(person, -1);
+					personPreferenceRanking.put(person, DUTY_CHANCE_NEVER);
 				} else {
 					// if this person is already doing something today, make it as unlikely as possible to do something else
-					personPreferenceRanking.put(person, 0);
+					personPreferenceRanking.put(person, Math.min(this.getDutyPreference(person, duty), DUTY_CHANCE_LOWEST));
 				}
 			} else {
 				personPreferenceRanking.put(person, this.getDutyPreference(person, duty));
 			}
 		}
-
-		final ArrayList<Person> listOfPeopleTimesPreferenceRanking = new ArrayList<>();
-		for (final Map.Entry<Person, Integer> entry : personPreferenceRanking.entrySet()) {
-			final Person key = entry.getKey();
-			final Integer value = entry.getValue();
-			if (value > 0) {
-				for (int i = 0; i < value * 2; i++) {
-					listOfPeopleTimesPreferenceRanking.add(key);
-				}
-			}
+		
+		// build list for enumerated distribution
+		final List<Pair<Person,Double>> itemWeights = personPreferenceRanking.entrySet().stream()
+			.filter(e -> e.getValue() > DUTY_CHANCE_LOWEST)
+			.map(e -> new Pair<Person, Double>(e.getKey(), Double.valueOf(e.getValue())))
+			.collect(Collectors.toList());
+		
+		// if there's nobody available w/ a duty chance > 0, add all the 0s to the distribution with a weight of 1 (equal chance)
+		if(itemWeights.isEmpty()) {
+			itemWeights.addAll(
+					personPreferenceRanking.entrySet().stream()
+					.filter(e -> e.getValue() == DUTY_CHANCE_LOWEST)
+					.map(e -> new Pair<Person, Double>(e.getKey(), 1d))
+					.collect(Collectors.toList())
+					);
 		}
 
-		// if we haven't found any candidates ...
-		if (listOfPeopleTimesPreferenceRanking.isEmpty()) {
-			// ... we'll need to include people that served last time and / or have already served today
-			for (final Map.Entry<Person, Integer> entry : personPreferenceRanking.entrySet()) {
-				final Person key = entry.getKey();
-				final Integer value = entry.getValue();
-				if (value.equals(0)) {
-					listOfPeopleTimesPreferenceRanking.add(key);
-				}
-			}
-		}
-
-		return CollectionUtils.isEmpty(listOfPeopleTimesPreferenceRanking) ? null
-				: listOfPeopleTimesPreferenceRanking.get(this.rand.nextInt(listOfPeopleTimesPreferenceRanking.size()));
+		return CollectionUtils.isEmpty(itemWeights) 
+				? Optional.empty() : Optional.of(new EnumeratedDistribution<>(itemWeights).sample());
+	}
+	
+	private Set<Long> getPeopleServingDutyById(@NonNull final Duty duty, @NonNull final EventRoster currentEventRoster){
+		return getPeopleServingDuty(duty, currentEventRoster).stream().map(Person::getId).collect(Collectors.toSet());
 	}
 
 	private Set<Person> getPeopleServingDuty(@NonNull final Duty duty, @NonNull final EventRoster currentEventRoster) {
-		final Set<Person> peopleServingDuty = new HashSet<>();
-
-		for (final Entry<Duty, Person> entry : currentEventRoster.getDutiesAndPeople()) {
-			if (entry.getKey() == null || entry.getValue() == null) {
-				continue;
-			}
-
-			if (entry.getKey().getId() == duty.getId()) {
-				peopleServingDuty.add(entry.getValue());
-			}
+		if(currentEventRoster.getDutiesAndPeople() == null) {
+			return Collections.emptySet();
 		}
-
-		return peopleServingDuty;
+		
+		return currentEventRoster.getDutiesAndPeople().stream()
+			.filter(e -> e.getKey() != null && e.getValue() != null)
+			.filter(e -> e.getKey().getId() == duty.getId())
+			.map(Entry::getValue)
+			.collect(Collectors.toSet());
 	}
 
 	private Set<Person> getPeopleWhoServed(final EventRoster er) {
-		final Set<Person> people = new HashSet<>();
-
-		if (er != null) {
-			for (int i = 0; i < er.getDutiesAndPeople().size(); i++) {
-				CollectionUtils.addIgnoreNull(people, er.getDutiesAndPeople().get(i).getValue());
-			}
+		if(er == null) {
+			return Collections.emptySet();
 		}
-
-		return people;
+		
+		return er.getDutiesAndPeople().stream().map(Entry::getValue).filter(Objects::nonNull).collect(Collectors.toSet());
 	}
 
-	private int getDutyPreference(@NonNull final Person p, @NonNull final Duty d) {
-		final Set<PersonDuty> personDuties = p.getDuties();
-		for (final PersonDuty pd : personDuties) {
-			if (pd.getDuty().getId() == d.getId()) {
-				return pd.getWeightedPreference();
-
-			}
+	private int getDutyPreference(@NonNull final Person p, @NonNull final Duty duty) {
+		Optional<PersonDuty> personDuty = p.getDuties().stream().filter(pd -> pd.getDuty().getId() == duty.getId()).findFirst();
+		
+		if(personDuty.isPresent()) {
+			return personDuty.get().getWeightedPreference();
+		} else {
+			return -1;
 		}
-
-		return -1;
 	}
 
 	@Transactional
