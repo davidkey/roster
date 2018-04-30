@@ -76,7 +76,7 @@ public class DutyServiceTest extends ServiceTest {
 		newDuty.setDescription("new duty");
 		newDuty.setName("new duty");
 		newDuty.setSortOrder(1);
-		newDuty.setOrganisation(this.orgRepos.findAll().get(0));
+		newDuty.setOrganisation(this.orgRepos.findById(1L).get());
 		this.dutyService.saveOrUpdateDuty(newDuty);
 
 		Assert.assertTrue("Sort order not incrementing correctly",
@@ -106,7 +106,7 @@ public class DutyServiceTest extends ServiceTest {
 	public void testBrokenSequenceVerification() {
 		Duty duty = new Duty();
 		duty.setName("testBrokenSequenceVerification");
-		duty.setOrganisation(this.orgRepos.findAll().get(0));
+		duty.setOrganisation(this.orgRepos.findById(1L).get());
 		duty.setSortOrder(this.dutyRepos.findMaxSortOrder() + 2); // out of sequence
 		duty = this.dutyService.saveOrUpdateDuty(duty);
 
@@ -118,7 +118,7 @@ public class DutyServiceTest extends ServiceTest {
 	public void testSortOrderAfterSoftDeleteOfFirstSortOrder() {
 		Duty duty = new Duty();
 		duty.setName("delete me please");
-		duty.setOrganisation(this.orgRepos.findAll().get(0));
+		duty.setOrganisation(this.orgRepos.findById(1L).get());
 		duty.setSortOrder(1);
 
 		duty = this.dutyService.saveOrUpdateDuty(duty);
@@ -134,7 +134,7 @@ public class DutyServiceTest extends ServiceTest {
 	public void testSortOrderAfterSoftDeleteOfLastSortOrder() {
 		Duty duty = new Duty();
 		duty.setName("delete me please");
-		duty.setOrganisation(this.orgRepos.findAll().get(0));
+		duty.setOrganisation(this.orgRepos.findById(1L).get());
 		duty.setSortOrder(this.dutyRepos.findMaxSortOrder() + 1);
 
 		duty = this.dutyService.saveOrUpdateDuty(duty);
@@ -144,6 +144,30 @@ public class DutyServiceTest extends ServiceTest {
 
 		Assert.assertTrue("Sort orders not sequencing correctly after soft delete!",
 				this.areSortOrdersInSequence(this.dutyRepos.findByActiveTrue()));
+	}
+	
+	@Test
+	public void testTwoDutiesWithSameNameDifferentOrgs() {
+		Duty duty = new Duty();
+		duty.setName("dupeName");
+		duty.setOrganisation(this.orgRepos.findById(2L).get());
+		
+		//dutyRepos.save(duty);
+		
+		Duty duty2= new Duty();
+		duty2.setName("dupeName");
+		duty2.setOrganisation(this.orgRepos.findById(3L).get());
+		
+		//dutyRepos.save(duty2);
+		
+		//this.dutyService.saveOrUpdateDuty(duty);
+		//this.dutyService.saveOrUpdateDuty(duty2);
+		
+		dutyRepos.save(duty);
+		dutyRepos.save(duty2);
+		
+		dutyRepos.delete(duty);
+		dutyRepos.delete(duty2);
 	}
 
 	private boolean areSortOrdersInSequence(final List<Duty> duties) {

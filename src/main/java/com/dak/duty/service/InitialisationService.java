@@ -120,6 +120,8 @@ public class InitialisationService {
 	protected List<Organisation> getDefaultOrganisations() {
 		final List<Organisation> orgs = new ArrayList<>();
 		orgs.add(this.getDefaultOrg());
+		orgs.add(this.getDefaultOrg2());
+		orgs.add(this.getDefaultOrg3());
 
 		return orgs;
 	}
@@ -190,7 +192,23 @@ public class InitialisationService {
 		final Organisation org = new Organisation();
 		org.setId(1L);
 		org.setName("My First Org");
-		org.setRegistrationCode("MYFIRST001");
+		org.setRegistrationCode("MYFIRST00001");
+		return org;
+	}
+	
+	public Organisation getDefaultOrg2() {
+		final Organisation org = new Organisation();
+		org.setId(2L);
+		org.setName("My Second Org");
+		org.setRegistrationCode("MYFIRST00002");
+		return org;
+	}
+	
+	public Organisation getDefaultOrg3() {
+		final Organisation org = new Organisation();
+		org.setId(3L);
+		org.setName("My Third Org");
+		org.setRegistrationCode("MYFIRST00003");
 		return org;
 	}
 

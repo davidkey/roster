@@ -21,6 +21,7 @@ import javax.persistence.PreUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -40,7 +41,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "event_type")
+@Table(name = "event_type", uniqueConstraints={@UniqueConstraint(columnNames = {"org_id", "name"})})
 @Getter
 @Setter
 @ToString
@@ -57,7 +58,7 @@ public class EventType implements Serializable {
 	@JoinColumn(name = "org_id", nullable = false)
 	private Organisation organisation;
 
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false)
 	@NotEmpty
 	private String name;
 

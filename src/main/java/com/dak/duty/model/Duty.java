@@ -13,6 +13,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 
@@ -25,7 +26,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "duty")
+@Table(name = "duty", uniqueConstraints={@UniqueConstraint(columnNames = {"org_id", "name"})})
 @Getter
 @Setter
 @ToString
@@ -42,7 +43,7 @@ public class Duty implements Serializable {
 	@JoinColumn(name = "org_id", nullable = false)
 	private Organisation organisation;
 
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false)
 	@NotEmpty
 	private String name;
 

@@ -55,7 +55,7 @@ public class DutyService {
 			if (!duty.getActive() && dutyBeforeChanges.getActive()) { // if we're deactivating / soft deleting this duty
 																							// ...
 
-				duty.setName(duty.getName() + " (deleted @ " + LocalDateTime.now().format(fmt) + ")"); // change name to show soft  delete and to prevent key errors if another with same name added later
+				duty.setName(duty.getName() + " (deleted @ " + LocalDateTime.now().format(fmt) + "; id " + duty.getId() + ")"); // change name to show soft  delete and to prevent key errors if another with same name added later
 				this.dutyRepos.decrementSortOrderAboveAndIncludingExcludingDutyId(dutyBeforeChanges.getSortOrder(), duty.getId());
 			}
 			if (duty.getActive() && !duty.getSortOrder().equals(dutyBeforeChanges.getSortOrder())) {
