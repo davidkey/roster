@@ -1,10 +1,11 @@
 package com.dak.duty.service;
 
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -30,6 +31,8 @@ public class DutyService {
 
 	@Autowired
 	IAuthenticationFacade authenticationFacade;
+	
+	private final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
 
 	public Duty saveOrUpdateDuty(final Duty duty) {
 
@@ -51,12 +54,8 @@ public class DutyService {
 
 			if (!duty.getActive() && dutyBeforeChanges.getActive()) { // if we're deactivating / soft deleting this duty
 																							// ...
-				final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
 
-				duty.setName(duty.getName() + " (deleted @ " + sdf.format(new Date()) + ")"); // change name to show soft
-																														// delete and to prevent key
-																														// errors if another with same
-																														// name added later
+				duty.setName(duty.getName() + " (deleted @ " + LocalDateTime.now().format(fmt) + ")"); // change name to show soft  delete and to prevent key errors if another with same name added later
 				this.dutyRepos.decrementSortOrderAboveAndIncludingExcludingDutyId(dutyBeforeChanges.getSortOrder(), duty.getId());
 			}
 			if (duty.getActive() && !duty.getSortOrder().equals(dutyBeforeChanges.getSortOrder())) {
@@ -110,18 +109,9 @@ public class DutyService {
 	}
 
 	public List<SortOrder> getSortOrders() {
-		final List<SortOrder> sortOrders = new ArrayList<>();
-
-		final List<Duty> activeDuties = this.dutyRepos.findByActiveTrue();
-
-		for (final Duty d : activeDuties) {
-			final SortOrder so = new SortOrder();
-			so.setId(d.getId());
-			so.setSortOrder(d.getSortOrder());
-			sortOrders.add(so);
-		}
-
-		return sortOrders;
+		return this.dutyRepos.findByActiveTrue().stream()
+			.map(d -> new SortOrder(d.getId(), d.getSortOrder()))
+			.collect(Collectors.toList());
 	}
 
 	public Duty softDeleteDuty(Duty duty) {

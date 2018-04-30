@@ -1,6 +1,6 @@
 package com.dak.duty.controller;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,7 +17,7 @@ public class ExceptionController {
 	public ModelAndView getDefaultErrorView(final Exception ex, final HttpServletRequest request, final HttpServletResponse response) {
 
 		final ModelAndView model = new ModelAndView("error");
-		model.addObject("now", new Date());
+		model.addObject("now", LocalDate.now());
 		model.addObject("requestUrl", request.getRequestURL().toString());
 		model.addObject("exception", ex);
 		model.addObject("stackTrace", ExceptionUtils.getStackTrace(ex));
