@@ -1,9 +1,9 @@
 package com.dak.duty.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -222,16 +222,16 @@ public class EventService {
 		return false;
 	}
 
-	public List<EventCalendarNode> getAllFutureEventCalendarNodes(final Date startDate) {
+	public List<EventCalendarNode> getAllFutureEventCalendarNodes(final LocalDate startDate) {
 		return this.eventRepos.findAllByDateEventGreaterThanEqual(startDate).stream()
 				.map(EventCalendarNode::fromEvent)
 				.sorted(new EventCalendarNodeSortByDate())
 				.collect(Collectors.toList());
 	}
 
-	public List<EventCalendarNode> getEventCalendarNodesForMonth(final Date monthDate) {
-		final Date startDate = this.intervalService.getFirstDayOfMonth(monthDate);
-		final Date endDate = this.intervalService.getLastDayOfMonth(startDate);
+	public List<EventCalendarNode> getEventCalendarNodesForMonth(final LocalDate monthDate) {
+		final LocalDate startDate = this.intervalService.getFirstDayOfMonth(monthDate);
+		final LocalDate endDate = this.intervalService.getLastDayOfMonth(startDate);
 
 		return this.eventRepos.findEventsByDateBetween(startDate, endDate).stream()
 				.map(EventCalendarNode::fromEvent)
@@ -248,7 +248,7 @@ public class EventService {
 	}
 
 	public int createAndSaveMissingEvents() {
-		final Date maxEventDate = this.eventRepos.findMaxEventDate();
+		final LocalDate maxEventDate = this.eventRepos.findMaxEventDate();
 
 		if (maxEventDate == null) {
 			return 0; // there's never even been a normal event generation process, so don't bother trying to create
@@ -274,16 +274,16 @@ public class EventService {
 	 * @param endDate (inclusive)
 	 * @return
 	 */
-	protected List<Event> getMissingEventsForRange(final Date startDate, final Date endDate) {
+	protected List<Event> getMissingEventsForRange(final LocalDate startDate, final LocalDate endDate) {
 		final List<Event> missingEvents = new ArrayList<>();
 		final List<EventType> eventTypesWithNoEvents = this.eventTypeRepos.getEventTypesWithNoEvents();
 
 		for (final EventType et : eventTypesWithNoEvents) {
-			Date currDate = this.intervalService.getFirstDayOfMonth(startDate);
+			LocalDate currDate = this.intervalService.getFirstDayOfMonth(startDate);
 
 			while (currDate.compareTo(endDate) <= 0) {
-				final List<Date> eventDays = this.intervalService.getDaysOfMonthForEventType(currDate, et);
-				for (final Date day : eventDays) {
+				final List<LocalDate> eventDays = this.intervalService.getDaysOfMonthForEventType(currDate, et);
+				for (final LocalDate day : eventDays) {
 					if (day.compareTo(startDate) >= 0 /* && day.compareTo(endDate) <= 0 */) { /* commented out because we  want to generate possible events through EOM */
 						final Event event = new Event();
 						event.setEventType(et);
@@ -303,8 +303,8 @@ public class EventService {
 	}
 
 	public int createAndSaveEventsForNextMonth() {
-		final Date mostRecentGenerationDate = this.eventRepos.findMaxEventDate();
-		Date startDate = null;
+		final LocalDate mostRecentGenerationDate = this.eventRepos.findMaxEventDate();
+		LocalDate startDate = null;
 		if (mostRecentGenerationDate == null) {
 			startDate = this.intervalService.getFirstDayOfMonth(this.intervalService.getCurrentSystemDate());
 		} else {
@@ -314,9 +314,9 @@ public class EventService {
 		return this.createAndSaveEventsForMonth(startDate);
 	}
 
-	public int createAndSaveEventsForMonth(final Date startDate) {
+	public int createAndSaveEventsForMonth(final LocalDate startDate) {
 
-		final Map<EventTypeDetailNode, List<Date>> eventTypeDays = new HashMap<>();
+		final Map<EventTypeDetailNode, List<LocalDate>> eventTypeDays = new HashMap<>();
 
 		for (final EventTypeInterval eti : EventTypeInterval.values()) {
 			final List<EventType> eventTypes = this.eventTypeRepos.findByInterval(eti);
@@ -324,7 +324,7 @@ public class EventService {
 
 				final EventTypeDetailNode etdn = this.intervalService.createEventTypeDetailNode(eti, et.getIntervalDetail());
 				if (!eventTypeDays.containsKey(etdn)) {
-					final List<Date> results = this.intervalService.getDaysOfMonthForInterval(startDate, eti, et.getIntervalDetail());
+					final List<LocalDate> results = this.intervalService.getDaysOfMonthForInterval(startDate, eti, et.getIntervalDetail());
 					eventTypeDays.put(etdn, results);
 				}
 			}
@@ -336,8 +336,8 @@ public class EventService {
 		for (final EventType et : allEventTypes) {
 			final EventTypeDetailNode etdn = this.intervalService.createEventTypeDetailNode(et.getInterval(), et.getIntervalDetail());
 			if (eventTypeDays.containsKey(etdn)) {
-				final List<Date> daysToProcessForEvent = eventTypeDays.get(etdn);
-				for (final Date d : daysToProcessForEvent) {
+				final List<LocalDate> daysToProcessForEvent = eventTypeDays.get(etdn);
+				for (final LocalDate d : daysToProcessForEvent) {
 					final Event e = new Event();
 					e.setDateEvent(d);
 					e.setEventType(et);

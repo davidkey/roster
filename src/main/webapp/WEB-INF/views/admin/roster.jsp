@@ -1,6 +1,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="duty" uri="/WEB-INF/duty.tld"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,8 +18,8 @@
 		<div id="roster">
 			<h2><c:out value="${event.eventType.name}"/></h2>
 			<h3>
-				<fmt:formatDate pattern="MM/dd/yyyy" value="${event.dateEvent}" /> 
-				<small><fmt:formatDate pattern="EEEE" value="${event.dateEvent}" /></small>
+				<duty:formatDate pattern="MM/dd/yyyy" value="${event.dateEvent}" /> 
+				<small><duty:formatDate pattern="EEEE" value="${event.dateEvent}" /></small>
 			</h3>
 			
 			<table class="table table-striped" id="rosterTable">

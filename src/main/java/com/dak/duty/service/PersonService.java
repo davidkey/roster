@@ -1,11 +1,10 @@
 package com.dak.duty.service;
 
 import java.io.StringWriter;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -125,7 +124,7 @@ public class PersonService {
 		final String resetToken = this.passwordResetTokenGenerator.getNextPasswordResetToken();
 
 		person.setResetToken(resetToken);
-		person.setResetTokenExpires(this.getMinutesInFuture(new Date(), EXPIRE_MIN));
+		person.setResetTokenExpires(LocalDateTime.now().plusMinutes(EXPIRE_MIN));
 
 		this.personRepos.save(person);
 
@@ -140,13 +139,6 @@ public class PersonService {
 		velocityEngine.mergeTemplate("velocity/passwordReset.vm", "UTF-8", context, stringWriter);
 
 		this.emailService.send(new Email("admin@roster.guru", person.getEmailAddress(), "Password Reset Initiated", stringWriter.toString()));
-	}
-
-	private Date getMinutesInFuture(final Date d, final int minutes) {
-		final Calendar calendar = Calendar.getInstance();
-		calendar.setTime(d);
-		calendar.add(Calendar.MINUTE, minutes);
-		return calendar.getTime();
 	}
 
 	public boolean loginAsPerson(final String username, final String password, final HttpServletRequest request) {
@@ -269,7 +261,7 @@ public class PersonService {
 		final List<Person> people = this.personRepos
 				.findAll(PersonSpecs.isActive().and(PersonSpecs.sameOrg()).and(PersonSpecs.hasDuty(duty)));
 		if (CollectionUtils.isEmpty(people)) {
-			return null;
+			return Optional.empty();
 		}
 
 		final Set<Person> peopleAlreadyServing = this.getPeopleWhoServed(currentEventRoster);

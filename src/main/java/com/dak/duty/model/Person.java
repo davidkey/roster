@@ -1,7 +1,7 @@
 package com.dak.duty.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,8 +20,6 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Email;
@@ -78,9 +76,9 @@ public class Person implements Serializable {
 	private Boolean active = true;
 
 	@Column(nullable = false)
-	@Temporal(TemporalType.TIMESTAMP)
+	//@Temporal(TemporalType.TIMESTAMP)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm aaa")
-	private Date lastUpdated = new Date();
+	private LocalDateTime lastUpdated = LocalDateTime.now();
 
 	@OneToMany(mappedBy = "person", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JsonManagedReference
@@ -94,7 +92,7 @@ public class Person implements Serializable {
 	private String resetToken;
 
 	@Column(nullable = true)
-	private Date resetTokenExpires;
+	private LocalDateTime resetTokenExpires;
 
 	@PrePersist
 	protected void onPersist() {
@@ -166,7 +164,7 @@ public class Person implements Serializable {
 		final PersonDuty pd = new PersonDuty();
 		pd.setDuty(duty);
 		pd.setPreference(preference);
-		this.setLastUpdated(new Date());
+		this.setLastUpdated(LocalDateTime.now());
 		this.addPersonDuty(pd);
 	}
 
@@ -185,7 +183,7 @@ public class Person implements Serializable {
 				if (pd.getDuty() != null && pd.getDuty().getId() == duty.getId()) {
 					found = true;
 					pd.setPreference(preference);
-					this.setLastUpdated(new Date());
+					this.setLastUpdated(LocalDateTime.now());
 					break;
 				}
 			}

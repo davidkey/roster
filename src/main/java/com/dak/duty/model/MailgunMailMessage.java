@@ -1,7 +1,7 @@
 package com.dak.duty.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -80,7 +80,7 @@ public class MailgunMailMessage implements Serializable, MailMessageInterface {
 	private int timestamp;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm aaa")
-	private Date timestampDate;
+	private LocalDateTime timestampDate;
 
 	@Column(columnDefinition = "text")
 	@JsonIgnore

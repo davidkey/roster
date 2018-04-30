@@ -1,7 +1,7 @@
 package com.dak.duty.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -21,8 +21,6 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -53,10 +51,10 @@ public class Event implements Serializable {
 	@JoinColumn(name = "org_id", nullable = false)
 	private Organisation organisation;
 
-	@Temporal(TemporalType.DATE)
+	//@Temporal(TemporalType.DATE)
 	@Column(nullable = false)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private Date dateEvent;
+	private LocalDate dateEvent;
 
 	@ManyToOne
 	@JoinColumn(name = "event_type_id", nullable = false)

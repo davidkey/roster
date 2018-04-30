@@ -49,7 +49,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.formLogin().loginPage("/login").defaultSuccessUrl("/user").failureUrl("/login?error=true")
 		.and()
 			.logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).deleteCookies("JSESSIONID").invalidateHttpSession(true)
-		.and().exceptionHandling().accessDeniedPage("/error?error=accessdenied");
+		.and()
+			.exceptionHandling().accessDeniedPage("/error?error=accessdenied")
+		.and()
+			.csrf().ignoringAntMatchers("/h2-console/**")
+		.and()
+			.headers().frameOptions().sameOrigin()
+			;
 	}
 
 	@Override

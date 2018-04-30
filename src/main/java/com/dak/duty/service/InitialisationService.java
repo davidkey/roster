@@ -1,5 +1,7 @@
 package com.dak.duty.service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,8 +10,6 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.fluttercode.datafactory.impl.DataFactory;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ import lombok.NonNull;
 public class InitialisationService {
 
 	private static final Logger logger = LoggerFactory.getLogger(InitialisationService.class);
-	private static final DateTimeFormatter fmt = DateTimeFormat.forPattern("MM/dd/yyyy");
+	private static final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
 	@Autowired
 	private PasswordEncoder encoder;
@@ -228,9 +228,9 @@ public class InitialisationService {
 			e.setName(et.getName());
 			try {
 				if (e.getName().contains("Sunday")) {
-					e.setDateEvent(InitialisationService.fmt.parseDateTime("05/24/2015").toDate()); // sunday
+					e.setDateEvent(LocalDate.parse("05/24/2015", fmt)); // sunday
 				} else {
-					e.setDateEvent(InitialisationService.fmt.parseDateTime("05/27/2015").toDate()); // wednesday
+					e.setDateEvent(LocalDate.parse("05/24/2015", fmt)); // wednesday
 				}
 			} catch (final IllegalArgumentException iae) {
 				// do nothing
