@@ -1,6 +1,6 @@
 package com.dak.duty.service;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.Assert;
@@ -47,7 +47,7 @@ public class IntervalServiceTest extends ServiceTest {
 		et.setInterval(EventTypeInterval.DAILY);
 		et = this.eventService.saveEventType(et);
 
-		final List<Date> dates = this.intervalService.getDaysOfMonthForInterval(this.intervalService.getCurrentSystemDate(), et.getInterval(),
+		final List<LocalDate> dates = this.intervalService.getDaysOfMonthForInterval(this.intervalService.getCurrentSystemDate(), et.getInterval(),
 				et.getIntervalDetail());
 
 		Assert.assertNotNull(dates);
@@ -62,7 +62,7 @@ public class IntervalServiceTest extends ServiceTest {
 		et.setInterval(EventTypeInterval.DAILY);
 		et.setOrganisation(this.orgRepos.findAll().get(0));
 
-		final List<Date> dates = this.intervalService.getDaysOfMonthForInterval(this.intervalService.getCurrentSystemDate(), et.getInterval(),
+		final List<LocalDate> dates = this.intervalService.getDaysOfMonthForInterval(this.intervalService.getCurrentSystemDate(), et.getInterval(),
 				et.getIntervalDetail());
 
 		Assert.assertNotNull(dates);

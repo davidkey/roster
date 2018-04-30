@@ -1,13 +1,11 @@
 package com.dak.duty.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
-import org.apache.commons.lang3.time.DateUtils;
-import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
 import com.dak.duty.model.EventType;
@@ -21,105 +19,105 @@ import lombok.NonNull;
 @Service
 public class IntervalService {
 
-	public List<Date> getDaysOfMonthForEventType(@NonNull final Date monthDate, @NonNull final EventType et) {
+	public List<LocalDate> getDaysOfMonthForEventType(@NonNull final LocalDate monthDate, @NonNull final EventType et) {
 		return this.getDaysOfMonthForInterval(monthDate, et.getInterval(), et.getIntervalDetail());
 	}
 
-	public List<Date> getDaysOfMonthForInterval(@NonNull final Date monthDate, @NonNull final EventTypeInterval eti,
+	public List<LocalDate> getDaysOfMonthForInterval(@NonNull final LocalDate monthDate, @NonNull final EventTypeInterval eti,
 			final String intervalDetail) {
-		final List<Date> dates = new ArrayList<>();
-		final DateTime som = this.getFirstDayOfMonth(this.getFirstDayOfMonth(this.getDateTime(this.sanitizeDate(monthDate))));
-		final DateTime eom = this.getLastDayOfMonth(som);
+		final List<LocalDate> dates = new ArrayList<>();
+		final LocalDate som = this.getFirstDayOfMonth(this.getFirstDayOfMonth(monthDate));
+		final LocalDate eom = this.getLastDayOfMonth(som);
 
 		if (intervalDetail == null && !EventTypeInterval.DAILY.equals(eti)) {
 			throw new IntervalValidationException("intervalDetail cannot be null when EventTypeInterval =" + eti.toString());
 		}
 
 		if (EventTypeInterval.ONCE.equals(eti)) {
-			final Date d = EventTypeIntervalValidation.strToDate(intervalDetail);
+			final LocalDate d = EventTypeIntervalValidation.strToDate(intervalDetail);
 			if (d != null) {
-				final DateTime onceDate = this.getDateTime(d);
+				final LocalDate onceDate = d;
 				if (IntervalService.dateInRange(onceDate, som, eom)) {
-					dates.add(onceDate.toDate());
+					dates.add(d);
 				}
 			}
 		} else if (EventTypeInterval.DAILY.equals(eti)) {
-			for (DateTime dt = som; dt.compareTo(eom) <= 0; dt = dt.plusDays(1)) {
-				dates.add(dt.toDate());
+			for (LocalDate dt = som; dt.compareTo(eom) <= 0; dt = dt.plusDays(1)) {
+				dates.add(dt);
 			}
 		} else if (EventTypeInterval.WEEKLY.equals(eti)) {
 			final int dayOfWeek = IntervalWeekly.valueOf(intervalDetail).ordinal() + 1;
-			for (DateTime dt = som; dt.compareTo(eom) <= 0; dt = dt.plusDays(1)) {
-				if (dt.getDayOfWeek() == dayOfWeek) {
-					dates.add(dt.toDate());
+			for (LocalDate dt = som; dt.compareTo(eom) <= 0; dt = dt.plusDays(1)) {
+				if (dt.getDayOfWeek().getValue() == dayOfWeek) {
+					dates.add(dt);
 					dt = dt.plusDays(6);
 				}
 			}
 		} else if (EventTypeInterval.MONTHLY.equals(eti)) {
-			DateTime dt = som.plusDays(Integer.parseInt(intervalDetail) - 1);
+			LocalDate dt = som.plusDays(Integer.parseInt(intervalDetail) - 1);
 			if (dt.compareTo(eom) > 0) { // if MONTHLY interval occurs on 29th, 30th or 31st and this month doesn't have
 													// that many days ...
 				dt = eom; // ... just use EOM
 			}
-			dates.add(dt.toDate());
+			dates.add(dt);
 		}
 
 		return dates;
 	}
 
-	public Date getCurrentSystemDate() {
-		return this.sanitizeDate(new Date());
+	public LocalDate getCurrentSystemDate() {
+		return LocalDate.now();
 	}
 
-	public List<Date> getDaysOfQuarterForInterval(@NonNull final Date firstMonthOfQuarter, @NonNull final EventTypeInterval eti,
+	public List<LocalDate> getDaysOfQuarterForInterval(@NonNull final LocalDate firstMonthOfQuarter, @NonNull final EventTypeInterval eti,
 			@NonNull final String intervalDetail) {
-		final List<Date> dates = new ArrayList<>();
-		final DateTime fmDt = this.getDateTime(firstMonthOfQuarter);
+		final List<LocalDate> dates = new ArrayList<>();
 
 		for (int i = 0; i < 3; i++) {
-			dates.addAll(this.getDaysOfMonthForInterval(fmDt.plusMonths(i).toDate(), eti, intervalDetail));
+			dates.addAll(this.getDaysOfMonthForInterval(firstMonthOfQuarter.plusMonths(i), eti, intervalDetail));
 		}
 
 		return dates;
 	}
 
-	protected DateTime getDateTime(final Date d) {
-		return new DateTime(d);
+	protected LocalDateTime getDateTime(final LocalDate d) {
+		return d.atStartOfDay();
 	}
 
-	protected Date sanitizeDate(final Date d) {
+/*	protected Date sanitizeDate(final Date d) {
 		return DateUtils.truncate(d, Calendar.DATE);
+	}*/
+
+	public LocalDate getFirstDayOfMonth(final LocalDate dt) {
+		return dt.withDayOfMonth(1);
 	}
 
-	public DateTime getFirstDayOfMonth(final DateTime dt) {
-		return dt.dayOfMonth().withMinimumValue();
+	public LocalDate getFirstDayOfMonth(final LocalDateTime d) {
+		return this.getFirstDayOfMonth(d.toLocalDate());
 	}
 
-	public Date getFirstDayOfMonth(final Date d) {
-		return this.getFirstDayOfMonth(this.getDateTime(this.sanitizeDate(d))).toDate();
+	public LocalDate getLastDayOfMonth(final LocalDate dt) {
+		return dt.withDayOfMonth(dt.lengthOfMonth());
 	}
 
-	public DateTime getLastDayOfMonth(final DateTime dt) {
-		return dt.dayOfMonth().withMaximumValue();
+	public LocalDate getLastDayOfMonth(final LocalDateTime d) {
+		return this.getLastDayOfMonth(d.toLocalDate());
 	}
 
-	public Date getLastDayOfMonth(final Date d) {
-		return this.getLastDayOfMonth(this.getDateTime(this.sanitizeDate(d))).toDate();
+	public LocalDate getFirstDayOfNextMonth(@NonNull final LocalDate inputDate) {
+		return getFirstDayOfMonth(inputDate).plusMonths(1);
 	}
 
-	public Date getFirstDayOfNextMonth(@NonNull final Date inputDate) {
-		return this.getFirstDayOfMonth(this.getDateTime(this.sanitizeDate(inputDate)).plusMonths(1)).toDate();
+	protected synchronized int getDayOfWeek(final LocalDate d) {
+		return d.getDayOfWeek().getValue();
+	}
+	
+	protected static boolean dateInRange(@NonNull final LocalDate dt, @NonNull final LocalDate start, @NonNull final LocalDate end) {
+		return dateInRange(dt.atStartOfDay(), start, end);
 	}
 
-	protected synchronized int getDayOfWeek(final Date d) {
-		final Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-		cal.setTime(d);
-
-		return cal.get(Calendar.DAY_OF_WEEK);
-	}
-
-	protected static boolean dateInRange(@NonNull final DateTime dt, @NonNull final DateTime start, @NonNull final DateTime end) {
-		return dt.compareTo(start) >= 0 && dt.compareTo(end) <= 0;
+	protected static boolean dateInRange(@NonNull final LocalDateTime dt, @NonNull final LocalDate start, @NonNull final LocalDate end) {
+		return dt.isEqual(start.atStartOfDay()) || (dt.isAfter(start.atStartOfDay()) && dt.isBefore(end.plusDays(1).atStartOfDay()));
 	}
 
 	/**
@@ -128,15 +126,8 @@ public class IntervalService {
 	 * @param minute: 0-59
 	 * @return
 	 */
-	public Date getTimeWithoutDate(final int hour, final int minute) {
-		final Calendar cal = Calendar.getInstance();
-		cal.setTime(new Date(0L));
-		cal.set(Calendar.HOUR_OF_DAY, hour);
-		cal.set(Calendar.MINUTE, minute);
-		cal.set(Calendar.SECOND, 0);
-		cal.set(Calendar.MILLISECOND, 0);
-
-		return cal.getTime();
+	public LocalTime getTimeWithoutDate(final int hour, final int minute) {
+		return LocalTime.of(hour, minute);
 	}
 
 	public EventTypeDetailNode createEventTypeDetailNode(final EventTypeInterval eti, final String detail) {

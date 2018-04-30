@@ -1,6 +1,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="duty" uri="/WEB-INF/duty.tld"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,7 +40,7 @@
 							<td><c:out value="${person.nameFirst}"/></td>
 							<td><c:out value="${person.emailAddress}"/></td>
 							<td>${person.active ? 'Yes' : 'No'}</td>
-							<td><fmt:formatDate value="${person.lastUpdated}" pattern="yyyy-MM-dd hh:mm aaa" /></td>
+							<td><duty:formatDate value="${person.lastUpdated}" pattern="yyyy-MM-dd hh:mm a" /></td>
 							<td><a href="${pageContext.request.contextPath}/admin/people/${person.id}" class="btn btn-xs btn-primary">Edit</a></td>
 							<td><a href="${pageContext.request.contextPath}/admin/people/${person.id}/duties" class="btn btn-xs btn-info">Manage Duties</a></td>
 						</tr>

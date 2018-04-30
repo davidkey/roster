@@ -1,6 +1,6 @@
 package com.dak.duty.controller;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -72,7 +72,7 @@ public class PasswordResetController {
 	public String getResetPassword(@PathVariable("resetToken") final String resetToken, final Model model) {
 		logger.debug("resetPassword({})", resetToken);
 
-		final Person person = this.personRepos.findByResetTokenAndResetTokenExpiresGreaterThan(resetToken, new Date());
+		final Person person = this.personRepos.findByResetTokenAndResetTokenExpiresGreaterThan(resetToken, LocalDateTime.now());
 
 		if (person == null) {
 			model.addAttribute("invalidToken", true);
@@ -96,7 +96,7 @@ public class PasswordResetController {
 			return "passwordReset";
 		}
 
-		final Person person = this.personRepos.findByResetTokenAndResetTokenExpiresGreaterThan(resetToken, new Date());
+		final Person person = this.personRepos.findByResetTokenAndResetTokenExpiresGreaterThan(resetToken, LocalDateTime.now());
 
 		if (person == null) {
 			model.addAttribute("passwordResetForm", form);

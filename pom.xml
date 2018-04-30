@@ -134,12 +134,6 @@
 			<version>2.4</version>
 		</dependency>
 
-		<!-- time -->
-		<dependency>
-			<groupId>joda-time</groupId>
-			<artifactId>joda-time</artifactId>
-		</dependency>
-
 		<!-- caching -->
 		<dependency>
 			<groupId>net.sf.ehcache</groupId>

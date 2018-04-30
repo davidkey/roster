@@ -1,10 +1,9 @@
 package com.dak.duty.controller.admin;
 
 import java.text.ParseException;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +34,8 @@ public class EventAdminController {
 	public @ResponseBody List<EventCalendarNode> getEventCalendarItems(@PathVariable("year") final Integer year,
 			@PathVariable("month") final Integer month) throws ParseException {
 		logger.info("getEventCalendarItems({}, {})", year, month);
-		final Date monthDate = new DateTime(year, month, 1, 0, 0, 0).toDate();
-		return this.eventService.getEventCalendarNodesForMonth(monthDate);
+		
+		return this.eventService.getEventCalendarNodesForMonth(LocalDate.of(year, month, 1));
 	}
 
 	@RequestMapping(value = "/all/json", method = RequestMethod.GET)

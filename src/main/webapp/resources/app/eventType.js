@@ -23,12 +23,12 @@ $(document).ready(function() {
 				var hour = dateStr.split(':')[0];
 				if(hour > 12){
 					hour -= 12;
-					dateStr = hour + ":" + dateStr.split(':')[1] + 'pm';
+					dateStr = hour + ":" + dateStr.split(':')[1] + ' AM';
 				} else {
 					if(hour == 0){
 						hour = 12;
 					}
-					dateStr = hour + ":" + dateStr.split(':')[1] + 'am';
+					dateStr = hour + ":" + dateStr.split(':')[1] + ' PM';
 				}
 			}
 
@@ -40,10 +40,12 @@ $(document).ready(function() {
 		**/
 		
 		$('#startTimePicker').timepicker({
-			'step': 15
+			'step': 15,
+			'timeFormat': 'h:i A'
 		});
 		$('#endTimePicker').timepicker({
-			'step': 15
+			'step': 15,
+			'timeFormat': 'h:i A'
 		});
 		
 		var initStartTime = getTimeFromField($('#startTimePicker'));

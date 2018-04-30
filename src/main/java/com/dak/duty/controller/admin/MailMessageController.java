@@ -1,6 +1,7 @@
 package com.dak.duty.controller.admin;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import javax.validation.Valid;
 
@@ -73,7 +74,8 @@ public class MailMessageController {
 
 		if (timestamp != null) {
 			mailgunMailMessage.setTimestamp(timestamp);
-			mailgunMailMessage.setTimestampDate(new Date(timestamp * 1000L));
+			//mailgunMailMessage.setTimestampDate(new Date(timestamp * 1000L));
+			mailgunMailMessage.setTimestampDate(LocalDateTime.ofEpochSecond(timestamp * 1000L * 1000L, 0, ZoneOffset.UTC));
 		}
 	}
 }

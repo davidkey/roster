@@ -1,6 +1,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="duty" uri="/WEB-INF/duty.tld"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -64,7 +65,7 @@
 							<td style="display:none;" class="msgIsRead">${message.read}</td>
 							<td><c:out value="${message.sender}"/></td>
 							<td><c:out value="${message.subject}"/></td>
-							<td class="msgTimestamp"><fmt:formatDate value="${message.timestampDate}" pattern="yyyy-MM-dd hh:mm aaa" /></td>
+							<td class="msgTimestamp"><duty:formatDate value="${message.timestampDate}" pattern="yyyy-MM-dd hh:mm aaa" /></td>
 							<td><button class="btn btn-sm btn-success readMsg">Read</button></td>
 							<td><button class="btn btn-sm btn-danger deleteMsg">Delete</button></td>
 							<c:choose>

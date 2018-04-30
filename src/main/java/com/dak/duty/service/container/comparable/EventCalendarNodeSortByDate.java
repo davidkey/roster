@@ -1,8 +1,8 @@
 package com.dak.duty.service.container.comparable;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Comparator;
-import java.util.Date;
 
 import com.dak.duty.service.container.EventCalendarNode;
 
@@ -11,8 +11,8 @@ public class EventCalendarNodeSortByDate implements Comparator<EventCalendarNode
 
 	@Override
 	public int compare(final EventCalendarNode o1, final EventCalendarNode o2) {
-		Date date1 = null;
-		Date date2 = null;
+		LocalDateTime date1 = null;
+		LocalDateTime date2 = null;
 
 		if (o1 != null) {
 			if (o1.getEventDate() != null) {
