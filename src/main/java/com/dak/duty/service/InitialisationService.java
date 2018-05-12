@@ -192,7 +192,7 @@ public class InitialisationService {
 		final Organisation org = new Organisation();
 		org.setId(1L);
 		org.setName("My First Org");
-		org.setRegistrationCode("MYFIRST00001");
+		org.setRegistrationCode(getRegistrationCode(org.getName()));
 		return org;
 	}
 	
