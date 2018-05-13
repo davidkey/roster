@@ -1,24 +1,18 @@
-<div class="alert alert-success" role="alert" th:unless="${SUCCESS_MESSAGE == null}" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
-	<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	<strong>Success:</strong> <span th:text="${SUCCESS_MESSAGE}"></span>
-</div>
+<div th:fragment="alerts" xmlns:th="http://www.thymeleaf.org">
+		<div class="alert alert-danger" th:if="${msg_error != null}">
+			<a href="#" class="close" data-dismiss="alert">&times;</a>
+			<span th:value="${msg_error}"></span>
+		</div>
 
-<div class="alert alert-info" role="alert" th:unless="${INFO_MESSAGE == null}" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
-	<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	<strong>Info:</strong> <span th:text="${INFO_MESSAGE}"></span>
-</div>
 
-<div class="alert alert-warning" role="alert" th:unless="${WARNING_MESSAGE == null}" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
-	<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	<strong>Warning:</strong> <span th:text="${WARNING_MESSAGE}"></span>
-</div>
+		<div class="alert alert-success" th:if="${msg_success != null}">
+			<a href="#" class="close" data-dismiss="alert">&times;</a>
+			<span th:value="${msg_success}"></span>
+		</div>
 
-<div class="alert alert-danger" role="alert" th:unless="${DANGER_MESSAGE == null}" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
-	<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	<strong>Error:</strong> <span th:text="${DANGER_MESSAGE}"></span>
-</div>
 
-<div class="alert alert-danger" role="alert" th:unless="${ERROR_MESSAGE == null}" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
-	<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	<strong>Error:</strong> <span th:text="${ERROR_MESSAGE}"></span>
+		<div class="alert alert-notice" th:if="${msg_notice != null}">
+			<a href="#" class="close" data-dismiss="alert">&times;</a>
+			<span th:value="${msg_notice}"></span>
+		</div>
 </div>

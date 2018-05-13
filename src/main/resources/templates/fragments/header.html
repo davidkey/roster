@@ -10,12 +10,56 @@
 
 		<link rel="stylesheet" type="text/css" media="all" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" 
 			th:href="@{/resources/css/themes/bootstrap.css}" />
+			
+		<link rel="stylesheet" type="text/css" th:href="@{/resources/css/bootstrap-slider.css}"/>
 		
 		<title th:text="${title}"></title>
 		
 		<script type="text/javascript" th:inline="javascript">
 			var WEB_ROOT = function(){
-				return /*[[@{/}]]*/ '/';
+				var root = /*[[@{/}]]*/ '/';
+				return root.replace("/", '');
+			}
+			
+			/* Stupid hack to fix tomcat / jboss bug. Won't be an issue in future releases... */
+			function reloadIfjSessionIdSet(){
+				var url = /*[[@{/lib}]]*/;
+				
+				if(url.indexOf('jsessionid=') >= 0){
+					location.reload();
+				}
+			}
+			
+			reloadIfjSessionIdSet();
+		</script>
+	</head>
+	
+	<head lang="en" th:fragment="user-header(title)">
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="_csrf" th:content="${_csrf.token}"/>
+		<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+		<link rel="stylesheet" type="text/css" media="all" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" 
+			th:href="@{/resources/css/themes/bootstrap.css}" />
+			
+		<link rel="stylesheet" type="text/css" th:href="@{/resources/css/bootstrap-slider.css}"/>
+		
+		<title th:text="${title}"></title>
+		
+		<style>
+			body {
+				min-height: 2000px;
+				padding-top: 70px;
+			}
+		</style>
+		
+		<script type="text/javascript" th:inline="javascript">
+			var WEB_ROOT = function(){
+				var root = /*[[@{/}]]*/ '/';
+				return root.replace("/", '');
 			}
 			
 			/* Stupid hack to fix tomcat / jboss bug. Won't be an issue in future releases... */

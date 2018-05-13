@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:include="fragments/header :: head('Roster Guru - Home')">
+<head th:include="fragments/header :: user-header('Roster Guru - Home')">
 </head>
 <body>
 	<div th:replace="fragments/nav :: nav-user"></div>
 	<div class="container">
-	
+		<div th:replace="fragments/alerts :: alerts"></div>
 		<div class="jumbotron">
 			<h1 th:text="${personName} + ','">User,</h1>
 			<p>
@@ -20,6 +20,6 @@
 		</div>
 	
 	</div>
-	<div th:replace="fragments/footer"></div>
+	<div th:replace="fragments/footer :: footer-user"></div>
 </body>
 </html>
