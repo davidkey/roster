@@ -1,0 +1,39 @@
+<!-- 
+	"Regular" nav
+-->
+
+<nav class="navbar navbar-default navbar-fixed-top" th:fragment="nav-user" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+				<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="#">Roster.Guru</a>
+		</div>
+		<div id="navbar" class="navbar-collapse collapse">
+			<ul class="nav navbar-nav">
+				<li id="navUser" class="active"><a th:href="@{/user}">Home</a></li>
+				<li id="navUpcomingDuties"><a th:href="@{/user/upcomingDuties}">Upcoming Duties <span id="upcomingDutiesCount" class="label label-primary"></span></a></li>
+				<li id="navPreferences"><a th:href="@{/user/preferences}">Duty Preferences</a></li>
+				<li><a href="#contact">Contact Admin</a></li>
+			</ul>
+
+			<ul class="nav navbar-nav navbar-right">
+				<li sec:authorize-url="/admin" class="list-group-item-warning"><a th:href="@{/admin}">Admin</a></li>
+				<li>
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+						<span sec:authentication="principal.person.nameFirst">FirstName</span> <span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu">
+						<li role="presentation" class="disabled"><a href="#" sec:authentication="principal.username"></a></li>
+						<li role="separator" class="divider"></li>
+						<li><a href="<c:url value='/user/changePassword' />">Change Password</a></li>
+						<li role="separator" class="divider"></li>
+						<li><a id="logoutLink" href="#">Log Out</a></li>
+					</ul></li>
+
+			</ul>
+		</div>
+		<!--/.nav-collapse -->
+	</div>
+</nav>

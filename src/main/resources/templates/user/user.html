@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: head('Roster Guru - Home')">
+</head>
+<body>
+	<div th:replace="fragments/nav :: nav-user"></div>
+	<div class="container">
+	
+		<div class="jumbotron">
+			<h1 th:text="${personName} + ','">User,</h1>
+			<p>
+				Welcome to Roster Guru!
+			</p>
+			<p>
+				Take a look at the navigation bar above to see what your options are.
+			</p>
+			<p>
+				<a class="btn btn-lg btn-primary" th:href="@{/user/upcomingDuties}" role="button">View upcoming duties &raquo;</a>
+			</p>
+		</div>
+	
+	</div>
+	<div th:replace="fragments/footer"></div>
+</body>
+</html>
