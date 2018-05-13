@@ -1,4 +1,10 @@
 $(document).ready(function() {
+	
+		function reindexDuties(){
+			$('#dutiesListed').find('input').each(function(index){
+				$(this).attr('name', 'duties[' + index + '].id');
+			});
+		}
 		
 		function addZero(i) {
 		    if (i < 10) {
@@ -8,32 +14,13 @@ $(document).ready(function() {
 		}
 		
 		function getTimeFromField(field){
-			/** FIXME: this is hideous **/
-			var dateStr = field.attr('value');
-			
-			var d = new Date(dateStr);
-			if(d && d != 'Invalid Date'){
-				var hours = addZero(d.getHours());
-				var mins = addZero(d.getMinutes());
-				
-				dateStr = hours + ":" + mins + ":00";
-			}
-
-			if(dateStr.length === 8){
-				var hour = dateStr.split(':')[0];
-				if(hour > 12){
-					hour -= 12;
-					dateStr = hour + ":" + dateStr.split(':')[1] + ' AM';
-				} else {
-					if(hour == 0){
-						hour = 12;
-					}
-					dateStr = hour + ":" + dateStr.split(':')[1] + ' PM';
-				}
-			}
-
-			return dateStr;
+			return field.attr('value');
 		}
+		
+		/**
+		 * reindex duties
+		 */
+		reindexDuties();
 		
 		/**
 			setting up timepickers for start / end times
