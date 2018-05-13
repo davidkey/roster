@@ -77,7 +77,7 @@ public class Person implements Serializable {
 
 	@Column(nullable = false)
 	//@Temporal(TemporalType.TIMESTAMP)
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm aaa")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm a")
 	private LocalDateTime lastUpdated = LocalDateTime.now();
 
 	@OneToMany(mappedBy = "person", fetch = FetchType.EAGER, cascade = CascadeType.ALL)

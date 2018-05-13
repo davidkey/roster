@@ -52,7 +52,6 @@
 					<div class="form-group">
 						<label for="password">Set Password</label>
 						<input id="password" type="password" class="form-control"/>
-						<!-- <form:errors path="password" class="alert-danger" /> -->
 						<button id="setPassword" class="btn btn-default">Set Password</button> 
 					</div>
 				</div>
@@ -62,5 +61,6 @@
 		
 	</div>
 	<div th:replace="fragments/footer :: footer-admin"></div>
+	<script type="text/javascript" th:src="@{/resources/app/savepassword.js}"></script>
 </body>
 </html>
