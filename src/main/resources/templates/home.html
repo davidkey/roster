@@ -51,7 +51,7 @@
 								<li><a href="#">Features</a></li>
 								<li><a href="mailto:davidkey@gmail.com">Contact</a></li>
 								<li sec:authorize="isAuthenticated()">
-									<a href="">Control Panel &mdash; <span sec:authentication="principal.person.nameFirst">FirstName</span> </a>
+									<a th:href="@{/user}">Control Panel &mdash; <span sec:authentication="principal.person.nameFirst">FirstName</span> </a>
 								</li>
 								<li sec:authorize="isAnonymous()"><a href="/setup" th:href="@{/setup}">Sign Up</a></li>
 								<li sec:authorize="isAnonymous()"><a href="/login" th:href="@{/login}">Log In</a></li>

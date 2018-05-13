@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
+	class="full">
+<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="_csrf" th:content="${_csrf.token}"/>
+		<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+		<link rel="stylesheet" type="text/css" media="all" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" 
+			th:href="@{/resources/css/themes/bootstrap.css}" />
+			
+		<link th:href="@{/resources/css/signin.css}" rel="stylesheet">
+		
+		<title>Roster Guru - Log In</title>
+		
+		<script type="text/javascript" th:inline="javascript">
+			var WEB_ROOT = function(){
+				return /*[[@{/}]]*/ '/';
+			}
+			
+			/* Stupid hack to fix tomcat / jboss bug. Won't be an issue in future releases... */
+			function reloadIfjSessionIdSet(){
+				var url = /*[[@{/lib}]]*/;
+				
+				if(url.indexOf('jsessionid=') >= 0){
+					location.reload();
+				}
+			}
+			
+			reloadIfjSessionIdSet();
+		</script>
+	
+</head>
+<body>
+	<div class="container">
+		<form th:action="@{/login}" method="post" class="form-signin">
+			<div th:if="${error != null}" class="error">${error}</div>
+			<input type="hidden" th:name="${_csrf.parameterName}"
+				th:value="${_csrf.token}" />
+			<h2 class="form-signin-heading">Please sign in</h2>
+
+			<label for="username" class="sr-only">Email address</label> <input
+				type="email" id="username" name="username" class="form-control"
+				placeholder="Email address" required autofocus> <label
+				for="password" class="sr-only">Password</label> <input
+				type="password" id="password" name="password" class="form-control"
+				placeholder="Password" required>
+			<button class="btn btn-lg btn-primary btn-block" type="submit">Sign
+				in</button>
+			<br /> <br /> 
+			<a class="btn btn-warning btn-block" th:href="@{/passwordReset/}">Forgot Password?</a>
+		</form>
+
+	</div>
+	<!-- /container -->
+
+</body>
+</html>
