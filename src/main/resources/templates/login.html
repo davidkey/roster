@@ -38,7 +38,7 @@
 <body>
 	<div class="container">
 		<form th:action="@{/login}" method="post" class="form-signin">
-			<div th:if="${error != null}" class="error">${error}</div>
+			<div th:if="${error != null}" class="error" th:text="${error}">error msg here</div>
 			<input type="hidden" th:name="${_csrf.parameterName}"
 				th:value="${_csrf.token}" />
 			<h2 class="form-signin-heading">Please sign in</h2>
