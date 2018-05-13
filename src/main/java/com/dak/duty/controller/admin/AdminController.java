@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dak.duty.service.InitialisationService;
+import com.dak.duty.service.VersionService;
 
 @Controller
 @RequestMapping("/admin")
@@ -19,6 +20,9 @@ public class AdminController {
 
 	@Autowired
 	private InitialisationService initService;
+	
+	@Autowired
+	private VersionService versionService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getAdminHome(final Model model) {
@@ -35,6 +39,10 @@ public class AdminController {
 	@RequestMapping(value = "/about", method = RequestMethod.GET)
 	public String getAbout(final Model model) {
 		logger.debug("getAbout()");
+		
+		model.addAttribute("version", versionService.getVersion());
+		model.addAttribute("commitId", versionService.getCommitId());
+		model.addAttribute("buildTimestamp", versionService.getTimestamp());
 		return "admin/about";
 	}
 

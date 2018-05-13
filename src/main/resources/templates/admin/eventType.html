@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: admin-header('Roster Guru - Event Type')">
+</head>
+<body>
+	<div th:replace="fragments/nav :: nav-admin-top"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div th:replace="fragments/nav :: nav-admin-side"></div>
+			<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+				<div th:replace="fragments/alerts :: alerts"></div>
+				<!-- content goes here -->
+				<h1 class="page-header">Event Type</h1>
+				<form th:action="@{/admin/eventTypes}" th:object="${eventType}" method="POST">
+					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+					<input type="hidden" th:field="*{id}" />
+					<div class="form-group">
+						<label for="name">Name</label>
+						<input type="text" th:field="*{name}" class="form-control" placeholder="Sunday AM" />
+						<div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('name')}">
+							<a href="#" class="close" data-dismiss="alert">&times;</a>
+							<div th:errors="*{name}"></div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="description">Description</label>
+						<input type="text" th:field="*{description}" class="form-control" placeholder="Sunday AM Worship Service" />
+						<div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('description')}">
+							<a href="#" class="close" data-dismiss="alert">&times;</a>
+							<div th:errors="*{description}"></div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="startTime">Start Time</label>
+						<input type="text" th:field="*{startTime}" class="form-control" id="startTimePicker"  />
+						<div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('startTime')}">
+							<a href="#" class="close" data-dismiss="alert">&times;</a>
+							<div th:errors="*{startTime}"></div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="endTime">End Time</label>
+						<input type="text" th:field="*{endTime}" class="form-control" id="endTimePicker"  />
+						<div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('endTime')}">
+							<a href="#" class="close" data-dismiss="alert">&times;</a>
+							<div th:errors="*{endTime}"></div>
+						</div>
+					</div>
+					<!-- end start time & end time -->
+					<div class="form-group">
+						<label for="interval">Interval</label>
+						<select th:field="*{interval}" id="intervalSelect" class="form-control">
+							<option value="">&nbsp;</option>
+							<option th:each="interval : ${eventTypeIntervals}" th:value="${interval}" th:text="${interval}"></option>
+						</select>
+						<div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('interval')}">
+							<a href="#" class="close" data-dismiss="alert">&times;</a>
+							<div th:errors="*{interval}"></div>
+						</div>
+					</div>
+					<div class="form-group" id="intervalDetailFormGroup" th:unless="${#strings.isEmpty(eventType.intervalDetail)}">
+						<label for="intervalDetail">Interval Detail</label>
+						<input type="text" th:field="*{intervalDetail}" class="form-control" placeholder="Sunday" />
+						<div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('intervalDetail')}">
+							<a href="#" class="close" data-dismiss="alert">&times;</a>
+							<div th:errors="*{intervalDetail}"></div>
+						</div>
+					</div>
+					<!-- duties -->			
+					<div class="form-group" th:with="count=${1}" id="dutiesListed">
+						<label for="duties">Duties</label>
+						
+						<!-- loop through all possible duties -->
+						<div th:if="${eventType.duties != null}" th:each="duty : ${allPossibleDuties}" th:with="alreadySelectedTimes=${T(java.util.Collections).frequency(eventType.duties, duty)}">
+							<!-- list already selected duties times number of times selected -->
+							<div th:if="${alreadySelectedTimes > 0}" th:each="i : ${#numbers.sequence( 1, alreadySelectedTimes)}">
+								<div class="checkbox">
+									<label>
+										<input class="dutyCheckbox" type="checkbox" th:name="${'duties[].id'}" th:value="${duty.id}" checked="checked" /> 
+										<span th:text="${duty.name}"></span>&nbsp;
+									</label>
+									<button th:if="${iStat.count == 1}" type="button" class="btn btn-default btn-xs add-another">Duplicate Me</button>
+								</div>
+							</div> <!-- DONE list already selected duties times number of times selected -->
+						</div>
+						
+						<div th:each="duty : ${allPossibleDuties}" th:with="alreadySelectedTimes=${eventType.duties == null ? 0 : T(java.util.Collections).frequency(eventType.duties, duty)}">
+							<!-- list duties not already selected -->
+							<div th:if="${alreadySelectedTimes == 0}">
+								<div class="checkbox">
+									<label>
+										<input class="dutyCheckbox" type="checkbox" th:name="${'duties[].id'}" th:value="${duty.id}" /> 
+										<span th:text="${duty.name}"></span>&nbsp;
+									</label>
+									<button type="button" class="btn btn-default btn-xs add-another">Duplicate Me</button>
+								</div>
+							</div><!-- DONE list duties not already selected -->
+						</div><!-- DONE loop through all possible duties -->
+					</div>
+					<!-- end duties -->
+					<button th:if="${eventType.id != null && eventType.id > 0}" type="button" class="btn btn-warning" id="deleteMe">Delete Event Type</button>
+					<button type="submit" class="btn btn-default">Save</button>
+				</form>
+				
+				<!-- content ends here -->
+			</div>
+		</div>
+		
+	</div>
+	<div th:replace="fragments/footer :: footer-admin"></div>
+	<script th:src="@{/resources/app/eventType.js}"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<div th:fragment="footer-home" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+	<!-- footer -->
+	<script src="/resources/jquery/jquery-2.1.4.min.js" th:src="@{/resources/jquery/jquery-2.1.4.min.js}"></script>
+	<script src="/resources/bootstrap/js/bootstrap.min.js" th:src="@{/resources/bootstrap/js/bootstrap.min.js}"></script>
+</div>
+
+<div th:fragment="footer-user" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+	<!-- footer -->
+	<script src="/resources/jquery/jquery-2.1.4.min.js" th:src="@{/resources/jquery/jquery-2.1.4.min.js}"></script>
+	<script type="text/javascript" src="/resources/bootstrap/js/bootstrap.min.js" th:src="@{/resources/bootstrap/js/bootstrap.min.js}"></script>
+	<script type="text/javascript" src="/resources/js/bootbox.min.js" th:src="@{/resources/js/bootbox.min.js}"></script>
+	<script type="text/javascript" src="/resources/app/csrf.js" th:src="@{/resources/app/csrf.js}"></script>
+	<script type="text/javascript" src="/resources/app/setActiveNav.js" th:src="@{/resources/app/setActiveNav.js}"></script>
+	<script type="text/javascript" src="/resources/app/logout.js" th:src="@{/resources/app/logout.js}"></script>
+	<script>
+		function updateDutyCount(){
+			$.get(WEB_ROOT() + "/user/upcomingDuties/count", function( data ) {
+				$( "#upcomingDutiesCount" ).html( data );
+			});
+		}
+		$(document).ready(function() {
+			updateDutyCount();
+		});
+	</script>
+</div>
+
+<div th:fragment="footer-admin" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+	<!-- footer -->
+	<script src="/resources/jquery/jquery-2.1.4.min.js" th:src="@{/resources/jquery/jquery-2.1.4.min.js}"></script>
+	<script src="/resources/bootstrap/js/bootstrap.min.js" th:src="@{/resources/bootstrap/js/bootstrap.min.js}"></script>
+	<script type="text/javascript" src="/resources/js/bootbox.min.js" th:src="@{/resources/js/bootbox.min.js}"></script>
+	<script type="text/javascript" charset="utf-8" src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.js"></script>
+	<script type='text/javascript' src='//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js'></script>
+    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.3.1/fullcalendar.min.js"></script>
+    <script type="text/javascript" th:src="@{/resources/js/jquery.autocomplete.min.js}"></script>
+    <script th:src="@{/resources/js/jquery.timepicker.min.js}"></script>
+    
+    <script type="text/javascript" src="/resources/app/logout.js" th:src="@{/resources/app/logout.js}"></script>
+    <script type="text/javascript" src="/resources/app/setActiveNav.js" th:src="@{/resources/app/setActiveNav.js}"></script>
+    <script type="text/javascript" th:src="@{/resources/app/autocomplete.js}"></script>
+    <script type="text/javascript" src="/resources/app/csrf.js" th:src="@{/resources/app/csrf.js}"></script>
+    
+</div>

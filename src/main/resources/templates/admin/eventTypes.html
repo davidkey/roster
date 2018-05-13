@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: admin-header('Roster Guru - Event Type')">
+</head>
+<body>
+	<div th:replace="fragments/nav :: nav-admin-top"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div th:replace="fragments/nav :: nav-admin-side"></div>
+			<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+				<div th:replace="fragments/alerts :: alerts"></div>
+				<!-- content goes here -->
+				<h1 class="page-header">Event Types</h1>
+				<div class="table-responsive">
+					<p>
+						<a th:href="@{/admin/eventTypes/new}" class="btn btn-lg btn-success">Add Event</a>
+					</p>
+					<table class="table table-striped" id="eventTypeTable">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Name</th>
+								<th>Description</th>
+								<th>Interval</th>
+								<th># Duties</th>
+								<th>Edit</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="eventType : ${eventTypes}">
+								<td th:text="${eventType.id}"></td>
+								<td th:text="${eventType.name}"></td>
+								<td th:text="${eventType.description}"></td>
+								<td th:text="${eventType.interval} + ' - '  + ${eventType.intervalDetail}"></td>
+								<td th:text="${#lists.size(eventType.duties)}"></td>
+								<td><a th:href="@{/admin/eventTypes/} + ${eventType.id}" class="btn btn-xs btn-primary">Edit</a></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				
+				<!-- content ends here -->
+			</div>
+		</div>
+		
+	</div>
+	<div th:replace="fragments/footer :: footer-admin"></div>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: admin-header('Roster Guru - People')">
+</head>
+<body>
+	<div th:replace="fragments/nav :: nav-admin-top"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div th:replace="fragments/nav :: nav-admin-side"></div>
+			<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+				<div th:replace="fragments/alerts :: alerts"></div>
+				<!-- content goes here -->
+				<h1 class="page-header">People</h1>
+				<div class="table-responsive">
+					<p>
+						<a th:href="@{/admin/people/new}" class="btn btn-lg btn-success">Add New Person</a>
+					</p>
+					<table class="table table-striped" id="personTable">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Last Name</th>
+								<th>First Name</th>
+								<th>Email</th>
+								<th>Active?</th>
+								<th>Updated</th>
+								<th>Edit</th>
+								<th>Manage Duties</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="person : ${people}">
+								<td th:text="${person.id}"></td>
+								<td th:text="${person.nameLast}"></td>
+								<td th:text="${person.nameFirst}"></td>
+								<td th:text="${person.emailAddress}"></td>
+								<td th:text="${person.active ? 'Yes' : 'No'}"></td>
+								<td th:text="${#temporals.format(person.lastUpdated, 'yyyy-MM-dd hh:mm a')}"></td>
+								<td><a th:href="@{/admin/people/} + ${person.id}" class="btn btn-xs btn-primary">Edit</a></td>
+								<td><a th:href="@{/admin/people/} + ${person.id} + '/duties'" class="btn btn-xs btn-info">Manage Duties</a></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				
+			</div>
+		</div>
+		
+	</div>
+	<div th:replace="fragments/footer :: footer-admin"></div>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!-- 
+	"Regular" nav
+-->
+
+<nav class="navbar navbar-default navbar-fixed-top" th:fragment="nav-user" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+				<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="#">Roster.Guru</a>
+		</div>
+		<div id="navbar" class="navbar-collapse collapse">
+			<ul class="nav navbar-nav">
+				<li id="navUser" class="active"><a th:href="@{/user}">Home</a></li>
+				<li id="navUpcomingDuties"><a th:href="@{/user/upcomingDuties}">Upcoming Duties <span id="upcomingDutiesCount" class="label label-primary"></span></a></li>
+				<li id="navPreferences"><a th:href="@{/user/preferences}">Duty Preferences</a></li>
+				<li><a href="#contact">Contact Admin</a></li>
+			</ul>
+
+			<ul class="nav navbar-nav navbar-right">
+				<li sec:authorize-url="/admin" class="list-group-item-warning"><a th:href="@{/admin}">Admin</a></li>
+				<li>
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+						<span sec:authentication="principal.person.nameFirst">FirstName</span> <span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu">
+						<li role="presentation" class="disabled"><a href="#" sec:authentication="principal.username"></a></li>
+						<li role="separator" class="divider"></li>
+						<li><a th:href="@{/user/changePassword}">Change Password</a></li>
+						<li role="separator" class="divider"></li>
+						<li><a id="logoutLink" href="#">Log Out</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</div>
+</nav>
+
+<!-- 
+	ADMIN top nav
+ -->
+<nav class="navbar navbar-inverse navbar-fixed-top" th:fragment="nav-admin-top" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+			<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="#" th:title="${display_version}">Roster.Guru</a>
+		</div>
+		<div id="navbar" class="navbar-collapse collapse">
+			<ul class="nav navbar-nav navbar-right">
+				<li sec:authorize-url="/user" class="list-group-item-info"><a th:href="@{/user}">Exit Admin</a></li>
+				<li>
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span sec:authentication="principal.person.nameFirst">FirstName</span> <span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li role="presentation" class="disabled"><a href="#" sec:authentication="principal.username"></a></li>
+						<li role="separator" class="divider"></li>
+						<li><a href="#">Change Password</a></li>
+						<li role="separator" class="divider"></li>
+						<li><a id="logoutLink" href="#">Log Out</a></li>
+					</ul>
+				</li>
+			</ul>
+			<form class="navbar-form navbar-right">
+				<input type="text" id="autocomplete" class="form-control" placeholder="Search...">
+			</form>
+		</div>
+	</div>
+</nav>
+
+
+<div id="navsidebar" class="col-sm-3 col-md-2 sidebar" th:fragment="nav-admin-side" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+	<ul class="nav nav-sidebar">
+		<li id="navAdmin"><a th:href="@{/admin}">Overview <span class="sr-only">(current)</span></a></li>
+		<li id="navRosters"><a th:href="@{/admin/rosters/}">Rosters</a></li>
+		<li id="navPeople"><a th:href="@{/admin/people/}">People</a></li>
+		<li id="navEventTypes"><a th:href="@{/admin/eventTypes/}">Event Scheduling</a></li>
+		<li id="navDuties"><a th:href="@{/admin/duties/}">Duty Management</a></li>
+		<li id="navMessages"><a th:href="@{/admin/messages/}">Messages</a></li>
+	</ul>
+	<ul class="nav nav-sidebar">
+		<li id="navSettings"><a th:href="@{/admin/settings/}">Settings</a></li>
+		<li id="navAbout"><a th:href="@{/admin/about/}">About</a></li>
+	</ul>
+</div>

@@ -142,7 +142,7 @@ public class PersonService {
 	}
 
 	public boolean loginAsPerson(final String username, final String password, final HttpServletRequest request) {
-		logger.debug("loginAsPerson({}, {})", username, password);
+		logger.debug("loginAsPerson({}, ********)", username);
 		try {
 			// Must be called from request filtered by Spring Security, otherwise SecurityContextHolder is not updated
 			final UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);

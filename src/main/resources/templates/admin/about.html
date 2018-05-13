@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: admin-header('Roster Guru - About')">
+</head>
+<body>
+	<div th:replace="fragments/nav :: nav-admin-top"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div th:replace="fragments/nav :: nav-admin-side"></div>
+			<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+				<div th:replace="fragments/alerts :: alerts"></div>
+				
+				<!-- content goes here -->
+				<h1 class="page-header">About</h1>
+				<p>
+					Roster.Guru, created 2015-2018 by <a href="mailto:davidkey@gmail.com">David Key</a>.
+				</p>
+				<p>
+					View source on GitHub: <a th:href="'https://github.com/davidkey/roster/tree/' + ${commitId}">This build</a> -- <a href="https://github.com/davidkey/roster">Dev Branch</a>.
+				</p>
+				<p>
+					<small th:text="'Version: ' + ${version}"></small>
+					<br/>
+					<small th:text="'Built ' + ${buildTimestamp}"></small>
+				</p>
+				
+			</div>
+		</div>
+		
+	</div>
+	<div th:replace="fragments/footer :: footer-admin"></div>
+</body>
+</html>

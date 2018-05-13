@@ -51,7 +51,7 @@ public class IntervalServiceTest extends ServiceTest {
 				et.getIntervalDetail());
 
 		Assert.assertNotNull(dates);
-		Assert.assertTrue("dates is empty", dates.size() > 0);
+		Assert.assertTrue("dates is empty", !dates.isEmpty());
 	}
 
 	@Test
