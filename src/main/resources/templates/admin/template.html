@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:include="fragments/header :: admin-header('Roster Guru - Admin')">
+<head th:include="fragments/header :: admin-header('Roster Guru - Rosters')">
 </head>
 <body>
 	<div th:replace="fragments/nav :: nav-admin-top"></div>
@@ -9,14 +9,13 @@
 			<div th:replace="fragments/nav :: nav-admin-side"></div>
 			<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 				<div th:replace="fragments/alerts :: alerts"></div>
-				<h1 class="page-header">Dashboard</h1>
-			
-				<div id='calendar'></div>
+				
+				<!-- content goes here -->
+				
 			</div>
 		</div>
 		
 	</div>
 	<div th:replace="fragments/footer :: footer-admin"></div>
-	<script type='text/javascript' th:src="@{/resources/app/eventCalendar.js}"></script>
 </body>
 </html>
