@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: admin-header('Roster Guru - Duty Management')">
+</head>
+<body>
+	<div th:replace="fragments/nav :: nav-admin-top"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div th:replace="fragments/nav :: nav-admin-side"></div>
+			<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+				<div th:replace="fragments/alerts :: alerts"></div>
+				<!-- content goes here -->
+				<h1 class="page-header">Duty Management</h1>
+				<div class="table-responsive">
+					<p>
+						<a th:href="@{/admin/duties/new}" class="btn btn-lg btn-success">Add Duty</a>
+					</p>
+					<table class="table table-striped" id="dutyTable">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Name</th>
+								<th>Description</th>
+								<th style="display:none;">Sort Order</th>
+								<th>Edit</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="dutyRow" th:each="duty : ${duties}">
+								<td class="dutyId" th:text="${duty.id}"></td>
+								<td th:text="${duty.name}"></td>
+								<td th:text="${duty.description}"></td>
+								<td style="display:none;" class="sortOrder" th:text="${duty.sortOrder}"></td>
+								<td><a th:href="@{/admin/duties/} + ${duty.id}" class="btn btn-xs btn-primary">Edit</a></td>
+							</tr>
+						</tbody>
+					</table>
+					<hr/>
+					<small>*Hint: You can drag Duties around to change the order they appear on rosters.</small>
+				</div>
+				
+			</div>
+		</div>
+		
+	</div>
+	<div th:replace="fragments/footer :: footer-admin"></div>
+	<script th:src="@{/resources/jquery-ui/jquery-ui.min.js}"></script>
+	<script th:src="@{/resources/app/dutyDraggr.js}"></script>
+</body>
+</html>

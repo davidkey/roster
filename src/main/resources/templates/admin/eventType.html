@@ -88,10 +88,10 @@
 							<div th:if="${alreadySelectedTimes == 0}">
 								<div class="checkbox">
 									<label>
-										<input class="dutyCheckbox" type="checkbox" th:name="${'duties[].id'}" th:value="${duty.id}" checked="checked" /> 
+										<input class="dutyCheckbox" type="checkbox" th:name="${'duties[].id'}" th:value="${duty.id}" /> 
 										<span th:text="${duty.name}"></span>&nbsp;
 									</label>
-									<button th:if="${dutyStat.count == 1}" type="button" class="btn btn-default btn-xs add-another">Duplicate Me</button>
+									<button type="button" class="btn btn-default btn-xs add-another">Duplicate Me</button>
 								</div>
 							</div><!-- DONE list duties not already selected -->
 						</div><!-- DONE loop through all possible duties -->

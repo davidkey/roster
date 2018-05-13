@@ -22,8 +22,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
-		<display_version>v${project.version} - build ${BUILD_NUMBER} @
-			${timestamp} - git ${GIT_COMMIT}</display_version>
+		<display_version>v${project.version} - build ${BUILD_NUMBER} @ ${timestamp} - git ${GIT_COMMIT}</display_version>
+		<application.version.number>${project.version}</application.version.number>
 		<git_commit>${GIT_COMMIT}</git_commit>
 		<main.basedir>${basedir}/../..</main.basedir>
 		<m2eclipse.wtp.contextRoot>/</m2eclipse.wtp.contextRoot>
@@ -262,13 +262,15 @@
 			<artifactId>commons-math3</artifactId>
 			<version>3.6.1</version>
 		</dependency>
-
-
-
 	</dependencies>
+	
 	<build>
 		<finalName>dutyRoster</finalName>
 		<plugins>
+			<plugin>
+			    <groupId>pl.project13.maven</groupId>
+			    <artifactId>git-commit-id-plugin</artifactId>
+			</plugin>
 			<plugin>
 				<artifactId>maven-eclipse-plugin</artifactId>
 				<configuration>
@@ -294,43 +296,6 @@
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
-
-			<!-- <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
-					<nonFilteredFileExtensions>
-						<nonFilteredFileExtension>gif</nonFilteredFileExtension>
-						<nonFilteredFileExtension>ico</nonFilteredFileExtension>
-						<nonFilteredFileExtension>jpg</nonFilteredFileExtension>
-						<nonFilteredFileExtension>png</nonFilteredFileExtension>
-						<nonFilteredFileExtension>pdf</nonFilteredFileExtension>
-					</nonFilteredFileExtensions>
-					<webResources>
-						<resource>
-							<directory>src/main/webapp</directory>
-							<filtering>true</filtering>
-							<includes>
-								<include>**/*.jsp</include>
-							</includes>
-						</resource>
-					</webResources>
-					<archive>
-						<manifestEntries>
-							<Specification-Title>${project.name}</Specification-Title>
-							<Specification-Version>${project.version}</Specification-Version>
-							<Build-Number>${BUILD_NUMBER}</Build-Number>
-							<Build-Date>${BUILD_ID}</Build-Date>
-							<Build-Time>${maven.build.timestamp}</Build-Time>
-							<SCM-Revision>${GIT_COMMIT}</SCM-Revision>
-							<Job-Name>${JOB_NAME}</Job-Name>
-							<Implementation-Version>${project.version}.${GIT_COMMIT}</Implementation-Version>
-						</manifestEntries>
-					</archive>
-					<warSourceExcludes>resources/app/*.js</warSourceExcludes>
-				</configuration>
-			</plugin>
- -->
 			<plugin>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
 				<version>2.8</version>
