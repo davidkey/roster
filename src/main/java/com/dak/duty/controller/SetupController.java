@@ -42,7 +42,7 @@ public class SetupController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getSetup(final Model model) {
-
+		logger.debug("getSetup()");
 		model.addAttribute("setupForm", new SetupForm());
 		return "setup/setup";
 	}

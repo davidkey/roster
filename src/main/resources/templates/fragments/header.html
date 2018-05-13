@@ -29,15 +29,15 @@
 			#calendar { width: 900px; } 
 		</style>
 		
-		<script type="text/javascript" th:inline="javascript">
+		<script type="text/javascript">
 			var WEB_ROOT = function(){
-				var root = /*[[@{/}]]*/ '/';
+				var root = '[[@{/}]]';
 				return root.replace("/", '');
 			}
 			
 			/* Stupid hack to fix tomcat / jboss bug. Won't be an issue in future releases... */
 			function reloadIfjSessionIdSet(){
-				var url = /*[[@{/lib}]]*/;
+				var url = '[[@{/static}]]';
 				
 				if(url.indexOf('jsessionid=') >= 0){
 					location.reload();
@@ -73,15 +73,15 @@
 			}
 		</style>
 		
-		<script type="text/javascript" th:inline="javascript">
+		<script type="text/javascript">
 			var WEB_ROOT = function(){
-				var root = /*[[@{/}]]*/ '/';
+				var root = '[[@{/}]]';
 				return root.replace("/", '');
 			}
 			
 			/* Stupid hack to fix tomcat / jboss bug. Won't be an issue in future releases... */
 			function reloadIfjSessionIdSet(){
-				var url = /*[[@{/lib}]]*/;
+				var url = '[[@{/static}]]';
 				
 				if(url.indexOf('jsessionid=') >= 0){
 					location.reload();

@@ -13,6 +13,7 @@
 				<!-- content goes here -->
 				<h1 class="page-header">Person</h1>
 				<form th:action="@{/admin/people}" th:object="${person}" method="POST">
+					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 					<input type="hidden" th:field="*{id}" />
 					
 					<div class="form-group">

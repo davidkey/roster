@@ -12,6 +12,7 @@
 				<!-- content goes here -->
 				<h1 class="page-header">Event Type</h1>
 				<form th:action="@{/admin/eventTypes}" th:object="${eventType}" method="POST">
+					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 					<input type="hidden" th:field="*{id}" />
 					<div class="form-group">
 						<label for="name">Name</label>
