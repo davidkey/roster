@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: user-header('Roster Guru - Duties')">
+</head>
+<body>
+	<div th:replace="fragments/nav :: nav-user"></div>
+	<div class="container">
+		<div th:replace="fragments/alerts :: alerts"></div>
+		<div th:if="${#lists.isEmpty(upcomingDuties)}">
+			<br/><br/>
+			<h2>No Upcoming Duties</h2>
+		</div>
+		<div class="table-responsive" th:if="${not #lists.isEmpty(upcomingDuties)}">
+			<table class="table table-striped" id="personTable">
+				<thead>
+					<tr>
+						<th style="display:none;">id</th>
+						<th>Event Name</th>
+						<th>Event Date</th>
+						<th>Duty</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="duty : ${upcomingDuties}">
+						<td style="display:none;" class="dutyId" th:text="${duty.dutyId}">-1</td>
+						<td style="display:none;" class="eventId" th:text="${duty.eventId}">-1</td>
+						<td th:text="${duty.eventName}">Some Event</td>
+						<td th:text="${duty.eventDate}"></td>
+						<td th:text="${duty.dutyName}"></td>
+						<td><button class="btn btn-sm btn-warning optOut">Opt Out</button></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div th:replace="fragments/footer :: footer-user"></div>
+	<script>
+	$(document).ready(function() {
+		function getDutyMetadata(row){
+			var metadata = {};
+			
+			metadata.dutyId  = parseInt(row.find('.dutyId').html());
+			metadata.eventId = parseInt(row.find('.eventId').html());
+			
+			return metadata;
+		}
+		
+		function optOut(metadata, row){
+			var headers = getCsrfHeaders();
+			
+			$.ajax({
+				type: "POST",
+				url: WEB_ROOT() + '/user/upcomingDuties/optOut',
+				headers: getCsrfHeaders(),
+				data: metadata,
+				success: function(data){
+					bootbox.alert('Successfully opted out of duty');
+					$(row).hide();
+					updateDutyCount();
+				},
+				error: function(xhr, textStatus, errorThrown){
+					bootbox.alert("Error: " + xhr.status + ' ' + textStatus);
+				}
+			});
+		}
+		
+		$(".optOut").click(function(e, btn){
+			var row = $(this).parent().parent();
+			var metadata = getDutyMetadata(row);
+			
+			console.log('metadata: ' + metadata);
+			
+			optOut(metadata, row);
+		});
+	});
+	</script>
+</body>
+</html>

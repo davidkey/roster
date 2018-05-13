@@ -1,0 +1,18 @@
+<div th:fragment="alerts" xmlns:th="http://www.thymeleaf.org">
+		<div class="alert alert-danger" th:if="${msg_error != null}">
+			<a href="#" class="close" data-dismiss="alert">&times;</a>
+			<span th:text="${msg_error}"></span>
+		</div>
+
+
+		<div class="alert alert-success" th:if="${msg_success != null}">
+			<a href="#" class="close" data-dismiss="alert">&times;</a>
+			<span th:text="${msg_success}"></span>
+		</div>
+
+
+		<div class="alert alert-notice" th:if="${msg_notice != null}">
+			<a href="#" class="close" data-dismiss="alert">&times;</a>
+			<span th:text="${msg_notice}"></span>
+		</div>
+</div>

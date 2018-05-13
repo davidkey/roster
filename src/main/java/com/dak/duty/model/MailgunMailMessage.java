@@ -79,7 +79,7 @@ public class MailgunMailMessage implements Serializable, MailMessageInterface {
 	@JsonIgnore
 	private int timestamp;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm aaa")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm a")
 	private LocalDateTime timestampDate;
 
 	@Column(columnDefinition = "text")

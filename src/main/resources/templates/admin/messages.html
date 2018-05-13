@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: admin-header('Roster Guru - Messages')">
+</head>
+<body>
+	<!-- modal -->
+	<div class="modal fade" id="msgModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+	      </div>
+	      <div class="modal-body" id="msgModalBody">
+	        ...
+	      </div>
+	      <input type="hidden" id="msgModalMsgId" value="0"/>
+	      <input type="hidden" id="msgModalIsRead" value="false"/>
+	      <div class="modal-footer">
+	        <button id="closeMsg" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<!-- end modal -->
+	<div th:replace="fragments/nav :: nav-admin-top"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div th:replace="fragments/nav :: nav-admin-side"></div>
+			<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+				<div th:replace="fragments/alerts :: alerts"></div>
+				<!-- content goes here -->
+				<h1 class="page-header">Messages</h1>
+				<div class="table-responsive">
+					<table class="table table-striped" id="eventTypeTable">
+						<thead>
+							<tr>
+								<th style="display:none;">id</th>
+								<th style="display:none;">read</th>
+								<th>From</th>
+								<th>Subject</th>
+								<th>Received</th>
+								<th></th>
+								<th></th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody th:each="message : ${messages}">
+							<tr th:if="${message.read}" class="active">
+							<tr th:unless="${message.read}" class="warning">
+								<td style="display:none;" class="msgId" th:text="${message.id}"></td>
+								<td style="display:none;" class="msgIsRead" th:text="${message.read}"></td>
+								<td th:text="${message.sender}"></td>
+								<td th:text="${message.subject}"></td>
+								<td class="msgTimestamp" th:text="${#temporals.format(message.timestampDate, 'yyyy-MM-dd hh:mm a')}"></td>
+								<td><button class="btn btn-sm btn-success readMsg">Read</button></td>
+								<td><button class="btn btn-sm btn-danger deleteMsg">Delete</button></td>
+								<td th:if="${message.read}"><button class="btn btn-sm changeReadStatus">Mark Unread</button></td>
+								<td th:unless="${message.read}"><button class="btn btn-sm changeReadStatus">Mark Read</button></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+	<div th:replace="fragments/footer :: footer-admin"></div>
+</body>
+</html>

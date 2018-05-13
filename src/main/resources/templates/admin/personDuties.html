@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: admin-header('Roster Guru - Rosters')">
+</head>
+<body>
+	<div th:replace="fragments/nav :: nav-admin-top"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div th:replace="fragments/nav :: nav-admin-side"></div>
+			<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+				<div th:replace="fragments/alerts :: alerts"></div>
+				<!-- content goes here -->
+				<h1 class="page-header" th:text="'Manage Duties for ' + ${personName}"></h1>
+				<form method="POST">
+					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+					<div class="form-group" th:each="duty : ${duties}">
+						<label th:for="'duty_' + ${duty.id} + '_slider'" th:text="${duty.name}"></label>
+						<br/>
+						<input type="text" style="width:50%;" th:id="'duty_' + ${duty.id} + '_slider'" th:name="'duty_' + ${duty.id} + '_slider'" 
+							class="sliderz"
+							data-slider-min="-1" data-slider-max="9" data-slider-step="1" 
+							th:attr="data-slider-value=${person.getPreferenceForDuty(duty)}"
+							th:attrappend="data-slider-id=${'duty_' + duty.id + '_slider'}" />
+							<br/>
+					</div>
+					<button type="submit" class="btn btn-success">Save</button>
+				</form>
+			</div>
+		</div>
+		
+	</div>
+	<div th:replace="fragments/footer :: footer-admin"></div>
+	<script th:src="@{/resources/js/bootstrap-slider.js}"></script>
+	<script>
+		$.each($('.sliderz'), function(index, obj){
+			$(obj).slider({
+				tooltip: 'hide',
+				ticks: [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+			    ticks_labels: ['Never', '', 'Very Rarely', '', 'Rarely', '', 'Sometimes', '', 'Often', '', 'Very Often']
+			});
+		});
+	</script>
+</body>
+</html>

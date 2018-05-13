@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: admin-header('Roster Guru - View Roster')">
+</head>
+<body>
+	<div th:replace="fragments/nav :: nav-admin-top"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div th:replace="fragments/nav :: nav-admin-side"></div>
+			<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+				<div th:replace="fragments/alerts :: alerts"></div>
+				<!-- content goes here -->
+				<div id="roster">
+					<h2 th:text="${event.eventType.name}"></h2>
+					<h3 th:text="${#temporals.format(event.dateEvent, 'MM/dd/yyyy')}">
+						<small th:text="${#temporals.format(event.dateEvent, 'EEEE')}"></small>
+					</h3>
+					<table class="table table-striped" id="rosterTable">
+						<thead>
+							<tr>
+								<th>Duty</th>
+								<th>Person</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="rosterItem : ${roster}">
+								<td th:text="${rosterItem.duty.name}"></td>
+								<td th:unless="${rosterItem.person == null}" th:text="${rosterItem.person.nameFirst + ' ' + rosterItem.person.nameLast}"></td>
+								<td th:if="${rosterItem.person == null}"></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+	<div th:replace="fragments/footer :: footer-admin"></div>
+</body>
+</html>
