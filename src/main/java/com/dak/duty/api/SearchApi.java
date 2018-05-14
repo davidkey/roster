@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,21 +22,19 @@ import com.dak.duty.repository.EventTypeRepository;
 import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.repository.specification.PersonSpecs;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
 @RequestMapping("/api/search")
 @PreAuthorize("hasRole('ROLE_ADMIN')")
+@RequiredArgsConstructor
 public class SearchApi {
 
 	private static final Logger logger = LoggerFactory.getLogger(SearchApi.class);
 
-	@Autowired
-	private PersonRepository personRepos;
-
-	@Autowired
-	private EventTypeRepository eventTypeRepos;
-
-	@Autowired
-	private DutyRepository dutyRepos;
+	private final PersonRepository personRepos;
+	private final EventTypeRepository eventTypeRepos;
+	private final DutyRepository dutyRepos;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public @ResponseBody AutocompleteResponse getSearch(@RequestParam("query") final String searchString) {

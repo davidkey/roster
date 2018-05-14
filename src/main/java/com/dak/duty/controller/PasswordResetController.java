@@ -7,7 +7,6 @@ import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -22,17 +21,17 @@ import com.dak.duty.model.Person;
 import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.service.PersonService;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
 @RequestMapping("/passwordReset")
+@RequiredArgsConstructor
 public class PasswordResetController {
 
 	private static final Logger logger = LoggerFactory.getLogger(PasswordResetController.class);
 
-	@Autowired
-	private PersonService personService;
-
-	@Autowired
-	private PersonRepository personRepos;
+	private final PersonService personService;
+	private final PersonRepository personRepos;
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String getForgotPassword(final Model model, final HttpServletRequest request) {

@@ -7,7 +7,7 @@ import com.dak.duty.model.Event;
 public final class EventSpecs {
 
 	private EventSpecs() {
-
+		
 	}
 
 	public static Specification<Event> isApproved() {

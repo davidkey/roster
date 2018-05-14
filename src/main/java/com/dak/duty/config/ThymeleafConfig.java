@@ -9,7 +9,7 @@ import nz.net.ultraq.thymeleaf.LayoutDialect;
 public class ThymeleafConfig {
 
 	public ThymeleafConfig() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	@Bean

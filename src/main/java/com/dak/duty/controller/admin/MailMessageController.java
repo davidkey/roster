@@ -7,7 +7,6 @@ import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -23,17 +22,16 @@ import com.dak.duty.model.MailgunMailMessage;
 import com.dak.duty.repository.MailMessageRepository;
 import com.dak.duty.service.EmailService;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
 @RequestMapping("/mail")
+@RequiredArgsConstructor
 public class MailMessageController {
-
-	@Autowired
-	private MailMessageRepository mailMessageRepos;
-
-	@Autowired
-	private EmailService<MailgunMailMessage> emailService;
-
 	private static final Logger logger = LoggerFactory.getLogger(MailMessageController.class);
+	
+	private final MailMessageRepository mailMessageRepos;
+	private final EmailService<MailgunMailMessage> emailService;
 
 	@RequestMapping(method = RequestMethod.POST)
 	public @ResponseBody Boolean postMessage(@ModelAttribute @Valid final MailgunMailMessage mailgunMailMessage) {
@@ -74,7 +72,6 @@ public class MailMessageController {
 
 		if (timestamp != null) {
 			mailgunMailMessage.setTimestamp(timestamp);
-			//mailgunMailMessage.setTimestampDate(new Date(timestamp * 1000L));
 			mailgunMailMessage.setTimestampDate(LocalDateTime.ofEpochSecond(timestamp * 1000L * 1000L, 0, ZoneOffset.UTC));
 		}
 	}

@@ -1,9 +1,11 @@
 package com.dak.duty.service.container;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.dak.duty.model.Duty;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -27,14 +29,12 @@ public class SortOrder implements Serializable {
 	@JsonProperty("sortOrder")
 	private Integer sortOrder;
 
-	public static HashMap<Long, Integer> getSortMap(@NonNull final List<SortOrder> sortOrders) {
-		final HashMap<Long, Integer> sortMap = new HashMap<>(sortOrders.size());
-
-		for (final SortOrder so : sortOrders) {
-			sortMap.put(so.getId(), so.getSortOrder());
-		}
-
-		return sortMap;
+	public static Map<Long, Integer> getSortMap(@NonNull final List<SortOrder> sortOrders) {
+		return sortOrders.stream().collect(Collectors.toMap(SortOrder::getId, SortOrder::getSortOrder));
+	}
+	
+	public static SortOrder fromDuty(final Duty duty) {
+		return new SortOrder(duty.getId(), duty.getSortOrder());
 	}
 
 	/**

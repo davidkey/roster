@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,18 +20,18 @@ import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.service.DutyService;
 import com.dak.duty.service.container.SortOrder;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
 @RequestMapping("/api/duty")
 @PreAuthorize("hasRole('ROLE_USER')")
+@RequiredArgsConstructor
 public class DutyApi {
 
 	private static final Logger logger = LoggerFactory.getLogger(DutyApi.class);
 
-	@Autowired
-	private DutyRepository dutyRepos;
-
-	@Autowired
-	private DutyService dutyService;
+	private final DutyRepository dutyRepos;
+	private final DutyService dutyService;
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(method = RequestMethod.DELETE)
@@ -72,7 +71,7 @@ public class DutyApi {
 
 	@RequestMapping(value = "/sortOrder", method = RequestMethod.GET)
 	public @ResponseBody List<SortOrder> getSortOrder() {
-		logger.debug("duty.getSortOrder({})");
+		logger.debug("duty.getSortOrder()");
 		return this.dutyService.getSortOrders();
 	}
 

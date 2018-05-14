@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
@@ -25,24 +24,20 @@ import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.security.IAuthenticationFacade;
 import com.dak.duty.service.PersonService;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
 @RequestMapping("/api/person")
-// @PreAuthorize("hasRole('ROLE_USER')") // set in security context xml
+@RequiredArgsConstructor
+// @PreAuthorize("hasRole('ROLE_USER')") // set in security config
 public class PersonApi {
 
 	private static final Logger logger = LoggerFactory.getLogger(PersonApi.class);
 
-	@Autowired
-	private PersonRepository personRepos;
-
-	@Autowired
-	private PersonService personService;
-
-	@Autowired
-	private PasswordEncoder encoder;
-
-	@Autowired
-	private IAuthenticationFacade authenticationFacade;
+	private final PersonRepository personRepos;
+	private final PersonService personService;
+	private final PasswordEncoder encoder;
+	private final IAuthenticationFacade authenticationFacade;
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(method = RequestMethod.DELETE)

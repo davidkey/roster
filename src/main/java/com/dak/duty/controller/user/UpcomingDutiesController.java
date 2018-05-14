@@ -4,7 +4,6 @@ import java.security.Principal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,37 +17,23 @@ import com.dak.duty.api.util.JsonResponse.ResponseStatus;
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.Event;
 import com.dak.duty.model.Person;
-import com.dak.duty.repository.DutyRepository;
-import com.dak.duty.repository.EventRepository;
-import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.security.IAuthenticationFacade;
 import com.dak.duty.service.EventService;
 import com.dak.duty.service.PersonService;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
 @RequestMapping("/user/upcomingDuties")
 @PreAuthorize("hasRole('ROLE_USER')")
+@RequiredArgsConstructor
 public class UpcomingDutiesController {
 
 	private static final Logger logger = LoggerFactory.getLogger(UpcomingDutiesController.class);
 
-	@Autowired
-	PersonService personService;
-
-	@Autowired
-	PersonRepository personRepos;
-
-	@Autowired
-	EventRepository eventRepos;
-
-	@Autowired
-	DutyRepository dutyRepos;
-
-	@Autowired
-	EventService eventService;
-
-	@Autowired
-	IAuthenticationFacade authenticationFacade;
+	private final PersonService personService;
+	private final EventService eventService;
+	private final IAuthenticationFacade authenticationFacade;
 
 	@RequestMapping(value = "/count", method = RequestMethod.GET)
 	public @ResponseBody int getUpcomingDutiesCount(final Principal principal) {

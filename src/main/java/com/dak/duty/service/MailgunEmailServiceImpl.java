@@ -63,7 +63,7 @@ public class MailgunEmailServiceImpl implements EmailService<MailgunMailMessage>
 		final MultivaluedMapImpl formData = new MultivaluedMapImpl();
 		formData.add("from", email.getFrom());
 
-		if (this.testEmailAddress != null && this.testEmailAddress.length() > 0) {
+		if (this.testEmailAddress != null && !this.testEmailAddress.isEmpty()) {
 			formData.add("to", this.testEmailAddress);
 		} else {
 			for (final String to : email.getTo()) {
@@ -89,15 +89,15 @@ public class MailgunEmailServiceImpl implements EmailService<MailgunMailMessage>
 		final ClientResponse clientResponse = webResource.type(MediaType.APPLICATION_FORM_URLENCODED).post(ClientResponse.class, formData);
 		final String output = clientResponse.getEntity(String.class);
 
-		logger.info("Email sent successfully : " + output);
+		logger.info("Email sent successfully: {}", output);
 		return true;
 	}
 
 	private String encode(@NonNull final String key, @NonNull final String data) {
 		try {
 			final Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
-			final SecretKeySpec secret_key = new SecretKeySpec(key.getBytes("UTF-8"), "HmacSHA256");
-			sha256_HMAC.init(secret_key);
+			final SecretKeySpec secretKey = new SecretKeySpec(key.getBytes("UTF-8"), "HmacSHA256");
+			sha256_HMAC.init(secretKey);
 
 			return Hex.encodeHexString(sha256_HMAC.doFinal(data.getBytes("UTF-8")));
 		} catch (final RuntimeException re) {

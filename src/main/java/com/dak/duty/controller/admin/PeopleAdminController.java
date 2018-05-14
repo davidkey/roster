@@ -6,9 +6,8 @@ import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
@@ -28,23 +27,19 @@ import com.dak.duty.repository.specification.PersonSpecs;
 import com.dak.duty.security.IAuthenticationFacade;
 import com.dak.duty.service.PersonService;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
 @RequestMapping("/admin/people")
+@RequiredArgsConstructor
 public class PeopleAdminController {
 
 	private static final Logger logger = LoggerFactory.getLogger(PeopleAdminController.class);
 
-	@Autowired
-	private PersonRepository personRepos;
-
-	@Autowired
-	private PersonService personService;
-
-	@Autowired
-	private DutyRepository dutyRepos;
-
-	@Autowired
-	private IAuthenticationFacade authenticationFacade;
+	private final PersonRepository personRepos;
+	private final PersonService personService;
+	private final DutyRepository dutyRepos;
+	private final IAuthenticationFacade authenticationFacade;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getPeople(final Model model) {

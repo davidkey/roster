@@ -54,10 +54,10 @@ public class IntervalService {
 				}
 			}
 		} else if (EventTypeInterval.MONTHLY.equals(eti)) {
-			LocalDate dt = som.plusDays(Integer.parseInt(intervalDetail) - 1);
-			if (dt.compareTo(eom) > 0) { // if MONTHLY interval occurs on 29th, 30th or 31st and this month doesn't have
-													// that many days ...
-				dt = eom; // ... just use EOM
+			LocalDate dt = som.plusDays((long)Integer.parseInt(intervalDetail) - 1L);
+			if (dt.compareTo(eom) > 0) { 
+				// if MONTHLY interval occurs on 29th, 30th or 31st and this month doesn't have that many days, just use EOM
+				dt = eom;
 			}
 			dates.add(dt);
 		}

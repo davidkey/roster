@@ -2,5 +2,12 @@
 language: java
 jdk:
   - oraclejdk8
+addons:
+   sonarcloud: 
+      organization: "davidkey-github"
+      token: 
+         secure: ${SONAR_TOKEN}
+script:
+ - sonar-scanner
 after_success:
    - python <(curl -s https://raw.githubusercontent.com/TouK/sputnik-ci/master/sputnik-ci.py)

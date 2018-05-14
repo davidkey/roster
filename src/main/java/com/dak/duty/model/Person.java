@@ -189,13 +189,11 @@ public class Person implements Serializable {
 			}
 		}
 
-		if (!found) {
-			if (preference > -1) { // don't bother saving 'never pick me' preference
-				final PersonDuty pd = new PersonDuty();
-				pd.setDuty(duty);
-				pd.setPreference(preference);
-				this.addPersonDuty(pd);
-			}
+		if (!found && preference > -1) { // don't bother saving 'never pick me' preference
+			final PersonDuty pd = new PersonDuty();
+			pd.setDuty(duty);
+			pd.setPreference(preference);
+			this.addPersonDuty(pd);
 		}
 	}
 

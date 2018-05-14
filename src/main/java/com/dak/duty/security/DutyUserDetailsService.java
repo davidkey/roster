@@ -1,9 +1,9 @@
 package com.dak.duty.security;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.dak.duty.model.Person;
 import com.dak.duty.model.PersonRole;
+import com.dak.duty.model.enums.Role;
 import com.dak.duty.repository.PersonRepository;
 
 @Service
@@ -38,16 +39,11 @@ public class DutyUserDetailsService implements UserDetailsService {
 	}
 
 	private List<GrantedAuthority> buildUserAuthority(final Set<PersonRole> personRoles) {
-
-		final Set<GrantedAuthority> setAuths = new HashSet<>();
-
-		for (final PersonRole personRole : personRoles) {
-			setAuths.add(new SimpleGrantedAuthority(personRole.getRole().toString()));
+		if(personRoles == null || personRoles.isEmpty()) {
+			return Collections.emptyList();
 		}
-
-		final List<GrantedAuthority> result = new ArrayList<>(setAuths);
-
-		return result;
+		
+		return personRoles.stream().map(PersonRole::getRole).map(Role::toString).distinct().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
 	}
 
 }

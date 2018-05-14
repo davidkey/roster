@@ -92,7 +92,7 @@ public class Event implements Serializable {
 
 	@Transient
 	public boolean isRosterGenerated() {
-		return this.roster != null && this.roster.size() > 0;
+		return this.roster != null && !this.roster.isEmpty();
 	}
 
 	@Transient

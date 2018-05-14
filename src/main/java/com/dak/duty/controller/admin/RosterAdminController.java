@@ -5,9 +5,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,18 +19,18 @@ import com.dak.duty.model.EventRosterItem;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.service.EventService;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
 @RequestMapping("/admin/rosters")
 @PreAuthorize("hasRole('ROLE_ADMIN')")
+@RequiredArgsConstructor
 public class RosterAdminController {
 
 	private static final Logger logger = LoggerFactory.getLogger(RosterAdminController.class);
 
-	@Autowired
-	private EventRepository eventRepos;
-
-	@Autowired
-	private EventService eventService;
+	private final EventRepository eventRepos;
+	private final EventService eventService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getRostersAndEvents(final Model model) {

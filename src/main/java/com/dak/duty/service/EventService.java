@@ -1,5 +1,9 @@
 package com.dak.duty.service;
 
+import static com.dak.duty.repository.specification.PersonSpecs.idNotIn;
+import static com.dak.duty.repository.specification.PersonSpecs.isActive;
+import static com.dak.duty.repository.specification.PersonSpecs.sameOrg;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +40,6 @@ import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.EventTypeRepository;
 import com.dak.duty.repository.PersonRepository;
-import com.dak.duty.repository.specification.PersonSpecs;
 import com.dak.duty.security.IAuthenticationFacade;
 import com.dak.duty.service.IntervalService.EventTypeDetailNode;
 import com.dak.duty.service.container.EventCalendarNode;
@@ -50,26 +53,31 @@ public class EventService {
 
 	private static final Logger logger = LoggerFactory.getLogger(EventService.class);
 
+	private final PersonRepository personRepos;
+	private final PersonService personService;
+	private final EventRepository eventRepos;
+	private final EventTypeRepository eventTypeRepos;
+	private final IntervalService intervalService;
+	private final DutyRepository dutyRepos;
+	private final IAuthenticationFacade authenticationFacade;
+	
 	@Autowired
-	private PersonRepository personRepos;
-
-	@Autowired
-	private PersonService personService;
-
-	@Autowired
-	private EventRepository eventRepos;
-
-	@Autowired
-	private EventTypeRepository eventTypeRepos;
-
-	@Autowired
-	private IntervalService intervalService;
-
-	@Autowired
-	private DutyRepository dutyRepos;
-
-	@Autowired
-	private IAuthenticationFacade authenticationFacade;
+	public EventService (
+			final PersonRepository personRepos,
+			final PersonService personService,
+			final EventRepository eventRepos,
+			final EventTypeRepository eventTypeRepos,
+			final IntervalService intervalService,
+			final DutyRepository dutyRepos,
+			final IAuthenticationFacade authenticationFacade) {
+		this.personRepos = personRepos;
+		this.personService = personService;
+		this.eventRepos = eventRepos;
+		this.eventTypeRepos = eventTypeRepos;
+		this.intervalService = intervalService;
+		this.dutyRepos = dutyRepos;
+		this.authenticationFacade = authenticationFacade;
+	}
 
 	/**
 	 * Attempt to fill any empty slots in any current and future events.
@@ -89,7 +97,6 @@ public class EventService {
 		for (final Event event : allCurrentAndFutureEvents) {
 			if (!event.isRosterFullyPopulated()) {
 				slotsFilled += this.fillEmptySlots(event);
-				//slotsFilled += this.fillEmptySlots(event, event.getRoster().stream().map(EventRosterItem::getPerson).collect(Collectors.toSet()));
 			}
 		}
 
@@ -385,26 +392,18 @@ public class EventService {
 		this.personRepos.saveAll(peopleWithDuties);
 
 		// increment everyone else's adjusted preference by 1
-		List<Person> peopleNotServing = null;
+		final List<Person> peopleNotServing;
 		if (CollectionUtils.isEmpty(peopleWithDuties)) {
-			peopleNotServing = this.personRepos.findAll();
+			peopleNotServing = this.personRepos.findAll(isActive().and(sameOrg()));
 		} else {
-			// peopleNotServing = personRepos.findByActiveTrueAndIdNotIn(getIds(peopleWithDuties));
-			
-			peopleNotServing = this.personRepos.findAll(PersonSpecs.isActive().and(PersonSpecs.sameOrg()).and(PersonSpecs.idNotIn(getIds(peopleWithDuties))));
-			
-/*			peopleNotServing = this.personRepos.findAll(
-					Specifications.where(PersonSpecs.isActive())
-					.and(PersonSpecs.sameOrg())
-					.and(PersonSpecs.idNotIn(EventService.getIds(peopleWithDuties))));  TODO TEST THIS!!! */
+			peopleNotServing = this.personRepos.findAll(isActive().and(sameOrg()).and(idNotIn(getIds(peopleWithDuties))));
 		}
 
 		if (!CollectionUtils.isEmpty(peopleNotServing)) {
-
 			peopleNotServing.stream()
-			.map(Person::getDuties)
-			.flatMap(Collection::stream)
-			.forEach(PersonDuty::incrementWeightedPreferenceIfNeeded);
+				.map(Person::getDuties)
+				.flatMap(Collection::stream)
+				.forEach(PersonDuty::incrementWeightedPreferenceIfNeeded);
 		}
 
 		this.personRepos.saveAll(peopleNotServing);
