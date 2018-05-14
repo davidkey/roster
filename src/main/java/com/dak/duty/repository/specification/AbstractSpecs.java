@@ -6,6 +6,10 @@ import com.dak.duty.model.Person;
 import com.dak.duty.security.CustomUserDetails;
 
 public abstract class AbstractSpecs {
+	
+	protected AbstractSpecs() {
+		
+	}
 
 	protected static Person getAuthorizedPerson() {
 		Person person = new Person();

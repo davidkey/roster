@@ -71,7 +71,7 @@ public class DutyApi {
 
 	@RequestMapping(value = "/sortOrder", method = RequestMethod.GET)
 	public @ResponseBody List<SortOrder> getSortOrder() {
-		logger.debug("duty.getSortOrder({})");
+		logger.debug("duty.getSortOrder()");
 		return this.dutyService.getSortOrders();
 	}
 

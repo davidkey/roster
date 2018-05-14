@@ -72,7 +72,6 @@ public class MailMessageController {
 
 		if (timestamp != null) {
 			mailgunMailMessage.setTimestamp(timestamp);
-			//mailgunMailMessage.setTimestampDate(new Date(timestamp * 1000L));
 			mailgunMailMessage.setTimestampDate(LocalDateTime.ofEpochSecond(timestamp * 1000L * 1000L, 0, ZoneOffset.UTC));
 		}
 	}

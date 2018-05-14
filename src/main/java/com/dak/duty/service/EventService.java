@@ -1,5 +1,9 @@
 package com.dak.duty.service;
 
+import static com.dak.duty.repository.specification.PersonSpecs.idNotIn;
+import static com.dak.duty.repository.specification.PersonSpecs.isActive;
+import static com.dak.duty.repository.specification.PersonSpecs.sameOrg;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +40,6 @@ import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.EventTypeRepository;
 import com.dak.duty.repository.PersonRepository;
-import com.dak.duty.repository.specification.PersonSpecs;
 import com.dak.duty.security.IAuthenticationFacade;
 import com.dak.duty.service.IntervalService.EventTypeDetailNode;
 import com.dak.duty.service.container.EventCalendarNode;
@@ -94,7 +97,6 @@ public class EventService {
 		for (final Event event : allCurrentAndFutureEvents) {
 			if (!event.isRosterFullyPopulated()) {
 				slotsFilled += this.fillEmptySlots(event);
-				//slotsFilled += this.fillEmptySlots(event, event.getRoster().stream().map(EventRosterItem::getPerson).collect(Collectors.toSet()));
 			}
 		}
 
@@ -390,26 +392,18 @@ public class EventService {
 		this.personRepos.saveAll(peopleWithDuties);
 
 		// increment everyone else's adjusted preference by 1
-		List<Person> peopleNotServing = null;
+		final List<Person> peopleNotServing;
 		if (CollectionUtils.isEmpty(peopleWithDuties)) {
-			peopleNotServing = this.personRepos.findAll();
+			peopleNotServing = this.personRepos.findAll(isActive().and(sameOrg()));
 		} else {
-			// peopleNotServing = personRepos.findByActiveTrueAndIdNotIn(getIds(peopleWithDuties));
-			
-			peopleNotServing = this.personRepos.findAll(PersonSpecs.isActive().and(PersonSpecs.sameOrg()).and(PersonSpecs.idNotIn(getIds(peopleWithDuties))));
-			
-/*			peopleNotServing = this.personRepos.findAll(
-					Specifications.where(PersonSpecs.isActive())
-					.and(PersonSpecs.sameOrg())
-					.and(PersonSpecs.idNotIn(EventService.getIds(peopleWithDuties))));  TODO TEST THIS!!! */
+			peopleNotServing = this.personRepos.findAll(isActive().and(sameOrg()).and(idNotIn(getIds(peopleWithDuties))));
 		}
 
 		if (!CollectionUtils.isEmpty(peopleNotServing)) {
-
 			peopleNotServing.stream()
-			.map(Person::getDuties)
-			.flatMap(Collection::stream)
-			.forEach(PersonDuty::incrementWeightedPreferenceIfNeeded);
+				.map(Person::getDuties)
+				.flatMap(Collection::stream)
+				.forEach(PersonDuty::incrementWeightedPreferenceIfNeeded);
 		}
 
 		this.personRepos.saveAll(peopleNotServing);

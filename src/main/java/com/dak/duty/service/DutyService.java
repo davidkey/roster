@@ -3,8 +3,8 @@ package com.dak.duty.service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -70,7 +70,7 @@ public class DutyService {
 	}
 
 	public void updateSortOrder(final List<SortOrder> sortOrders) throws SortOrderException {
-		final HashMap<Long, Integer> sortOrderSet = SortOrder.getSortMap(sortOrders);
+		final Map<Long, Integer> sortOrderSet = SortOrder.getSortMap(sortOrders);
 		final List<Duty> allActiveDuties = this.dutyRepos.findByActiveTrue();
 		final List<Duty> dutiesToUpdate = new ArrayList<>();
 

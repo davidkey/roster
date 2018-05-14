@@ -254,7 +254,7 @@ public class InitialisationService {
 				if (e.getName().contains("Sunday")) {
 					e.setDateEvent(LocalDate.parse("05/24/2015", fmt)); // sunday
 				} else {
-					e.setDateEvent(LocalDate.parse("05/24/2015", fmt)); // wednesday
+					e.setDateEvent(LocalDate.parse("05/27/2015", fmt)); // wednesday
 				}
 			} catch (final IllegalArgumentException iae) {
 				// do nothing

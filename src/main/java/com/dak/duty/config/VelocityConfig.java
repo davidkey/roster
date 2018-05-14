@@ -1,6 +1,5 @@
 package com.dak.duty.config;
 
-import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.velocity.app.VelocityEngine;
@@ -11,11 +10,11 @@ import org.springframework.context.annotation.Configuration;
 public class VelocityConfig {
 
 	public VelocityConfig() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	@Bean
-	VelocityEngine velocityEngine() throws IOException{
+	VelocityEngine velocityEngine() {
 		Properties properties = new Properties();
 		properties.setProperty("input.encoding", "UTF-8");
 		properties.setProperty("output.encoding", "UTF-8");

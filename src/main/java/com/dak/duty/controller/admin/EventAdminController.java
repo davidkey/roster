@@ -1,6 +1,5 @@
 package com.dak.duty.controller.admin;
 
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -31,7 +30,7 @@ public class EventAdminController {
 
 	@RequestMapping(value = "/{year}/{month}/json", method = RequestMethod.GET)
 	public @ResponseBody List<EventCalendarNode> getEventCalendarItems(@PathVariable("year") final Integer year,
-			@PathVariable("month") final Integer month) throws ParseException {
+			@PathVariable("month") final Integer month) {
 		logger.info("getEventCalendarItems({}, {})", year, month);
 		
 		return this.eventService.getEventCalendarNodesForMonth(LocalDate.of(year, month, 1));
