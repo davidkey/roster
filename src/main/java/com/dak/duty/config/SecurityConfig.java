@@ -27,8 +27,6 @@ import com.dak.duty.security.SecurityEvaluationContextExtension;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SecurityConfig.class);
 	
-
-
 	@Autowired
 	UserDetailsService userDetailsService;
 

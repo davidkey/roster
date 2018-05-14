@@ -2,7 +2,6 @@ package com.dak.duty.controller.admin;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,17 +11,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.dak.duty.service.InitialisationService;
 import com.dak.duty.service.VersionService;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
 @RequestMapping("/admin")
+@RequiredArgsConstructor
 public class AdminController {
 
 	private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
-	@Autowired
-	private InitialisationService initService;
-	
-	@Autowired
-	private VersionService versionService;
+	private final InitialisationService initService;
+	private final VersionService versionService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getAdminHome(final Model model) {

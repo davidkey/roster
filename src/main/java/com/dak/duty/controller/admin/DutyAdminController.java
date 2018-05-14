@@ -6,7 +6,6 @@ import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
@@ -22,17 +21,17 @@ import com.dak.duty.model.Duty;
 import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.service.DutyService;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
 @RequestMapping("/admin/duties")
+@RequiredArgsConstructor
 public class DutyAdminController {
 
 	private static final Logger logger = LoggerFactory.getLogger(DutyAdminController.class);
 
-	@Autowired
-	private DutyRepository dutyRepos;
-
-	@Autowired
-	private DutyService dutyService;
+	private final DutyRepository dutyRepos;
+	private final DutyService dutyService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getDuties(final Model model) {

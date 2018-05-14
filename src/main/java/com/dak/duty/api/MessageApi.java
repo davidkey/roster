@@ -3,7 +3,6 @@ package com.dak.duty.api;
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,16 +15,17 @@ import com.dak.duty.api.util.JsonResponse.ResponseStatus;
 import com.dak.duty.model.MailgunMailMessage;
 import com.dak.duty.repository.MailMessageRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
 @RequestMapping("/api/message")
-@PreAuthorize("hasRole('ROLE_ADMIN')") // will need to open up at least part of this to user so they can "post" messages
-													// to admin(s)
+@PreAuthorize("hasRole('ROLE_ADMIN')") // will need to open up at least part of this to user so they can "post" messages to admin(s)
+@RequiredArgsConstructor
 public class MessageApi {
 
 	private static final Logger logger = LoggerFactory.getLogger(MessageApi.class);
-
-	@Autowired
-	private MailMessageRepository messageRepos;
+	
+	private final MailMessageRepository messageRepos;
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public @ResponseBody MailgunMailMessage getMessage(@PathVariable("id") final MailgunMailMessage msg) {

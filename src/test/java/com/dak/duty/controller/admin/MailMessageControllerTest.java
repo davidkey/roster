@@ -5,11 +5,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,16 +21,15 @@ import com.dak.duty.service.EmailService;
 import com.dak.duty.service.ServiceTest;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-// @SpringApplicationConfiguration(classes = {RosterApplication.class, SecurityConfig.class} )
 public class MailMessageControllerTest extends ServiceTest {
 
 	@Mock
-	MailMessageRepository mailMessageRepos;
+	private MailMessageRepository mailMessageRepos;
 
 	@Mock
 	private EmailService<MailgunMailMessage> emailService;
 
-	@InjectMocks
+	//@InjectMocks
 	private MailMessageController mailMessageController;
 
 	private MockMvc mockMvc;
@@ -50,7 +47,10 @@ public class MailMessageControllerTest extends ServiceTest {
 
 	@Before
 	public void setup() {
-		MockitoAnnotations.initMocks(this);
+		mailMessageController = new MailMessageController(mailMessageRepos, emailService);
+		
+		//MockitoAnnotations.initMocks(this);
+
 		this.mockMvc = MockMvcBuilders.standaloneSetup(this.mailMessageController).build();
 	}
 
@@ -58,7 +58,7 @@ public class MailMessageControllerTest extends ServiceTest {
 	public void testMailMessageBinding() throws Exception {
 
 		// skip validation (auto-true)
-		Mockito.when(this.emailService.validateIncoming((MailgunMailMessage) ArgumentMatchers.notNull())).thenReturn(true);
+		Mockito.when(this.emailService.validateIncoming(ArgumentMatchers.any(MailgunMailMessage.class))).thenReturn(Boolean.TRUE);
 
 		// capture message when .save action occurs
 		final ArgumentCaptor<MailgunMailMessage> msg = ArgumentCaptor.forClass(MailgunMailMessage.class);

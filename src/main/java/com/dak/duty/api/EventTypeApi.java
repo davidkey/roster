@@ -2,7 +2,6 @@ package com.dak.duty.api;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,18 +16,18 @@ import com.dak.duty.model.EventType;
 import com.dak.duty.repository.EventTypeRepository;
 import com.dak.duty.service.EventService;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
 @RequestMapping("/api/eventType")
 @PreAuthorize("hasRole('ROLE_USER')")
+@RequiredArgsConstructor
 public class EventTypeApi {
 
 	private static final Logger logger = LoggerFactory.getLogger(EventTypeApi.class);
 
-	@Autowired
-	private EventTypeRepository eventTypeRepos;
-
-	@Autowired
-	private EventService eventService;
+	private final EventTypeRepository eventTypeRepos;
+	private final EventService eventService;
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(method = RequestMethod.DELETE)

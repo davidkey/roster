@@ -25,8 +25,6 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -57,9 +55,10 @@ import com.dak.duty.security.IAuthenticationFacade;
 import com.dak.duty.service.facade.IPasswordResetTokenFacade;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Service
-// @Transactional
+@RequiredArgsConstructor
 public class PersonService {
 
 	private static final Logger logger = LoggerFactory.getLogger(PersonService.class);
@@ -69,36 +68,16 @@ public class PersonService {
 	
 	private static final Integer EXPIRE_MIN = 90;
 
-	@Autowired
-	private PersonRepository personRepos;
-
-	@Autowired
-	private EventRepository eventRepos;
-
-	@Autowired
-	private DutyRepository dutyRepos;
-
-	@Autowired
-	private IntervalService intervalService;
-
-	@Autowired
-	private IAuthenticationFacade authenticationFacade;
-	
-	@Autowired
-	private PasswordEncoder encoder;
-
-	@Autowired
-	@Qualifier("authenticationManagerBean")
-	private AuthenticationManager authenticationManager;
-
-	@Autowired
-	private IPasswordResetTokenFacade passwordResetTokenGenerator;
-
-	@Autowired
-	private EmailService<MailgunMailMessage> emailService;
-
-	@Autowired
-	private VelocityEngine velocityEngine;
+	private final PersonRepository personRepos;
+	private final EventRepository eventRepos;
+	private final DutyRepository dutyRepos;
+	private final IntervalService intervalService;
+	private final IAuthenticationFacade authenticationFacade;
+	private final PasswordEncoder encoder;
+	private final AuthenticationManager authenticationManager;
+	private final IPasswordResetTokenFacade passwordResetTokenGenerator;
+	private final EmailService<MailgunMailMessage> emailService;
+	private final VelocityEngine velocityEngine;
 
 	public List<PersonRole> getDefaultRoles() {
 		final List<PersonRole> personRoles = new ArrayList<>();

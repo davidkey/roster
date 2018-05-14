@@ -41,31 +41,37 @@ import lombok.NonNull;
 public class InitialisationService {
 
 	private static final Logger logger = LoggerFactory.getLogger(InitialisationService.class);
-	private static final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+	private final DateTimeFormatter fmt;
 
+	private final PasswordEncoder encoder;
+	private final EventTypeRepository eventTypeRepos;
+	private final DutyRepository dutyRepos;
+	private final PersonRepository personRepos;
+	private final EventRepository eventRepos;
+	private final IntervalService intervalService;
+	private final PersonService personService;
+	private final OrganisationRepository orgRepos;
+	
 	@Autowired
-	private PasswordEncoder encoder;
-
-	@Autowired
-	private EventTypeRepository eventTypeRepos;
-
-	@Autowired
-	private DutyRepository dutyRepos;
-
-	@Autowired
-	private PersonRepository personRepos;
-
-	@Autowired
-	private EventRepository eventRepos;
-
-	@Autowired
-	private IntervalService intervalService;
-
-	@Autowired
-	private PersonService personService;
-
-	@Autowired
-	private OrganisationRepository orgRepos;
+	public InitialisationService(
+			final PasswordEncoder encoder,
+			final EventTypeRepository eventTypeRepos,
+			final DutyRepository dutyRepos,
+			final PersonRepository personRepos,
+			final EventRepository eventRepos,
+			final IntervalService intervalService,
+			final PersonService personService,
+			final OrganisationRepository orgRepos) {
+		this.encoder = encoder;
+		this.eventTypeRepos = eventTypeRepos;
+		this.dutyRepos = dutyRepos;
+		this.personRepos = personRepos;
+		this.eventRepos = eventRepos;
+		this.intervalService = intervalService;
+		this.personService = personService;
+		this.orgRepos = orgRepos;
+		this.fmt = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+	}
 
 	protected void clearAllData() {
 		logger.info("clearAllData");

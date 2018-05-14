@@ -23,16 +23,16 @@ import com.dak.duty.service.container.SortOrder;
 @Transactional
 public class DutyService {
 
-	@Autowired
-	DutyRepository dutyRepos;
-
-	@Autowired
-	PersonService personService;
-
-	@Autowired
-	IAuthenticationFacade authenticationFacade;
+	private final DutyRepository dutyRepos;
+	private final IAuthenticationFacade authenticationFacade;
+	private final DateTimeFormatter fmt;
 	
-	private final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+	@Autowired
+	public DutyService(final DutyRepository dutyRepos, final IAuthenticationFacade authenticationFacade) {
+		this.dutyRepos = dutyRepos;
+		this.authenticationFacade = authenticationFacade;
+		this.fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+	}
 
 	public Duty saveOrUpdateDuty(final Duty duty) {
 
@@ -103,14 +103,14 @@ public class DutyService {
 			throw new SortOrderException("Invalid sort order sequence");
 		}
 
-		if (dutiesToUpdate.size() > 0) {
+		if (!dutiesToUpdate.isEmpty()) {
 			this.dutyRepos.saveAll(dutiesToUpdate);
 		}
 	}
 
 	public List<SortOrder> getSortOrders() {
 		return this.dutyRepos.findByActiveTrue().stream()
-			.map(d -> new SortOrder(d.getId(), d.getSortOrder()))
+			.map(SortOrder::fromDuty)
 			.collect(Collectors.toList());
 	}
 

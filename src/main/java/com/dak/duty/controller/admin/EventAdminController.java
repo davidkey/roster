@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,18 +16,18 @@ import com.dak.duty.service.EventService;
 import com.dak.duty.service.IntervalService;
 import com.dak.duty.service.container.EventCalendarNode;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
 @RequestMapping("/admin/events")
+@RequiredArgsConstructor
 // FIXME: move to api (along with jsp calls)
 public class EventAdminController {
 
 	private static final Logger logger = LoggerFactory.getLogger(EventAdminController.class);
 
-	@Autowired
-	private EventService eventService;
-
-	@Autowired
-	private IntervalService intervalService;
+	private final EventService eventService;
+	private final IntervalService intervalService;
 
 	@RequestMapping(value = "/{year}/{month}/json", method = RequestMethod.GET)
 	public @ResponseBody List<EventCalendarNode> getEventCalendarItems(@PathVariable("year") final Integer year,

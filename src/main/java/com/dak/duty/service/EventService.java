@@ -50,26 +50,31 @@ public class EventService {
 
 	private static final Logger logger = LoggerFactory.getLogger(EventService.class);
 
+	private final PersonRepository personRepos;
+	private final PersonService personService;
+	private final EventRepository eventRepos;
+	private final EventTypeRepository eventTypeRepos;
+	private final IntervalService intervalService;
+	private final DutyRepository dutyRepos;
+	private final IAuthenticationFacade authenticationFacade;
+	
 	@Autowired
-	private PersonRepository personRepos;
-
-	@Autowired
-	private PersonService personService;
-
-	@Autowired
-	private EventRepository eventRepos;
-
-	@Autowired
-	private EventTypeRepository eventTypeRepos;
-
-	@Autowired
-	private IntervalService intervalService;
-
-	@Autowired
-	private DutyRepository dutyRepos;
-
-	@Autowired
-	private IAuthenticationFacade authenticationFacade;
+	public EventService (
+			final PersonRepository personRepos,
+			final PersonService personService,
+			final EventRepository eventRepos,
+			final EventTypeRepository eventTypeRepos,
+			final IntervalService intervalService,
+			final DutyRepository dutyRepos,
+			final IAuthenticationFacade authenticationFacade) {
+		this.personRepos = personRepos;
+		this.personService = personService;
+		this.eventRepos = eventRepos;
+		this.eventTypeRepos = eventTypeRepos;
+		this.intervalService = intervalService;
+		this.dutyRepos = dutyRepos;
+		this.authenticationFacade = authenticationFacade;
+	}
 
 	/**
 	 * Attempt to fill any empty slots in any current and future events.

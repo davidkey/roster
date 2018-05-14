@@ -5,9 +5,6 @@ import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,24 +18,18 @@ import com.dak.duty.service.EmailService;
 import com.dak.duty.service.InitialisationService;
 import com.dak.duty.service.PersonService;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
 @RequestMapping("/setup")
+@RequiredArgsConstructor
 public class SetupController {
 
 	private static final Logger logger = LoggerFactory.getLogger(SetupController.class);
 
-	@Autowired
-	private EmailService<MailgunMailMessage> emailService;
-
-	@Autowired
-	private InitialisationService initService;
-
-	@Autowired
-	private PersonService personService;
-
-	@Autowired
-	@Qualifier("authenticationManagerBean")
-	private AuthenticationManager authenticationManager;
+	private final EmailService<MailgunMailMessage> emailService;
+	private final InitialisationService initService;
+	private final PersonService personService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getSetup(final Model model) {

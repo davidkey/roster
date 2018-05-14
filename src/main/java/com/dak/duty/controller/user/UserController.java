@@ -6,7 +6,6 @@ import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,25 +16,21 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.dak.duty.form.ChangePasswordForm;
 import com.dak.duty.model.Person;
-import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.security.IAuthenticationFacade;
 import com.dak.duty.service.PersonService;
+
+import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequestMapping("/user")
 @PreAuthorize("hasRole('ROLE_USER')")
+@RequiredArgsConstructor
 public class UserController {
 
 	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-	@Autowired
-	PersonRepository personRepos;
-
-	@Autowired
-	PersonService personService;
-
-	@Autowired
-	IAuthenticationFacade authenticationFacade;
+	private final PersonService personService;
+	private final IAuthenticationFacade authenticationFacade;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getUserHome(final Model model, final Principal principal) {

@@ -2,7 +2,6 @@ package com.dak.duty.controller.user;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
@@ -16,23 +15,19 @@ import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.security.IAuthenticationFacade;
 import com.dak.duty.service.PersonService;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
 @RequestMapping("/user/preferences")
+@RequiredArgsConstructor
 public class PreferencesController {
 
 	private static final Logger logger = LoggerFactory.getLogger(PreferencesController.class);
 
-	@Autowired
-	DutyRepository dutyRepos;
-
-	@Autowired
-	PersonService personService;
-
-	@Autowired
-	PersonRepository personRepos;
-
-	@Autowired
-	IAuthenticationFacade authenciationFacade;
+	private final DutyRepository dutyRepos;
+	private final PersonService personService;
+	private final PersonRepository personRepos;
+	private final IAuthenticationFacade authenciationFacade;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getPreferences(final Model model) {

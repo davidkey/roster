@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
+import com.dak.duty.model.Duty;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -35,6 +36,10 @@ public class SortOrder implements Serializable {
 		}
 
 		return sortMap;
+	}
+	
+	public static SortOrder fromDuty(final Duty duty) {
+		return new SortOrder(duty.getId(), duty.getSortOrder());
 	}
 
 	/**
