@@ -4,13 +4,14 @@ jdk:
   - oraclejdk8
 git:
    depth: 9999999
+install: true
 addons:
    sonarcloud: 
       organization: "davidkey-github"
       token: 
          secure: ${SONAR_TOKEN}
 script:
-# - "mvn sonar:sonar"
+ - "mvn clean package"
  - sonar-scanner
 after_success:
    - python <(curl -s https://raw.githubusercontent.com/TouK/sputnik-ci/master/sputnik-ci.py)
