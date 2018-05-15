@@ -50,13 +50,13 @@
 		</div>
 		<div id="navbar" class="navbar-collapse collapse">
 			<ul class="nav navbar-nav navbar-right">
-				<li sec:authorize-url="/user" class="list-group-item-info"><a th:href="@{/user}">Exit Admin</a></li>
+				<li sec:authorize-url="/user"><a th:href="@{/user}">Exit Admin</a></li>
 				<li>
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span sec:authentication="principal.person.nameFirst">FirstName</span> <span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						<li role="presentation" class="disabled"><a href="#" sec:authentication="principal.username"></a></li>
 						<li role="separator" class="divider"></li>
-						<li><a href="#">Change Password</a></li>
+						<li><a th:href="@{/user/changePassword}">Change Password</a></li>
 						<li role="separator" class="divider"></li>
 						<li><a id="logoutLink" href="#">Log Out</a></li>
 					</ul>

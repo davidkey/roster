@@ -45,19 +45,19 @@ public class DutyService {
 		/**
 		 * If this is a soft delete: 1) Update name accordingly, decrement sort order [>=] current duty.sortOrder
 		 *
-		 * Otherwise (update or a new duty) 1) Decrement all sort orders [>] old sort order (if this is an update, not a
-		 * new item) 2) Increment all sort orders [>=] new / updated duty sort order IF this isn't an inactive duty 3)
-		 * Persist duty w/ new sort order
+		 * Otherwise (update or a new duty) 
+		 * 1) Decrement all sort orders [>] old sort order (if this is an update, not a new item) 
+		 * 2) Increment all sort orders [>=] new / updated duty sort order IF this isn't an inactive duty 
+		 * 3) Persist duty w/ new sort order
 		 */
 		if (duty.getId() > 0) { // if this is an update, not a new entity
 			final Duty dutyBeforeChanges = this.dutyRepos.findOne(duty.getId());
 
-			if (!duty.getActive() && dutyBeforeChanges.getActive()) { // if we're deactivating / soft deleting this duty
-																							// ...
-
+			if (!duty.getActive() && dutyBeforeChanges.getActive()) { // if we're deactivating / soft deleting this duty...
 				duty.setName(duty.getName() + " (deleted @ " + LocalDateTime.now().format(fmt) + "; id " + duty.getId() + ")"); // change name to show soft  delete and to prevent key errors if another with same name added later
 				this.dutyRepos.decrementSortOrderAboveAndIncludingExcludingDutyId(dutyBeforeChanges.getSortOrder(), duty.getId());
 			}
+			
 			if (duty.getActive() && !duty.getSortOrder().equals(dutyBeforeChanges.getSortOrder())) {
 				this.dutyRepos.decrementSortOrderAboveExcludingDutyId(dutyBeforeChanges.getSortOrder(), duty.getId());
 				this.dutyRepos.incrementSortOrderAboveAndIncludingExcludingDutyId(duty.getSortOrder(), duty.getId());
@@ -86,14 +86,9 @@ public class DutyService {
 					duty.setSortOrder(newSortOrder);
 					dutiesToUpdate.add(duty);
 				}
-
-				if (newSortOrder < minSortOrder) {
-					minSortOrder = newSortOrder;
-				}
-
-				if (newSortOrder > maxSortOrder) {
-					maxSortOrder = newSortOrder;
-				}
+				
+				minSortOrder = Math.min(newSortOrder, minSortOrder);
+				maxSortOrder = Math.max(newSortOrder, maxSortOrder);
 			} else {
 				throw new SortOrderException("Duty " + duty.getId() + " was not included in sort.");
 			}

@@ -17,15 +17,8 @@ public class HomeController {
 
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
-	/*@Autowired
-	private InitialisationService initService;*/
-
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String home(final Locale locale, final Model model) {
-		// if(!initService.initSetupComplete()){
-		// return "redirect:/setup";
-		// }
-
 		return "home";
 	}
 

@@ -27,9 +27,9 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 import lombok.NonNull;
 
 @Component
-public class MailgunEmailServiceImpl implements EmailService<MailgunMailMessage> {
+public class MailgunEmailService implements EmailService<MailgunMailMessage> {
 
-	private static final Logger logger = LoggerFactory.getLogger(MailgunEmailServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(MailgunEmailService.class);
 
 	@Value("${email.mailgun.apiKey:NONE}")
 	private String mailgunApiKey;

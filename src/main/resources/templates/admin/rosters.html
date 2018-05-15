@@ -13,18 +13,15 @@
 				<!-- content goes here -->
 				<h1 class="page-header">Rosters &amp; Events</h1>
 				<div class="table-responsive">
-					<p>
-						<a th:href="@{/admin/rosters/generate}" class="btn btn-lg btn-success">Generate Next Set</a>
-						&nbsp;
-						<a th:href="@{/admin/rosters/generateMissing}" class="btn btn-lg btn-success">Generate Missing Rosters</a>
-						&nbsp;
-						<a th:href="@{/admin/rosters/approveAllFullyPopulated}" class="btn btn-lg btn-success">Approve All Fully Populated Rosters</a>
-						&nbsp;
-						<a th:href="@{/admin/rosters/unapproveAll}" class="btn btn-lg btn-success">Unapprove All Rosters</a>
-						&nbsp;
-						<a th:href="@{/admin/rosters/fillEmptySlots}" class="btn btn-lg btn-success">Fill empty slots</a>
-					</p>
-					<br/>
+					
+					<div class="btn-group">
+						<a th:href="@{/admin/rosters/generate}" class="btn btn-success">Generate Next Set</a>
+						<a th:href="@{/admin/rosters/generateMissing}" class="btn btn-success">Generate Missing Rosters</a>
+						<a th:href="@{/admin/rosters/approveAllFullyPopulated}" class="btn btn-success">Approve All Fully Populated Rosters</a>
+						<a th:href="@{/admin/rosters/unapproveAll}" class="btn btn-success">Unapprove All Rosters</a>
+						<a th:href="@{/admin/rosters/fillEmptySlots}" class="btn btn-success">Fill empty slots</a>
+					</div>
+					<br/><br/>
 					<table class="table table-striped" id="eventTable">
 						<thead>
 							<tr>
@@ -57,5 +54,13 @@
 		
 	</div>
 	<div th:replace="fragments/footer :: footer-admin"></div>
+	<script>
+		$(document).ready(function() {
+		    $('#eventTable').DataTable({
+		    	"order": [ [1, "desc"] ],
+		    	stateSave: true
+		    });
+		} );
+	</script>
 </body>
 </html>
