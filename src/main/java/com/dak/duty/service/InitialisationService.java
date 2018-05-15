@@ -1,7 +1,12 @@
 package com.dak.duty.service;
 
+import static com.dak.duty.repository.specification.PersonSpecs.hasRole;
+import static com.dak.duty.repository.specification.PersonSpecs.isActive;
+import static com.dak.duty.repository.specification.PersonSpecs.sameOrg;
+
+import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,7 +17,6 @@ import org.apache.commons.math3.random.RandomDataGenerator;
 import org.fluttercode.datafactory.impl.DataFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -32,17 +36,17 @@ import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.EventTypeRepository;
 import com.dak.duty.repository.OrganisationRepository;
 import com.dak.duty.repository.PersonRepository;
-import com.dak.duty.repository.specification.PersonSpecs;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class InitialisationService {
 
 	private static final Logger logger = LoggerFactory.getLogger(InitialisationService.class);
-	private final DateTimeFormatter fmt;
-
+	
 	private final PasswordEncoder encoder;
 	private final EventTypeRepository eventTypeRepos;
 	private final DutyRepository dutyRepos;
@@ -52,27 +56,6 @@ public class InitialisationService {
 	private final PersonService personService;
 	private final OrganisationRepository orgRepos;
 	
-	@Autowired
-	public InitialisationService(
-			final PasswordEncoder encoder,
-			final EventTypeRepository eventTypeRepos,
-			final DutyRepository dutyRepos,
-			final PersonRepository personRepos,
-			final EventRepository eventRepos,
-			final IntervalService intervalService,
-			final PersonService personService,
-			final OrganisationRepository orgRepos) {
-		this.encoder = encoder;
-		this.eventTypeRepos = eventTypeRepos;
-		this.dutyRepos = dutyRepos;
-		this.personRepos = personRepos;
-		this.eventRepos = eventRepos;
-		this.intervalService = intervalService;
-		this.personService = personService;
-		this.orgRepos = orgRepos;
-		this.fmt = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-	}
-
 	protected void clearAllData() {
 		logger.info("clearAllData");
 
@@ -91,7 +74,7 @@ public class InitialisationService {
 
 	public boolean initSetupComplete() {
 		return !this.personRepos
-				.findAll(PersonSpecs.isActive().and(PersonSpecs.sameOrg()).and(PersonSpecs.hasRole(Role.ROLE_ADMIN)))
+				.findAll(isActive().and(sameOrg()).and(hasRole(Role.ROLE_ADMIN)))
 				.isEmpty();
 	}
 
@@ -252,9 +235,9 @@ public class InitialisationService {
 			e.setName(et.getName());
 			try {
 				if (e.getName().contains("Sunday")) {
-					e.setDateEvent(LocalDate.parse("05/24/2015", fmt)); // sunday
+					e.setDateEvent(getThirdSundayOfMonth(intervalService.getCurrentSystemDate())); // sunday
 				} else {
-					e.setDateEvent(LocalDate.parse("05/27/2015", fmt)); // wednesday
+					e.setDateEvent(getThirdSundayOfMonth(intervalService.getCurrentSystemDate()).plusDays(3L)); // wednesday
 				}
 			} catch (final IllegalArgumentException iae) {
 				// do nothing
@@ -267,6 +250,11 @@ public class InitialisationService {
 		}
 
 		return events;
+	}
+	
+	private LocalDate getThirdSundayOfMonth(final LocalDate month) {
+		 final LocalDate dateOfFirstSunday = month.with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY));
+		 return dateOfFirstSunday.plusWeeks(2);
 	}
 
 	protected List<Person> getDefaultPeople(final List<Duty> duties, final List<Organisation> orgs) {

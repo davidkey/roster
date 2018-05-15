@@ -15,28 +15,7 @@
 		th:href="@{/resources/css/cover.css}" />
 	
 	<title>Roster Guru - Welcome</title>
-	
-	<script type="text/javascript">
-		var WEB_ROOT = function(){
-			/*<![CDATA[*/
-	        return '[[@{/}]]';
-	    	/*]]>*/
-			
-		}
-		
-		/* Stupid hack to fix tomcat / jboss bug. Won't be an issue in future releases... */
-		function reloadIfjSessionIdSet(){
-			/*<![CDATA[*/
-			var url = '[[@{/resources}]]';
-			/*]]>*/
-			
-			if(url.indexOf('jsessionid=') >= 0){
-				location.reload();
-			}
-		}
-		
-		reloadIfjSessionIdSet();
-	</script>
+
 </head>
 <body>
 	<div class="site-wrapper">
@@ -65,7 +44,7 @@
 					<p class="lead">Roster Guru is designed to take the pain out of
 						generating and maintaining duty rosters.</p>
 					<p class="lead">
-						<a href="#" class="btn btn-lg btn-default">Learn more</a>
+						<a href="#" class="btn btn-lg btn-primary">Learn more</a>
 					</p>
 				</div>
 
