@@ -327,7 +327,7 @@ public class PersonService {
 			final String key = entry.getKey();
 			final List<String> vals = entry.getValue();
 
-			if (key != null && vals != null && vals.size() > 0 && key.startsWith("duty_")) {
+			if (key != null && vals != null && !vals.isEmpty() && key.startsWith("duty_")) {
 				final long dutyId = Long.parseLong(key.split("_")[1]);
 				final int prefRanking = Integer.parseInt(vals.get(0));
 				dutyPrefs.put(dutyId, prefRanking);
