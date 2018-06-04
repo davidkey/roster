@@ -6,18 +6,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
@@ -33,7 +31,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
-
 import com.dak.duty.api.util.DutyNode;
 import com.dak.duty.exception.InvalidIdException;
 import com.dak.duty.exception.RosterSecurityException;
@@ -53,7 +50,6 @@ import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.repository.specification.PersonSpecs;
 import com.dak.duty.security.IAuthenticationFacade;
 import com.dak.duty.service.facade.IPasswordResetTokenFacade;
-
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -62,10 +58,10 @@ import lombok.RequiredArgsConstructor;
 public class PersonService {
 
 	private static final Logger logger = LoggerFactory.getLogger(PersonService.class);
-	
+
 	private static final Integer DUTY_CHANCE_NEVER = -1;
 	private static final Integer DUTY_CHANCE_LOWEST = 0;
-	
+
 	private static final Integer EXPIRE_MIN = 90;
 
 	private final PersonRepository personRepos;
@@ -174,7 +170,7 @@ public class PersonService {
 	public String getPasswordRequirements() {
 		return "Password must be at least 6 digits";
 	}
-	
+
 	public List<DutyNode> getUpcomingDuties(final Person person) {
 		return this.eventRepos.findAllByRoster_PersonAndDateEventGreaterThanEqualOrderByDateEventAsc(person, this.intervalService.getCurrentSystemDate()).stream()
 			.map(Event::getRoster)
@@ -216,7 +212,7 @@ public class PersonService {
 		}
 
 		if (!force && person.getOrganisation() != null
-				&& !person.getOrganisation().getId().equals(this.authenticationFacade.getOrganisation().getId())) {
+			&& !person.getOrganisation().getId().equals(this.authenticationFacade.getOrganisation().getId())) {
 			throw new RosterSecurityException("can't do that");
 		}
 
@@ -235,10 +231,10 @@ public class PersonService {
 	public Optional<Person> getPersonForDuty(@NonNull final Duty duty, final EventRoster currentEventRoster, @NonNull final Set<Person> peopleExcluded) {
 		return this.getPersonForDutyExcludedById(duty, currentEventRoster, peopleExcluded.stream().map(Person::getId).collect(Collectors.toSet()));
 	}
-	
+
 	public Optional<Person> getPersonForDutyExcludedById(@NonNull final Duty duty, final EventRoster currentEventRoster, @NonNull final Set<Long> peopleIdsExcluded) {
 		final List<Person> people = this.personRepos
-				.findAll(PersonSpecs.isActive().and(PersonSpecs.sameOrg()).and(PersonSpecs.hasDuty(duty)));
+			.findAll(PersonSpecs.isActive().and(PersonSpecs.sameOrg()).and(PersonSpecs.hasDuty(duty)));
 		if (CollectionUtils.isEmpty(people)) {
 			return Optional.empty();
 		}
@@ -261,27 +257,27 @@ public class PersonService {
 				personPreferenceRanking.put(person, this.getDutyPreference(person, duty));
 			}
 		}
-		
+
 		// build list for enumerated distribution
 		final List<Pair<Person,Double>> itemWeights = personPreferenceRanking.entrySet().stream()
 			.filter(e -> e.getValue() > DUTY_CHANCE_LOWEST)
 			.map(e -> new Pair<Person, Double>(e.getKey(), Double.valueOf(e.getValue())))
 			.collect(Collectors.toList());
-		
+
 		// if there's nobody available w/ a duty chance > 0, add all the 0s to the distribution with a weight of 1 (equal chance)
 		if(itemWeights.isEmpty()) {
 			itemWeights.addAll(
-					personPreferenceRanking.entrySet().stream()
-					.filter(e -> e.getValue() == DUTY_CHANCE_LOWEST)
-					.map(e -> new Pair<Person, Double>(e.getKey(), 1d))
-					.collect(Collectors.toList())
-					);
+				personPreferenceRanking.entrySet().stream()
+				.filter(e -> e.getValue().equals(DUTY_CHANCE_LOWEST))
+				.map(e -> new Pair<Person, Double>(e.getKey(), 1d))
+				.collect(Collectors.toList())
+				);
 		}
 
 		return CollectionUtils.isEmpty(itemWeights) 
-				? Optional.empty() : Optional.of(new EnumeratedDistribution<>(itemWeights).sample());
+			? Optional.empty() : Optional.of(new EnumeratedDistribution<>(itemWeights).sample());
 	}
-	
+
 	private Set<Long> getPeopleServingDutyById(@NonNull final Duty duty, @NonNull final EventRoster currentEventRoster){
 		return getPeopleServingDuty(duty, currentEventRoster).stream().map(Person::getId).collect(Collectors.toSet());
 	}
@@ -290,7 +286,7 @@ public class PersonService {
 		if(currentEventRoster.getDutiesAndPeople() == null) {
 			return Collections.emptySet();
 		}
-		
+
 		return currentEventRoster.getDutiesAndPeople().stream()
 			.filter(e -> e.getKey() != null && e.getValue() != null)
 			.filter(e -> e.getKey().getId() == duty.getId())
@@ -302,13 +298,13 @@ public class PersonService {
 		if(er == null) {
 			return Collections.emptySet();
 		}
-		
+
 		return er.getDutiesAndPeople().stream().map(Entry::getValue).filter(Objects::nonNull).collect(Collectors.toSet());
 	}
 
 	private int getDutyPreference(@NonNull final Person p, @NonNull final Duty duty) {
 		Optional<PersonDuty> personDuty = p.getDuties().stream().filter(pd -> pd.getDuty().getId() == duty.getId()).findFirst();
-		
+
 		if(personDuty.isPresent()) {
 			return personDuty.get().getWeightedPreference();
 		} else {
@@ -319,39 +315,28 @@ public class PersonService {
 	@Transactional
 	public void updateDutiesFromFormPost(@NonNull final Person person, @NonNull final MultiValueMap<String, String> parameters) {
 		logger.debug("updateDutesForPersonFromFormPost({})", person.getId());
+		
+		final Map<Long, Integer> dutyPrefs = parameters.entrySet().stream()
+			.filter(this::isValidDutyFormPostEntry)
+			.collect(Collectors.toMap(e -> Long.parseLong(e.getKey().split("_")[1]), e -> Integer.parseInt(e.getValue().get(0))));
 
-		final Map<Long, Integer> dutyPrefs = new HashMap<>();
+		final AtomicBoolean personUpdated = new AtomicBoolean(false);
 
-		for (final Iterator<Entry<String, List<String>>> iter = parameters.entrySet().iterator(); iter.hasNext();) {
-			final Entry<String, List<String>> entry = iter.next();
-			final String key = entry.getKey();
-			final List<String> vals = entry.getValue();
+		dutyPrefs.entrySet().stream()
+			.filter(e -> e.getKey() != null && e.getKey() >= 0)
+			.forEach(entry -> {
+				final Duty duty = this.dutyRepos.findOne(entry.getKey());
+				person.addOrUpdateDutyAndPreference(duty, entry.getValue());
+				personUpdated.set(true);
+			});
 
-			if (key != null && vals != null && !vals.isEmpty() && key.startsWith("duty_")) {
-				final long dutyId = Long.parseLong(key.split("_")[1]);
-				final int prefRanking = Integer.parseInt(vals.get(0));
-				dutyPrefs.put(dutyId, prefRanking);
-			}
-		}
-
-		logger.info("Duty Prefs: {}", dutyPrefs);
-
-		boolean personUpdated = false;
-		for (final Map.Entry<Long, Integer> entry : dutyPrefs.entrySet()) {
-			final Long dutyId = entry.getKey();
-
-			if (dutyId != null && dutyId >= 0) {
-				final Duty duty = this.dutyRepos.findOne(dutyId);
-				final int prefRanking = entry.getValue();
-
-				person.addOrUpdateDutyAndPreference(duty, prefRanking);
-				personUpdated = true;
-			}
-		}
-
-		if (personUpdated) {
+		if (personUpdated.get()) {
 			this.save(person);
 		}
+	}
+	
+	private Boolean isValidDutyFormPostEntry(final Entry<String, List<String>> entry) {
+		return entry.getKey() != null && entry.getValue() != null && !entry.getValue().isEmpty() && entry.getKey().startsWith("duty_");
 	}
 
 }
