@@ -16,7 +16,7 @@ import com.dak.duty.exception.RosterSecurityException;
 import com.dak.duty.exception.SortOrderException;
 import com.dak.duty.model.Duty;
 import com.dak.duty.repository.DutyRepository;
-import com.dak.duty.security.IAuthenticationFacade;
+import com.dak.duty.security.AuthenticationFacade;
 import com.dak.duty.service.container.SortOrder;
 
 @Service
@@ -24,11 +24,11 @@ import com.dak.duty.service.container.SortOrder;
 public class DutyService {
 
 	private final DutyRepository dutyRepos;
-	private final IAuthenticationFacade authenticationFacade;
+	private final AuthenticationFacade authenticationFacade;
 	private final DateTimeFormatter fmt;
 	
 	@Autowired
-	public DutyService(final DutyRepository dutyRepos, final IAuthenticationFacade authenticationFacade) {
+	public DutyService(final DutyRepository dutyRepos, final AuthenticationFacade authenticationFacade) {
 		this.dutyRepos = dutyRepos;
 		this.authenticationFacade = authenticationFacade;
 		this.fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
@@ -37,8 +37,8 @@ public class DutyService {
 	public Duty saveOrUpdateDuty(final Duty duty) {
 
 		if (duty.getOrganisation() == null) {
-			duty.setOrganisation(this.authenticationFacade.getOrganisation());
-		} else if (!duty.getOrganisation().getId().equals(this.authenticationFacade.getOrganisation().getId())) {
+			duty.setOrganisation(this.authenticationFacade.getOrganisation().get());
+		} else if (!duty.getOrganisation().getId().equals(this.authenticationFacade.getOrganisation().get().getId())) {
 			throw new RosterSecurityException("can't do that");
 		}
 

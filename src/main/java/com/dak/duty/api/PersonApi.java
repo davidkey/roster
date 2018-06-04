@@ -21,7 +21,7 @@ import com.dak.duty.api.util.JsonResponse.ResponseStatus;
 import com.dak.duty.exception.RosterSecurityException;
 import com.dak.duty.model.Person;
 import com.dak.duty.repository.PersonRepository;
-import com.dak.duty.security.IAuthenticationFacade;
+import com.dak.duty.security.AuthenticationFacade;
 import com.dak.duty.service.PersonService;
 
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class PersonApi {
 	private final PersonRepository personRepos;
 	private final PersonService personService;
 	private final PasswordEncoder encoder;
-	private final IAuthenticationFacade authenticationFacade;
+	private final AuthenticationFacade authenticationFacade;
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(method = RequestMethod.DELETE)
@@ -87,7 +87,7 @@ public class PersonApi {
 						"Password does not meet requirements: " + this.personService.getPasswordRequirements());
 			}
 
-			if (!personToUpdate.getOrganisation().getId().equals(this.authenticationFacade.getOrganisation().getId())) {
+			if (!personToUpdate.getOrganisation().getId().equals(this.authenticationFacade.getOrganisation().get().getId())) {
 				throw new RosterSecurityException("can't do that");
 			}
 

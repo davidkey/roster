@@ -1,36 +1,23 @@
 package com.dak.duty.security;
 
+import java.util.Optional;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 
 import com.dak.duty.model.Organisation;
 import com.dak.duty.model.Person;
 
-@Component
-public class AuthenticationFacade implements IAuthenticationFacade {
+public interface AuthenticationFacade {
+	Authentication getAuthentication();
 
-	@Override
-	public Authentication getAuthentication() {
-		return SecurityContextHolder.getContext().getAuthentication();
-	}
+	Optional<Organisation> getOrganisation();
 
-	@Override
-	public Organisation getOrganisation() {
-		return this.getPerson().getOrganisation(); // this could be null - problem?
-	}
-
-	@Override
-	public Person getPerson() {
-		Person p = new Person();
-
-		try {
-			p = ((CustomUserDetails) this.getAuthentication().getPrincipal()).getPerson();
-		} catch (final ClassCastException cce) {
-			// do nothing - give them a blank person
-		}
-
-		return p;
-	}
-
+	/**
+	 * Caution: Be careful with this method. SecurityContext Person entity is NOT updated after login, so any changes
+	 * (preferences, duties, etc) won't be updated in this particular instance. <br/>
+	 * <br/>
+	 * You'll want to *refresh* the Person from persistence layer if you need up-to-date data:<br/>
+	 * Example: personRepos.findOne(authenciationFacade.getPerson().getId())
+	 * @return Person
+	 */
+	Optional<Person> getPerson();
 }

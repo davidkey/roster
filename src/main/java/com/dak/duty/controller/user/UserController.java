@@ -16,7 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.dak.duty.form.ChangePasswordForm;
 import com.dak.duty.model.Person;
-import com.dak.duty.security.IAuthenticationFacade;
+import com.dak.duty.security.AuthenticationFacade;
 import com.dak.duty.service.PersonService;
 
 import lombok.RequiredArgsConstructor;
@@ -30,12 +30,12 @@ public class UserController {
 	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
 	private final PersonService personService;
-	private final IAuthenticationFacade authenticationFacade;
+	private final AuthenticationFacade authenticationFacade;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getUserHome(final Model model, final Principal principal) {
 		logger.debug("getUserHome");
-		final Person p = this.authenticationFacade.getPerson();
+		final Person p = this.authenticationFacade.getPerson().get();
 
 		model.addAttribute("personName", p.getNameFirst() + " " + p.getNameLast());
 		return "user/user";
@@ -54,7 +54,7 @@ public class UserController {
 			final Principal principal, final RedirectAttributes redirectAttributes) {
 		logger.debug("changePasswordPost({})", principal.getName());
 
-		final Person person = this.authenticationFacade.getPerson();
+		final Person person = this.authenticationFacade.getPerson().get();
 		final boolean currentPasswordMatches = this.personService.isCurrentPassword(person, form.getCurrentPassword());
 
 		if (bindingResult.hasErrors() || !form.getNewPassword().equals(form.getNewPasswordConfirm()) || !currentPasswordMatches) {

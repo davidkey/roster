@@ -12,7 +12,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.PersonRepository;
-import com.dak.duty.security.IAuthenticationFacade;
+import com.dak.duty.security.AuthenticationFacade;
 import com.dak.duty.service.PersonService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,12 +27,12 @@ public class PreferencesController {
 	private final DutyRepository dutyRepos;
 	private final PersonService personService;
 	private final PersonRepository personRepos;
-	private final IAuthenticationFacade authenciationFacade;
+	private final AuthenticationFacade authenciationFacade;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getPreferences(final Model model) {
 
-		model.addAttribute("person", this.personRepos.findOne(this.authenciationFacade.getPerson().getId()));
+		model.addAttribute("person", this.personRepos.findOne(this.authenciationFacade.getPerson().get().getId()));
 		model.addAttribute("duties", this.dutyRepos.findAllByActiveTrueOrderByNameAsc());
 
 		return "user/preferences";
@@ -43,7 +43,7 @@ public class PreferencesController {
 			final RedirectAttributes redirectAttributes) {
 		logger.debug("savePreferences()");
 
-		this.personService.updateDutiesFromFormPost(this.personRepos.findOne(this.authenciationFacade.getPerson().getId()), parameters);
+		this.personService.updateDutiesFromFormPost(this.personRepos.findOne(this.authenciationFacade.getPerson().get().getId()), parameters);
 		redirectAttributes.addFlashAttribute("msg_success", "Duties updated!");
 		return "redirect:/user/preferences";
 	}

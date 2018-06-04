@@ -24,7 +24,7 @@ import com.dak.duty.model.Person;
 import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.repository.specification.PersonSpecs;
-import com.dak.duty.security.IAuthenticationFacade;
+import com.dak.duty.security.AuthenticationFacade;
 import com.dak.duty.service.PersonService;
 
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ public class PeopleAdminController {
 	private final PersonRepository personRepos;
 	private final PersonService personService;
 	private final DutyRepository dutyRepos;
-	private final IAuthenticationFacade authenticationFacade;
+	private final AuthenticationFacade authenticationFacade;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getPeople(final Model model) {
@@ -62,7 +62,7 @@ public class PeopleAdminController {
 
 		if (personAlreadyExisted) {
 			if (!this.personRepos.findOne(person.getId()).getOrganisation().getId()
-					.equals(this.authenticationFacade.getOrganisation().getId())) {
+					.equals(this.authenticationFacade.getOrganisation().get().getId())) {
 				throw new RosterSecurityException("can't do that!");
 			}
 
@@ -83,7 +83,7 @@ public class PeopleAdminController {
 
 		if (!personAlreadyExisted) {
 			person.addRoles(this.personService.getDefaultRoles());
-			person.setOrganisation(this.authenticationFacade.getOrganisation());
+			person.setOrganisation(this.authenticationFacade.getOrganisation().get());
 		}
 
 		this.personService.save(person);

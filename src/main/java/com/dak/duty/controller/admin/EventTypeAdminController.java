@@ -21,7 +21,7 @@ import com.dak.duty.model.EventType;
 import com.dak.duty.model.enums.EventTypeInterval;
 import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.EventTypeRepository;
-import com.dak.duty.security.IAuthenticationFacade;
+import com.dak.duty.security.AuthenticationFacade;
 import com.dak.duty.service.EventService;
 
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ public class EventTypeAdminController {
 	private final EventTypeRepository eventTypeRepos;
 	private final EventService eventService;
 	private final DutyRepository dutyRepos;
-	private final IAuthenticationFacade authenticationFacade;
+	private final AuthenticationFacade authenticationFacade;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getEventTypes(final Model model) {
@@ -67,10 +67,10 @@ public class EventTypeAdminController {
 		}
 
 		if (alreadyExisted && !this.eventTypeRepos.findOne(eventType.getId()).getOrganisation().getId()
-				.equals(this.authenticationFacade.getOrganisation().getId())) {
+				.equals(this.authenticationFacade.getOrganisation().get().getId())) {
 			throw new SecurityException("can't do that");
 		} else {
-			eventType.setOrganisation(this.authenticationFacade.getOrganisation());
+			eventType.setOrganisation(this.authenticationFacade.getOrganisation().get());
 		}
 
 		this.eventService.saveEventType(eventType);

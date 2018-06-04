@@ -40,7 +40,7 @@ import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.EventTypeRepository;
 import com.dak.duty.repository.PersonRepository;
-import com.dak.duty.security.IAuthenticationFacade;
+import com.dak.duty.security.AuthenticationFacade;
 import com.dak.duty.service.IntervalService.EventTypeDetailNode;
 import com.dak.duty.service.container.EventCalendarNode;
 import com.dak.duty.service.container.comparable.EventCalendarNodeSortByDate;
@@ -59,7 +59,7 @@ public class EventService {
 	private final EventTypeRepository eventTypeRepos;
 	private final IntervalService intervalService;
 	private final DutyRepository dutyRepos;
-	private final IAuthenticationFacade authenticationFacade;
+	private final AuthenticationFacade authenticationFacade;
 	
 	@Autowired
 	public EventService (
@@ -69,7 +69,7 @@ public class EventService {
 			final EventTypeRepository eventTypeRepos,
 			final IntervalService intervalService,
 			final DutyRepository dutyRepos,
-			final IAuthenticationFacade authenticationFacade) {
+			final AuthenticationFacade authenticationFacade) {
 		this.personRepos = personRepos;
 		this.personService = personService;
 		this.eventRepos = eventRepos;
@@ -175,10 +175,10 @@ public class EventService {
 
 	public EventType saveEventType(final EventType eventType) {
 
-		if (eventType.getOrganisation() != null && !eventType.getOrganisation().getId().equals(this.authenticationFacade.getOrganisation().getId())) {
+		if (eventType.getOrganisation() != null && !eventType.getOrganisation().getId().equals(this.authenticationFacade.getOrganisation().get().getId())) {
 			throw new RosterSecurityException("can't do that");
 		} else {
-			eventType.setOrganisation(this.authenticationFacade.getOrganisation());
+			eventType.setOrganisation(this.authenticationFacade.getOrganisation().get());
 		}
 
 		if (EventTypeInterval.DAILY.equals(eventType.getInterval())) {

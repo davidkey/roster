@@ -48,7 +48,7 @@ import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.repository.specification.PersonSpecs;
-import com.dak.duty.security.IAuthenticationFacade;
+import com.dak.duty.security.AuthenticationFacade;
 import com.dak.duty.service.facade.IPasswordResetTokenFacade;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -68,7 +68,7 @@ public class PersonService {
 	private final EventRepository eventRepos;
 	private final DutyRepository dutyRepos;
 	private final IntervalService intervalService;
-	private final IAuthenticationFacade authenticationFacade;
+	private final AuthenticationFacade authenticationFacade;
 	private final PasswordEncoder encoder;
 	private final AuthenticationManager authenticationManager;
 	private final IPasswordResetTokenFacade passwordResetTokenGenerator;
@@ -212,7 +212,7 @@ public class PersonService {
 		}
 
 		if (!force && person.getOrganisation() != null
-			&& !person.getOrganisation().getId().equals(this.authenticationFacade.getOrganisation().getId())) {
+			&& !person.getOrganisation().getId().equals(this.authenticationFacade.getOrganisation().get().getId())) {
 			throw new RosterSecurityException("can't do that");
 		}
 
