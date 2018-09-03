@@ -40,6 +40,13 @@ public class DutyApi {
 		duty = this.dutyService.softDeleteDuty(duty);
 		return new JsonResponse(ResponseStatus.OK, "Duty " + duty.getId() + " deleted");
 	}
+	
+	@RequestMapping(value = "/all", method = RequestMethod.GET)
+	public @ResponseBody List<Duty> getAllDuties(){
+		logger.trace("getAllDuties()");
+		
+		return this.dutyRepos.findAllByActiveTrueOrderByNameAsc();
+	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public @ResponseBody Duty get(@PathVariable("id") final Long id) {

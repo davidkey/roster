@@ -39,6 +39,7 @@ import com.dak.duty.exception.InvalidIdException;
 import com.dak.duty.exception.RosterSecurityException;
 import com.dak.duty.exception.UsernameAlreadyExists;
 import com.dak.duty.model.Duty;
+import com.dak.duty.model.DutyPreference;
 import com.dak.duty.model.Email;
 import com.dak.duty.model.Event;
 import com.dak.duty.model.EventRoster;
@@ -118,6 +119,10 @@ public class PersonService {
 		velocityEngine.mergeTemplate("velocity/passwordReset.vm", "UTF-8", context, stringWriter);
 
 		this.emailService.send(new Email("admin@roster.guru", person.getEmailAddress(), "Password Reset Initiated", stringWriter.toString()));
+	}
+	
+	public Authentication attemptAuthentication(final String username, final String password) {
+		return this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 	}
 
 	public boolean loginAsPerson(final String username, final String password, final HttpServletRequest request) {
@@ -314,6 +319,17 @@ public class PersonService {
 		} else {
 			return -1;
 		}
+	}
+	
+	public void updateDutiesFromDutyPreference(@NonNull final Person person, @NonNull final List<DutyPreference> dutyPreferences) {
+		for(DutyPreference df : dutyPreferences) {
+			final Duty duty = this.dutyRepos.findOne(df.getDutyId());
+			final int prefRanking = df.getPreference();
+			
+			person.addOrUpdateDutyAndPreference(duty, prefRanking);
+		}
+		
+		this.save(person);
 	}
 
 	@Transactional

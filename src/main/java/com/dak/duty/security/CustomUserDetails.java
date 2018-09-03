@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
 
+import com.dak.duty.config.jwt.JwtUser;
 import com.dak.duty.model.Person;
 
 import lombok.Getter;
@@ -22,6 +23,10 @@ public class CustomUserDetails extends org.springframework.security.core.userdet
 
 	public CustomUserDetails(final String username, final String password, final Collection<? extends GrantedAuthority> authorities) {
 		super(username, password, authorities);
+	}
+	
+	public CustomUserDetails(final JwtUser jwtUser) {
+		this(jwtUser.getPerson(), jwtUser.getAuthorities());
 	}
 
 	@Override

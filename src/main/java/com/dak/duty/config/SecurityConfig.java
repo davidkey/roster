@@ -1,92 +1,110 @@
 package com.dak.duty.config;
 
-import java.util.Random;
+import java.util.Arrays;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.annotation.Order;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.dak.duty.config.jwt.JwtAuthenticationEntryPoint;
+import com.dak.duty.config.jwt.JwtAuthorizationTokenFilter;
+import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.security.SecurityEvaluationContextExtension;
 
-// @Configuration
-// @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
-@Order(SecurityProperties.BASIC_AUTH_ORDER - 1) // max order
+import lombok.extern.slf4j.Slf4j;
+
+@Profile("!oldSecurity")
+@Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+@Slf4j
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-	private static final Logger LOGGER = LoggerFactory.getLogger(SecurityConfig.class);
 	
 	@Autowired
-	UserDetailsService userDetailsService;
+	private JwtAuthenticationEntryPoint unauthorizedHandler;
+	
+	@Value("${jwt.signingKey}")
+	private String signingKey;
+	
+	@Autowired
+	private UserDetailsService userDetailsService;
 
 	@Autowired
-	PasswordEncoder encoder;
+	private PasswordEncoder encoder;
+	
+	@Autowired
+	private PersonRepository personRepos;
+
 
 	@Override
-	protected void configure(final HttpSecurity http) throws Exception {
-		LOGGER.debug("configure(http)");
+	protected void configure(HttpSecurity httpSecurity) throws Exception {
+		httpSecurity
+		.csrf().disable()
+		.cors().configurationSource(corsConfigurationSource()).and() 
+		.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+		.authorizeRequests()
+			.antMatchers("/css/**", "/fonts/**", "/js/**", "/login").permitAll()     
+			.antMatchers("/account/**").fullyAuthenticated()
+			.anyRequest().permitAll();
 
-		http.authorizeRequests()
-			.antMatchers("/login", "/logout", "/console/**", "/info").permitAll()
-			.antMatchers("/admin/**").hasRole("ADMIN")
-			.antMatchers("/user/**").hasRole("USER")
-			.antMatchers("/h2-console/**").permitAll()
-				// .anyRequest().fullyAuthenticated()
-		.and()
-			.formLogin().loginPage("/login").defaultSuccessUrl("/user").failureUrl("/login?error=true")
-		.and()
-			.logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).deleteCookies("JSESSIONID").invalidateHttpSession(true)
-		.and()
-			.exceptionHandling().accessDeniedPage("/error?error=accessdenied")
-		.and()
-			.csrf().ignoringAntMatchers("/h2-console/**")
-		.and()
-			.headers().frameOptions().sameOrigin()
-			;
+		// Custom JWT based security filter
+		final JwtAuthorizationTokenFilter authenticationTokenFilter = new JwtAuthorizationTokenFilter(signingKey, personRepos);
+		
+		httpSecurity
+			.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+
+		// disable page caching
+		httpSecurity
+			.headers()
+				.frameOptions().sameOrigin()  // required to set for H2 else H2 Console will be blank.
+				.cacheControl();
 	}
-
-	@Override
-	protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
-		LOGGER.debug("configure(auth)");
-		auth.authenticationProvider(this.authProvider());
+	
+	@Bean
+	CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.setAllowedHeaders(Arrays.asList("*"));
+		configuration.setExposedHeaders(Arrays.asList("Authorization"));
+		configuration.setAllowedOrigins(Arrays.asList("*"));
+		configuration.setAllowedMethods(Arrays.asList("*"));
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
 	}
-
+	
 	@Bean
 	public DaoAuthenticationProvider authProvider() {
-		LOGGER.debug("DaoAuthenticationProvider authProvider()");
+		log.debug("DaoAuthenticationProvider authProvider()");
 		final DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 		authProvider.setUserDetailsService(this.userDetailsService);
 		authProvider.setPasswordEncoder(encoder);
 		return authProvider;
 	}
-
+	
 	@Bean
 	@Override
 	public AuthenticationManager authenticationManagerBean() throws Exception {
 		return super.authenticationManagerBean();
 	}
-
+	
 	@Bean
 	public SecurityEvaluationContextExtension getSecurityEvaluationContextExtension() {
 		return new SecurityEvaluationContextExtension();
 	}
-	
-	@Bean
-	public Random getRand() {
-		return new Random();
-	}
-
 
 
 }
