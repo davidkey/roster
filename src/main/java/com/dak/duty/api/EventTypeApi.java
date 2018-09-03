@@ -1,5 +1,7 @@
 package com.dak.duty.api;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -55,5 +57,12 @@ public class EventTypeApi {
 		eventType = this.eventService.saveEventType(eventType);
 
 		return new JsonResponse(ResponseStatus.OK, "Event saved with id " + eventType.getId());
+	}
+	
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@RequestMapping(value = "/all", method = RequestMethod.GET)
+	public @ResponseBody List<EventType> getAll() {
+		logger.debug("getAll()");
+		return eventTypeRepos.findAll();
 	}
 }
