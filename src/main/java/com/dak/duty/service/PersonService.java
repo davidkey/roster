@@ -1,10 +1,12 @@
 package com.dak.duty.service;
 
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -25,9 +27,12 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
@@ -38,6 +43,7 @@ import com.dak.duty.api.util.DutyNode;
 import com.dak.duty.exception.InvalidIdException;
 import com.dak.duty.exception.RosterSecurityException;
 import com.dak.duty.exception.UsernameAlreadyExists;
+import com.dak.duty.model.AuthRequest;
 import com.dak.duty.model.Duty;
 import com.dak.duty.model.DutyPreference;
 import com.dak.duty.model.Email;
@@ -52,9 +58,13 @@ import com.dak.duty.repository.DutyRepository;
 import com.dak.duty.repository.EventRepository;
 import com.dak.duty.repository.PersonRepository;
 import com.dak.duty.repository.specification.PersonSpecs;
+import com.dak.duty.security.CustomUserDetails;
 import com.dak.duty.security.IAuthenticationFacade;
 import com.dak.duty.service.facade.IPasswordResetTokenFacade;
 
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -63,6 +73,9 @@ import lombok.RequiredArgsConstructor;
 public class PersonService {
 
 	private static final Logger logger = LoggerFactory.getLogger(PersonService.class);
+	
+	@Value("${jwt.signingKey}")
+	private String signingKey;
 	
 	private static final Integer DUTY_CHANCE_NEVER = -1;
 	private static final Integer DUTY_CHANCE_LOWEST = 0;
@@ -123,6 +136,41 @@ public class PersonService {
 	
 	public Authentication attemptAuthentication(final String username, final String password) {
 		return this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+	}
+	
+	public String getJwtForUser(final AuthRequest authRequest) {
+		final Authentication auth;
+		try {
+			auth = this.attemptAuthentication(authRequest.getUsername(), authRequest.getPassword());
+		} catch (AuthenticationException ae) {
+			logger.debug("auth failed for user {}", authRequest.getUsername(), ae);
+			throw new RuntimeException("auth failed for user " + authRequest.getUsername());
+		}
+
+		Map<String, Object> additionalClaims = new HashMap<>();
+
+		final CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
+		
+		additionalClaims.put("roles", auth.getAuthorities().stream().map(a -> a.getAuthority()).collect(Collectors.toList()));
+		additionalClaims.put("fullName", user.getPerson().getNameFirst() + " " + user.getPerson().getNameLast());
+		additionalClaims.put("orgId", user.getPerson().getOrganisation().getId());
+		additionalClaims.put("orgName", user.getPerson().getOrganisation().getName());
+
+		JwtBuilder builder = Jwts.builder().setId(authRequest.getUsername())
+				.setIssuedAt(new Date())
+				.setSubject("roster")
+				.setIssuer("roster.guru")
+				.addClaims(additionalClaims)
+				.setExpiration(new Date(new Date().getTime() + 1000 * 60 * 60 * 12)) // 12 hours
+				//.setExpiration(new Date(new Date().getTime() + 1000 * 60 * 6)) // 6 minutes
+				.signWith(SignatureAlgorithm.HS256, signingKey.getBytes(Charset.forName("UTF-8")));
+
+		final String jwt = builder.compact();
+
+		final HttpHeaders header = new HttpHeaders();
+		header.set(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
+
+		return jwt;
 	}
 
 	public boolean loginAsPerson(final String username, final String password, final HttpServletRequest request) {
