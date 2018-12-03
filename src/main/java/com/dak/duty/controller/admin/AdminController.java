@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dak.duty.service.InitialisationService;
 import com.dak.duty.service.VersionService;
+import com.dak.duty.service.VersionServiceKotlin;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +23,7 @@ public class AdminController {
 
 	private final InitialisationService initService;
 	private final VersionService versionService;
+	private final VersionServiceKotlin versionServiceKotlin;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String getAdminHome(final Model model) {
@@ -39,9 +41,13 @@ public class AdminController {
 	public String getAbout(final Model model) {
 		logger.debug("getAbout()");
 		
-		model.addAttribute("version", versionService.getVersion());
-		model.addAttribute("commitId", versionService.getCommitId());
-		model.addAttribute("buildTimestamp", versionService.getTimestamp());
+//		model.addAttribute("version", versionService.getVersion());
+//		model.addAttribute("commitId", versionService.getCommitId());
+//		model.addAttribute("buildTimestamp", versionService.getTimestamp());
+		
+		model.addAttribute("version", versionServiceKotlin.getVersion());
+		model.addAttribute("commitId", versionServiceKotlin.getCommitId());
+		model.addAttribute("buildTimestamp", versionServiceKotlin.getTimestamp());
 		return "admin/about";
 	}
 

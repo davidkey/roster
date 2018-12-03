@@ -22,3 +22,5 @@ target/
 */svn/**
 *.pid
 .checkstyle
+
+\.factorypath
