@@ -1,4 +1,7 @@
 node {
+   stage 'checkout scm' {
+  //	checkout scm 
+   }
    stage('Test') {
        // steps {
             sh 'pwd'
