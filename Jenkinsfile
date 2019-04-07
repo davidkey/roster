@@ -13,8 +13,14 @@ node {
 
    stage('Build') {
        // steps {
-            sh "./mvnw clean package -DskipTests=true"
+            sh "./mvnw package -DskipTests=true"
             step([$class: 'ArtifactArchiver', artifacts: '**/target/*.jar', fingerprint: true])
       //  }
+   }
+
+   post {
+	always {
+		junit 'target/surefire-reports/*.xml'
+	}
    }
 }
